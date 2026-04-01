@@ -15,6 +15,9 @@ import Orders from "./pages/amdin/orders/Orders";
 import OrderDetailsPage from "./pages/amdin/orders/OrderDetailsPage";
 import Inventory from "./pages/amdin/inventory/Inventory";
 import LowStockAlerts from "./pages/amdin/inventory/LowStock";
+import Customers from "./pages/amdin/customers/Customers";
+import CustomerDetailsPage from "./pages/amdin/customers/CustomerDetailsPage";
+import CustomerFormPage from "./pages/amdin/customers/CustomerFormPage";
 
 // Dummy components for example
 
@@ -45,6 +48,11 @@ function App() {
           {/* 🔥 Order Routes */}
           <Route path="orders" element={<Orders />} />
           <Route path="orders/:id" element={<OrderDetailsPage />} />
+          {/* 🔥 Customer Routes */}
+          <Route path="customers" element={<Customers />} />
+          <Route path="customers/:id" element={<CustomerDetailsPage />} />
+          <Route path="customers/add" element={<CustomerFormPage />} />
+          <Route path="customers/edit/:id" element={<CustomerFormPage />} />
         </Route>
         {/* 404 Not Found Route */}
         <Route
