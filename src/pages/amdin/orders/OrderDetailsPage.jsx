@@ -12,6 +12,7 @@ const OrderDetailsPage = () => {
   const [showStatusModal, setShowStatusModal] = useState(false);
 
   useEffect(() => {
+    console.log("Fetching details for order ID:", id);
     // Fetch order details
     const fetchOrder = async () => {
       setLoading(true);
@@ -23,7 +24,8 @@ const OrderDetailsPage = () => {
     };
     fetchOrder();
   }, [id]);
-
+  console.log("Order ID from URL:", id);
+  console.log("Order Details:", order);
   const handleUpdateStatus = async (status, note, sendEmail) => {
     // API call to update status
     console.log("Updating status:", status, note, sendEmail);
@@ -43,7 +45,7 @@ const OrderDetailsPage = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-(--color-primary)"></div>
       </div>
     );
   }
@@ -69,19 +71,19 @@ const OrderDetailsPage = () => {
             <div className="flex space-x-3">
               <button
                 onClick={() => setShowStatusModal(true)}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                className="px-4 py-2 cursor-pointer bg-(--color-primary) text-white rounded-md hover:bg-(--color-primary-hover)"
               >
                 Update Status
               </button>
               <button
                 onClick={handlePrintInvoice}
-                className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
+                className="px-4 py-2 cursor-pointer bg-gray-600 text-white rounded-md hover:bg-gray-700"
               >
                 Print Invoice
               </button>
               <button
                 onClick={handleSendEmail}
-                className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+                className="px-4 py-2 cursor-pointer bg-(--color-primary) text-white rounded-md hover:bg-(--color-primary-hover)"
               >
                 Send Email
               </button>
@@ -98,11 +100,11 @@ const OrderDetailsPage = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-gray-600">Order ID</p>
-                  <p className="font-medium">{order.id}</p>
+                  <p className="font-medium text-black">{order.id}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Date</p>
-                  <p className="font-medium">
+                  <p className="font-medium text-black">
                     {new Date(order.date).toLocaleString()}
                   </p>
                 </div>
@@ -187,7 +189,7 @@ const OrderDetailsPage = () => {
                       >
                         Subtotal:
                       </td>
-                      <td className="px-6 py-4 font-medium">
+                      <td className="px-6 py-4 font-medium text-black">
                         ${order.subtotal.toFixed(2)}
                       </td>
                     </tr>
@@ -198,7 +200,7 @@ const OrderDetailsPage = () => {
                       >
                         Shipping:
                       </td>
-                      <td className="px-6 py-4 font-medium">
+                      <td className="px-6 py-4 font-medium text-black">
                         ${order.shipping.toFixed(2)}
                       </td>
                     </tr>
@@ -209,7 +211,7 @@ const OrderDetailsPage = () => {
                       >
                         Total:
                       </td>
-                      <td className="px-6 py-4 font-bold text-lg">
+                      <td className="px-6 py-4 font-bold text-lg text-black">
                         ${order.total.toFixed(2)}
                       </td>
                     </tr>
@@ -229,19 +231,25 @@ const OrderDetailsPage = () => {
               <div className="space-y-3">
                 <div>
                   <p className="text-sm text-gray-600">Name</p>
-                  <p className="font-medium">{order.customer.name}</p>
+                  <p className="font-medium text-black">
+                    {order.customer.name}
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Email</p>
-                  <p className="font-medium">{order.customer.email}</p>
+                  <p className="font-medium text-black">
+                    {order.customer.email}
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Phone</p>
-                  <p className="font-medium">{order.customer.phone}</p>
+                  <p className="font-medium text-black">
+                    {order.customer.phone}
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Shipping Address</p>
-                  <p className="font-medium whitespace-pre-line">
+                  <p className="font-medium whitespace-pre-line text-black">
                     {order.customer.address}
                   </p>
                 </div>
@@ -256,7 +264,9 @@ const OrderDetailsPage = () => {
               <div className="space-y-3">
                 <div>
                   <p className="text-sm text-gray-600">Method</p>
-                  <p className="font-medium">{order.payment.method}</p>
+                  <p className="font-medium text-black">
+                    {order.payment.method}
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Transaction ID</p>
