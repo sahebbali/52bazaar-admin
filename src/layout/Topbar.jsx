@@ -5,6 +5,7 @@ const BREADCRUMBS = {
   category: ["Admin", "Catalog", "Category"],
   product: ["Admin", "Catalog", "Product"],
   order: ["Admin", "Sales", "Order"],
+  inventory: ["Admin", "Sales", "Inventory"],
   coupon: ["Admin", "Sales", "Coupons"],
   customers: ["Admin", "Customers"],
   settings: ["Admin", "Settings"],
@@ -34,7 +35,9 @@ export default function Topbar({ collapsed, onToggle, activeNav }) {
           <span key={i} className="flex items-center gap-1.5">
             {i < crumbs.length - 1 ? (
               <>
-                <span className="hover:text-green-600 cursor-pointer transition-colors">{c}</span>
+                <span className="hover:text-green-600 cursor-pointer transition-colors">
+                  {c}
+                </span>
                 <span className="text-gray-300 text-xs">›</span>
               </>
             ) : (

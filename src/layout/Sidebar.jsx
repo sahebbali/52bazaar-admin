@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import Logo from "../assets/logo/52-bazaar-logo.webp";
 import { Link, useLocation } from "react-router-dom";
+import Logo from "../assets/logo/52-bazaar-logo.webp";
 
 const NAV = [
   {
@@ -22,7 +22,6 @@ const NAV = [
         label: "Category",
         icon: "🗂️",
         path: "/admin/categories",
-        // sub: ["All Categories", "Add Category", "Sub Categories"],
       },
       {
         id: "product",
@@ -41,158 +40,240 @@ const NAV = [
         icon: "🛍️",
         badge: 12,
         path: "/admin/orders",
-        // sub: ["All Orders", "Pending", "Processing", "Delivered", "Returns"],
       },
       {
         id: "inventory",
         label: "Inventory",
         icon: "📦",
-        badge: 12,
+        badge: 8,
         path: "/admin/inventory",
-        // sub: ["All Inventory", "Low Stock", "Out of Stock"],
       },
-
-      { id: "coupon", label: "Coupons", icon: "🎟️" },
+      {
+        id: "coupon",
+        label: "Coupons",
+        icon: "🎟️",
+        path: "/admin/coupons",
+      },
     ],
   },
   {
     section: "Settings",
     items: [
-      { id: "customers", label: "Customers", icon: "👥" },
-      { id: "settings", label: "Settings", icon: "⚙️" },
+      {
+        id: "customers",
+        label: "Customers",
+        icon: "👥",
+        path: "/admin/customers",
+      },
+      {
+        id: "settings",
+        label: "Settings",
+        icon: "⚙️",
+        path: "/admin/settings",
+      },
     ],
   },
 ];
 
 export default function Sidebar({ collapsed, activeNav, onNavChange }) {
   const location = useLocation();
-  const pathnames = location.pathname.split("/").filter(Boolean);
-  console.log("Current path:", location.pathname);
-  const currentMainNav = location.pathname;
+  const [openSubs, setOpenSubs] = useState({});
 
-  const [openSubs, setOpenSubs] = useState({ order: true });
-  console.log("Active Nav:", activeNav, "Open Subs:", openSubs);
+  // Auto-expand current section based on active path
+  useEffect(() => {
+    const currentItem = NAV.flatMap((section) => section.items).find(
+      (item) => item.path === location.pathname,
+    );
+    if (currentItem && currentItem.sub) {
+      setOpenSubs((prev) => ({ ...prev, [currentItem.id]: true }));
+    }
+  }, [location.pathname]);
 
-  const toggleSub = (id) =>
+  const toggleSub = (id) => {
     setOpenSubs((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  const isActive = (path) => location.pathname === path;
 
   return (
     <aside
-      className={`fixed top-0 left-0 h-screen bg-(--color-primary) flex flex-col z-50 transition-all duration-300 ${
-        collapsed ? "w-16" : "w-62"
+      className={`fixed top-0 left-0 h-screen bg-gradient-to-b from-gray-900 to-gray-800 flex flex-col z-50 transition-all duration-300 shadow-2xl ${
+        collapsed ? "w-20" : "w-64"
       }`}
-      style={{ width: collapsed ? "64px" : "248px" }}
     >
-      {/* Logo */}
-      <div className="flex items-center gap-3 px-10 py-4 border-b border-white/10 flex-shrink-0">
-        {!collapsed && (
-          <div className="overflow-hidden">
-            <div className="hidden lg:flex items-center">
-              <Link to="/admin/dashboard" className="flex items-center group">
-                <img
-                  src={Logo}
-                  alt="52bazaar Logo"
-                  className="h-16 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
-                />
-              </Link>
-            </div>
-          </div>
+      {/* Logo Section */}
+      <div className="flex items-center justify-center h-20 border-b border-gray-700/50 flex-shrink-0">
+        {!collapsed ? (
+          <Link to="/admin/dashboard" className="flex items-center group">
+            <img
+              src={Logo}
+              alt="52bazaar Logo"
+              className="h-12 w-auto object-contain transition-all duration-300 group-hover:scale-105"
+            />
+            <span className="ml-2 text-xl font-bold bg-gradient-to-r from-green-400 to-emerald-500 bg-clip-text text-transparent">
+              52Bazaar
+            </span>
+          </Link>
+        ) : (
+          <Link to="/admin/dashboard" className="group">
+            <img
+              src={Logo}
+              alt="52bazaar Logo"
+              className="h-10 w-auto object-contain transition-all duration-300 group-hover:scale-110"
+            />
+          </Link>
         )}
       </div>
 
-      {/* Nav */}
-      <nav className="flex-1 py-3 px-2 overflow-y-auto scrollbar-hide">
+      {/* Navigation Container - No Scrollbar */}
+      <div
+        className="flex-1 overflow-y-auto py-4 px-3"
+        style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+      >
+        <style>
+          {`
+            .flex-1::-webkit-scrollbar {
+              display: none;
+            }
+          `}
+        </style>
         {NAV.map(({ section, items }) => (
-          <div key={section}>
+          <div key={section} className="mb-6">
             {!collapsed && (
-              <p className="text-white/30 text-[10px] uppercase tracking-widest font-semibold px-3 pt-4 pb-1">
-                {section}
-              </p>
-            )}
-            {collapsed && <div className="my-2 border-t border-white/10" />}
-
-            {items.map((item) => (
-              <div key={item.id}>
-                <Link
-                  to={item.path}
-                  onClick={() => {
-                    onNavChange(item.id);
-                    if (item.sub) toggleSub(item.id);
-                  }}
-                  className={`w-full cursor-pointer flex items-center gap-3 px-3 py-2.5 rounded-xl mb-0.5 transition-all duration-150 text-left group
-                    ${
-                      activeNav === item.id
-                        ? "bg-green-500 text-white shadow-lg shadow-green-900/40"
-                        : "text-white/60 hover:bg-white/8 hover:text-white"
-                    }
-                    ${collapsed ? "justify-center" : ""}
-                  `}
-                >
-                  <span
-                    className={`text-base flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg transition-all
-                    ${activeNav === item.path ? "bg-white/20" : "group-hover:bg-white/10"}`}
-                  >
-                    {item.icon}
-                  </span>
-
-                  {!collapsed && (
-                    <>
-                      <span className="text-sm font-medium flex-1 truncate">
-                        {item.label}
-                      </span>
-                      {item.badge && (
-                        <span className="bg-orange-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full font-mono">
-                          {item.badge}
-                        </span>
-                      )}
-                      {item.sub && (
-                        <span
-                          className={`text-[10px] opacity-50 transition-transform duration-200 ${
-                            openSubs[item.id] ? "rotate-90" : ""
-                          }`}
-                        >
-                          ▶
-                        </span>
-                      )}
-                    </>
-                  )}
-                </Link>
-
-                {/* Sub menu */}
-                {item.sub && !collapsed && openSubs[item.id] && (
-                  <div className="pl-11 pr-2 pb-1">
-                    {item.sub.map((s) => (
-                      <button
-                        key={s}
-                        className="w-full cursor-pointer text-left px-3 py-2 text-xs text-white/50 hover:text-white hover:bg-white/6 rounded-lg transition-all mb-0.5"
-                      >
-                        {s}
-                      </button>
-                    ))}
-                  </div>
-                )}
+              <div className="px-3 mb-2">
+                <p className="text-gray-400 text-[11px] uppercase tracking-wider font-semibold">
+                  {section}
+                </p>
               </div>
-            ))}
+            )}
+
+            <div className="space-y-1">
+              {items.map((item) => (
+                <div key={item.id}>
+                  <Link
+                    to={item.path}
+                    onClick={() => {
+                      onNavChange(item.id);
+                      if (item.sub) toggleSub(item.id);
+                    }}
+                    className={`
+                      group relative flex items-center gap-3 px-3 py-2.5 rounded-xl
+                      transition-all duration-200 ease-in-out
+                      ${collapsed ? "justify-center" : ""}
+                      ${
+                        isActive(item.path)
+                          ? "bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/20"
+                          : "text-gray-300 hover:bg-white/10 hover:text-white"
+                      }
+                    `}
+                  >
+                    {/* Icon Container */}
+                    <div
+                      className={`
+                      flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg
+                      transition-all duration-200
+                      ${
+                        isActive(item.path)
+                          ? "bg-white/20"
+                          : "bg-gray-800/50 group-hover:bg-white/10"
+                      }
+                    `}
+                    >
+                      <span className="text-lg">{item.icon}</span>
+                    </div>
+
+                    {/* Label & Badge */}
+                    {!collapsed && (
+                      <div className="flex-1 flex items-center justify-between min-w-0">
+                        <span className="text-sm font-medium truncate">
+                          {item.label}
+                        </span>
+                        {item.badge && (
+                          <span
+                            className={`
+                            ml-2 px-2 py-0.5 text-xs font-bold rounded-full
+                            ${
+                              isActive(item.path)
+                                ? "bg-white/20 text-white"
+                                : "bg-orange-500/20 text-orange-400"
+                            }
+                          `}
+                          >
+                            {item.badge}
+                          </span>
+                        )}
+                        {item.sub && (
+                          <svg
+                            className={`w-4 h-4 transition-transform duration-200 ml-1 ${
+                              openSubs[item.id] ? "rotate-90" : ""
+                            }`}
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M9 5l7 7-7 7"
+                            />
+                          </svg>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Tooltip for collapsed mode */}
+                    {collapsed && (
+                      <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50 shadow-lg">
+                        {item.label}
+                        {item.badge && ` (${item.badge})`}
+                      </div>
+                    )}
+                  </Link>
+
+                  {/* Sub Menu */}
+                  {item.sub && !collapsed && openSubs[item.id] && (
+                    <div className="ml-11 mt-1 space-y-1">
+                      {item.sub.map((subItem) => (
+                        <Link
+                          key={subItem}
+                          to={`${item.path}/${subItem.toLowerCase().replace(/\s+/g, "-")}`}
+                          className="block px-3 py-2 text-sm text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-all"
+                        >
+                          {subItem}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         ))}
-      </nav>
+      </div>
 
-      {/* User */}
-      <div className="p-3 border-t border-white/10 flex-shrink-0">
+      {/* User Profile Section */}
+      <div className="flex-shrink-0 p-3 border-t border-gray-700/50">
         <div
-          className={`flex items-center gap-3 p-2.5 rounded-xl cursor-pointer hover:bg-white/8 transition-all ${
-            collapsed ? "justify-center" : ""
-          }`}
+          className={`
+            flex items-center gap-3 p-2 rounded-xl cursor-pointer
+            transition-all duration-200 hover:bg-white/10
+            ${collapsed ? "justify-center" : ""}
+          `}
         >
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-green-400 to-green-700 flex items-center justify-center text-xs font-bold text-white flex-shrink-0">
-            AD
+          <div className="relative flex-shrink-0">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-emerald-600 flex items-center justify-center text-sm font-bold text-white shadow-lg">
+              AD
+            </div>
+            <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-gray-800 rounded-full"></div>
           </div>
+
           {!collapsed && (
-            <div className="overflow-hidden">
-              <div className="text-white text-xs font-semibold truncate">
+            <div className="flex-1 min-w-0">
+              <p className="text-white text-sm font-semibold truncate">
                 Admin User
-              </div>
-              <div className="text-white/40 text-[10px]">Super Admin</div>
+              </p>
+              <p className="text-gray-400 text-xs truncate">Super Admin</p>
             </div>
           )}
         </div>
