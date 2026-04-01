@@ -43,6 +43,15 @@ const NAV = [
         path: "/admin/orders",
         // sub: ["All Orders", "Pending", "Processing", "Delivered", "Returns"],
       },
+      {
+        id: "inventory",
+        label: "Inventory",
+        icon: "📦",
+        badge: 12,
+        path: "/admin/inventory",
+        // sub: ["All Inventory", "Low Stock", "Out of Stock"],
+      },
+
       { id: "coupon", label: "Coupons", icon: "🎟️" },
     ],
   },

@@ -13,6 +13,8 @@ import AddEditProduct from "./pages/amdin/products/AddEditProduct";
 import ProductDetails from "./pages/amdin/products/ProductDetails";
 import Orders from "./pages/amdin/orders/Orders";
 import OrderDetailsPage from "./pages/amdin/orders/OrderDetailsPage";
+import Inventory from "./pages/amdin/inventory/Inventory";
+import LowStockAlerts from "./pages/amdin/inventory/LowStock";
 
 // Dummy components for example
 
@@ -36,6 +38,9 @@ function App() {
           <Route path="products/add" element={<AddEditProduct />} />
           <Route path="products/edit/:id" element={<AddEditProduct />} />
           <Route path="products/:id" element={<ProductDetails />} />
+          {/* 🔥 Inventory Routes */}
+          <Route path="inventory" element={<Inventory />} />
+          <Route path="inventory/low-stock" element={<LowStockAlerts />} />
 
           {/* 🔥 Order Routes */}
           <Route path="orders" element={<Orders />} />
