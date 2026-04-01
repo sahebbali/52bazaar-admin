@@ -28,7 +28,7 @@ const NAV = [
         id: "product",
         label: "Product",
         icon: "📦",
-        sub: ["All Products", "Add Product", "Inventory", "Reviews"],
+        path: "/admin/products",
       },
     ],
   },

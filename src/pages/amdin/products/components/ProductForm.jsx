@@ -25,7 +25,7 @@ const ProductForm = ({ activeTab, formData, setFormData }) => {
               name="name"
               value={formData.name}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
           </div>
@@ -38,7 +38,7 @@ const ProductForm = ({ activeTab, formData, setFormData }) => {
               name="sku"
               value={formData.sku}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
           </div>
@@ -52,7 +52,7 @@ const ProductForm = ({ activeTab, formData, setFormData }) => {
             name="category"
             value={formData.category}
             onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
           >
             <option value="">Select Category</option>
@@ -72,7 +72,7 @@ const ProductForm = ({ activeTab, formData, setFormData }) => {
             value={formData.description}
             onChange={handleChange}
             rows="6"
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Product description..."
           />
         </div>
@@ -92,7 +92,7 @@ const ProductForm = ({ activeTab, formData, setFormData }) => {
               value={formData.regularPrice}
               onChange={handleChange}
               step="0.01"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
           </div>
@@ -106,7 +106,7 @@ const ProductForm = ({ activeTab, formData, setFormData }) => {
               value={formData.salePrice}
               onChange={handleChange}
               step="0.01"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div>
@@ -119,7 +119,7 @@ const ProductForm = ({ activeTab, formData, setFormData }) => {
               value={formData.cost}
               onChange={handleChange}
               step="0.01"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
         </div>
@@ -138,7 +138,7 @@ const ProductForm = ({ activeTab, formData, setFormData }) => {
               name="stockQuantity"
               value={formData.stockQuantity}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
           </div>
@@ -151,7 +151,7 @@ const ProductForm = ({ activeTab, formData, setFormData }) => {
               name="lowStockThreshold"
               value={formData.lowStockThreshold}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
         </div>
@@ -171,7 +171,7 @@ const ProductForm = ({ activeTab, formData, setFormData }) => {
             name="slug"
             value={formData.slug}
             onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="product-url-slug"
           />
         </div>
@@ -184,7 +184,7 @@ const ProductForm = ({ activeTab, formData, setFormData }) => {
             name="metaTitle"
             value={formData.metaTitle}
             onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
         <div>
@@ -214,7 +214,7 @@ const ProductForm = ({ activeTab, formData, setFormData }) => {
               name="weight"
               value={formData.weight}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div>
@@ -226,7 +226,7 @@ const ProductForm = ({ activeTab, formData, setFormData }) => {
               name="dimensions"
               value={formData.dimensions}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="20x15x5"
             />
           </div>
@@ -239,7 +239,7 @@ const ProductForm = ({ activeTab, formData, setFormData }) => {
             type="text"
             value={formData.tags.join(", ")}
             onChange={handleTagsChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="headphones, wireless, audio"
           />
         </div>
