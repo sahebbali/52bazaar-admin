@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { use, useState } from "react";
 import { Eye, EyeOff, Mail, Lock, ArrowRight } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import MyLogo from "../components/MyLogo";
 
 export default function LoginPage() {
+  const navigat = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -11,6 +12,8 @@ export default function LoginPage() {
 
   const handleLogin = () => {
     console.log("Login:", { email, password, rememberMe });
+    // Simulate successful login and navigate to dashboard
+    navigat("/admin/dashboard");
   };
 
   return (
@@ -105,7 +108,7 @@ export default function LoginPage() {
             {/* Login Button */}
             <button
               onClick={handleLogin}
-              className="w-full bg-(--color-primary) text-white font-semibold py-4 rounded-xl hover:bg-green-700 transition flex items-center justify-center gap-2"
+              className="w-full cursor-pointer bg-(--color-primary) text-white font-semibold py-4 rounded-xl hover:bg-(--color-primary-hover) transition flex items-center justify-center gap-2"
             >
               Sign In
               <ArrowRight className="w-5 h-5" />

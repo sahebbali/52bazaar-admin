@@ -11,6 +11,8 @@ import CategoryManagement from "./pages/amdin/CategoryManagement";
 import ProductList from "./pages/amdin/products/ProductList";
 import AddEditProduct from "./pages/amdin/products/AddEditProduct";
 import ProductDetails from "./pages/amdin/products/ProductDetails";
+import Orders from "./pages/amdin/orders/Orders";
+import OrderDetailsPage from "./pages/amdin/orders/OrderDetailsPage";
 
 // Dummy components for example
 
@@ -24,19 +26,22 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegistrationPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-  
         {/* ✅ ADMIN ROUTES */}
         <Route path="/admin" element={<AdminWrapper />}>
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="categories" element={<CategoryManagement />} />
 
-          {/* 🔥 FIXED HERE */}
+          {/* 🔥 Product Routes */}
           <Route path="products" element={<ProductList />} />
           <Route path="products/add" element={<AddEditProduct />} />
           <Route path="products/edit/:id" element={<AddEditProduct />} />
           <Route path="products/:id" element={<ProductDetails />} />
+
+          {/* 🔥 Order Routes */}
+          <Route path="orders" element={<Orders />} />
+          <Route path="orders/:id" element={<OrderDetailsPage />} />
         </Route>
-        ;{/* 404 Not Found Route */}
+        {/* 404 Not Found Route */}
         <Route
           path="*"
           element={<div className="text-center py-20">Page Not Found</div>}
