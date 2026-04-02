@@ -25,6 +25,7 @@ import ReportsDashboard from "./pages/amdin/reports/ReportsDashboard";
 import SalesReport from "./pages/amdin/reports/SalesReport";
 import OrderReport from "./pages/amdin/reports/OrderReport";
 import ScheduledReports from "./pages/amdin/reports/ScheduledReports";
+import NotFound from "./pages/amdin/not found/NotFound";
 
 // Dummy components for example
 
@@ -71,12 +72,9 @@ function App() {
             <Route path="orders" element={<OrderReport />} />
             <Route path="scheduled" element={<ScheduledReports />} />
           </Route>
+          <Route path="*" element={<NotFound />} />
         </Route>
         {/* 404 Not Found Route */}
-        <Route
-          path="*"
-          element={<div className="text-center py-20">Page Not Found</div>}
-        />
       </Routes>
     </div>
   );
