@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { Loading } from "../../../common/Loading";
+import { METHOD_CONFIG, PAYMENTS_DATA } from "./PaymentList";
 export default function RefundManagement() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -78,7 +79,7 @@ export default function RefundManagement() {
           </p>
           <Link
             to={`/admin/payments/${id}`}
-            className="text-green-600 hover:underline"
+            className="text-(--color-primary) hover:underline"
           >
             Back to Payment Details
           </Link>
@@ -94,7 +95,7 @@ export default function RefundManagement() {
         <div className="mb-6">
           <Link
             to={`/admin/payments/${id}`}
-            className="text-green-600 hover:underline text-sm inline-block mb-2"
+            className="text-(--color-primary) hover:underline text-sm inline-block mb-2"
           >
             ← Back to Payment Details
           </Link>
@@ -175,7 +176,7 @@ export default function RefundManagement() {
                     step="0.01"
                     value={refundAmount}
                     onChange={(e) => setRefundAmount(e.target.value)}
-                    className={`w-full pl-8 pr-4 py-2 border ${errors.refundAmount ? "border-red-500" : "border-gray-300"} rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent`}
+                    className={`w-full pl-8 pr-4 py-2 text-black cursor-pointer border ${errors.refundAmount ? "border-red-500" : "border-gray-300"} rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent`}
                     placeholder="0.00"
                   />
                 </div>
@@ -201,7 +202,7 @@ export default function RefundManagement() {
                 <select
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
-                  className={`w-full px-4 py-2 border ${errors.reason ? "border-red-500" : "border-gray-300"} rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent`}
+                  className={`w-full px-4 py-2 text-black cursor-pointer border ${errors.reason ? "border-red-500" : "border-gray-300"} rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent`}
                 >
                   <option value="">Select a reason</option>
                   <option value="Customer requested refund">

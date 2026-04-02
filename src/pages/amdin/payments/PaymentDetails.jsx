@@ -42,7 +42,10 @@ export default function PaymentDetails() {
           <p className="text-gray-500 mb-4">
             The payment you're looking for doesn't exist
           </p>
-          <Link to="/admin/payments" className="text-green-600 hover:underline">
+          <Link
+            to="/admin/payments"
+            className="text-(--color-primary) hover:underline"
+          >
             Back to Payments
           </Link>
         </div>
@@ -59,7 +62,7 @@ export default function PaymentDetails() {
             <div>
               <Link
                 to="/admin/payments"
-                className="text-green-600 hover:underline text-sm mb-2 inline-block"
+                className="text-(--color-primary) hover:underline text-sm mb-2 inline-block"
               >
                 ← Back to Payments
               </Link>
@@ -79,7 +82,7 @@ export default function PaymentDetails() {
                   ↩️ Process Refund
                 </button>
               )}
-              <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+              <button className="px-4 py-2 border bg-(--color-primary) border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
                 📥 Download Receipt
               </button>
             </div>
@@ -109,7 +112,7 @@ export default function PaymentDetails() {
                   </label>
                   <Link
                     to={`/admin/orders/${payment.orderId}`}
-                    className="text-sm text-green-600 hover:underline block mt-1"
+                    className="text-sm text-(--color-primary) hover:underline block mt-1"
                   >
                     {payment.orderId} →
                   </Link>
@@ -118,7 +121,7 @@ export default function PaymentDetails() {
                   <label className="text-xs text-gray-500 uppercase">
                     Amount
                   </label>
-                  <p className="text-2xl font-bold text-green-600 mt-1">
+                  <p className="text-2xl font-bold text-(--color-primary) mt-1">
                     {new Intl.NumberFormat("en-US", {
                       style: "currency",
                       currency: "USD",
@@ -248,7 +251,7 @@ export default function PaymentDetails() {
               <div className="space-y-4">
                 <div className="flex gap-3">
                   <div className="flex-shrink-0 w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                    <span className="text-green-600">💰</span>
+                    <span className="text-(--color-primary)">💰</span>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-gray-900">
@@ -262,7 +265,7 @@ export default function PaymentDetails() {
                 {payment.status === "completed" && (
                   <div className="flex gap-3">
                     <div className="flex-shrink-0 w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                      <span className="text-green-600">✓</span>
+                      <span className="text-(--color-primary)">✓</span>
                     </div>
                     <div>
                       <p className="text-sm font-medium text-gray-900">
@@ -298,7 +301,7 @@ export default function PaymentDetails() {
                 Actions
               </h2>
               <div className="space-y-3">
-                <button className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                <button className="w-full px-4 py-2 bg-(--color-primary) text-white rounded-lg hover:bg-(--color-primary-hover) transition-colors">
                   Send Receipt Email
                 </button>
                 <button className="w-full px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">

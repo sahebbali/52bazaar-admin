@@ -271,7 +271,7 @@ export default function PaymentList() {
                   placeholder="Search by transaction ID, order ID or customer..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-2 border text-black cursor-pointer border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 />
               </div>
             </div>
@@ -282,7 +282,7 @@ export default function PaymentList() {
               onChange={(e) =>
                 setFilters({ ...filters, status: e.target.value })
               }
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+              className="px-4 py-2 border text-black cursor-pointer border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
             >
               <option value="">All Status</option>
               <option value="completed">Completed</option>
@@ -297,7 +297,7 @@ export default function PaymentList() {
               onChange={(e) =>
                 setFilters({ ...filters, method: e.target.value })
               }
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+              className="px-4 py-2 border text-black cursor-pointer border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
             >
               <option value="">All Methods</option>
               <option value="bkash">bKash</option>
@@ -313,7 +313,7 @@ export default function PaymentList() {
               onChange={(e) =>
                 setFilters({ ...filters, startDate: e.target.value })
               }
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+              className="px-4 py-2 border text-black cursor-pointer border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
               placeholder="Start Date"
             />
             <input
@@ -322,14 +322,14 @@ export default function PaymentList() {
               onChange={(e) =>
                 setFilters({ ...filters, endDate: e.target.value })
               }
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+              className="px-4 py-2 border  text-black cursor-pointer border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
               placeholder="End Date"
             />
 
             {/* Export Button */}
             <button
               onClick={handleExport}
-              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+              className="flex items-center cursor-pointer gap-2 px-4 py-2 bg-(--color-primary) text-white rounded-lg hover:bg-(--color-primary-hover) transition-colors"
             >
               📥 Export
             </button>
@@ -341,7 +341,7 @@ export default function PaymentList() {
             filters.startDate ||
             filters.endDate) && (
             <div className="flex flex-wrap gap-2 mt-4">
-              <span className="text-sm text-gray-600">Active filters:</span>
+              <span className="text-sm text-black">Active filters:</span>
               {filters.status && (
                 <span className="px-2 py-1 bg-gray-100 rounded-lg text-xs flex items-center gap-1">
                   Status: {STATUS_CONFIG[filters.status]?.label}
@@ -384,14 +384,14 @@ export default function PaymentList() {
         {/* Bulk Actions */}
         {selectedPayments.length > 0 && (
           <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4 flex items-center justify-between">
-            <span className="text-sm text-green-800">
+            <span className="text-sm text-(--color-primary)">
               {selectedPayments.length} payment(s) selected
             </span>
             <div className="flex gap-2">
-              <button className="px-3 py-1 text-sm bg-white border border-green-300 rounded-lg hover:bg-green-100">
+              <button className="px-3 py-1 text-sm text-black cursor-pointer bg-white border border-green-300 rounded-lg hover:bg-green-100">
                 Export Selected
               </button>
-              <button className="px-3 py-1 text-sm bg-red-50 text-red-600 rounded-lg hover:bg-red-100">
+              <button className="px-3 py-1 text-sm  cursor-pointer bg-red-50 text-red-600 rounded-lg hover:bg-red-100">
                 Bulk Action
               </button>
             </div>
@@ -499,7 +499,7 @@ export default function PaymentList() {
                     <td className="px-4 py-3 text-center">
                       <Link
                         to={`/admin/payments/${payment.id}`}
-                        className="text-green-600 hover:text-green-700 text-sm font-medium"
+                        className="text-(--color-primary) hover:text-(--color-primary-hover) text-sm font-medium"
                       >
                         View →
                       </Link>
@@ -522,7 +522,7 @@ export default function PaymentList() {
               >
                 Previous
               </button>
-              <button className="px-3 py-1 bg-green-600 text-white rounded-lg hover:bg-green-700">
+              <button className="px-3 py-1 bg-(--color-primary) text-white rounded-lg hover:bg-(--color-primary-hover)">
                 Next
               </button>
             </div>
