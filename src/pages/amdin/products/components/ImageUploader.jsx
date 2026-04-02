@@ -35,7 +35,7 @@ const ImageUploader = ({ formData, setFormData }) => {
           <div className="space-y-1 text-center">
             <Upload className="mx-auto h-12 w-12 text-gray-400" />
             <div className="flex text-sm text-gray-600">
-              <label className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500">
+              <label className="relative cursor-pointer bg-white rounded-md font-medium text-(--color-primary) hover:text-(--color-primary-hover)">
                 <span>Upload files</span>
                 <input
                   type="file"
@@ -78,7 +78,7 @@ const ImageUploader = ({ formData, setFormData }) => {
                 )}
                 <button
                   onClick={() => setFeatured(index)}
-                  className="absolute bottom-1 right-1 bg-blue-500 text-white text-xs px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition"
+                  className="absolute bottom-1 right-1 bg-(--color-primary) text-white text-xs px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition"
                 >
                   Set Featured
                 </button>

@@ -46,6 +46,12 @@ export const NAV = [
         path: "/admin/inventory",
       },
       {
+        id: "payments",
+        label: "Payments",
+        icon: "💳",
+        path: "/admin/payments",
+      },
+      {
         id: "coupon",
         label: "Coupons",
         icon: "🎟️",
@@ -80,5 +86,6 @@ export const BREADCRUMBS = {
   inventory: ["Admin", "Sales", "Inventory"],
   coupon: ["Admin", "Sales", "Coupons"],
   customers: ["Admin", "Customers"],
+  payments: ["Admin", "Payments"],
   settings: ["Admin", "Settings"],
 };

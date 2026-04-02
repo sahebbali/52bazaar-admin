@@ -58,13 +58,13 @@ const ProductGrid = ({ products, onDelete, getStockStatus }) => {
               <div className="flex gap-2">
                 <Link
                   to={`/admin/products/${product.id}`}
-                  className="flex-1 bg-blue-600 text-white px-3 py-1 rounded text-center hover:bg-blue-700 transition"
+                  className="flex-1 bg-(--color-primary) text-white px-3 py-1 rounded text-center hover:bg-(--color-primary-hover) transition"
                 >
                   <Eye size={16} className="inline mr-1" /> View
                 </Link>
                 <Link
                   to={`/admin/products/edit/${product.id}`}
-                  className="flex-1 bg-green-600 text-white px-3 py-1 rounded text-center hover:bg-green-700 transition"
+                  className="flex-1 bg-(--color-primary) text-white px-3 py-1 rounded text-center hover:bg-(--color-primary-hover) transition"
                 >
                   <Edit size={16} className="inline mr-1" /> Edit
                 </Link>

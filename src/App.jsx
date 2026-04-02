@@ -18,6 +18,9 @@ import LowStockAlerts from "./pages/amdin/inventory/LowStock";
 import Customers from "./pages/amdin/customers/Customers";
 import CustomerDetailsPage from "./pages/amdin/customers/CustomerDetailsPage";
 import CustomerFormPage from "./pages/amdin/customers/CustomerFormPage";
+import PaymentList from "./pages/amdin/payments/PaymentList";
+import PaymentDetails from "./pages/amdin/payments/PaymentDetails";
+import RefundManagement from "./pages/amdin/payments/RefundManagement";
 
 // Dummy components for example
 
@@ -53,6 +56,10 @@ function App() {
           <Route path="customers/:id" element={<CustomerDetailsPage />} />
           <Route path="customers/add" element={<CustomerFormPage />} />
           <Route path="customers/edit/:id" element={<CustomerFormPage />} />
+          {/* 🔥 Payment Routes */}
+          <Route path="payments" element={<PaymentList />} />
+          <Route path="payments/:id" element={<PaymentDetails />} />
+          <Route path="payments/:id/refund" element={<RefundManagement />} />
         </Route>
         {/* 404 Not Found Route */}
         <Route

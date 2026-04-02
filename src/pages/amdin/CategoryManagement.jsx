@@ -1200,7 +1200,7 @@ function CategoryForm({ categories, editData, onSave, onCancel, showToast }) {
                   <p className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold mb-2">
                     Search Preview
                   </p>
-                  <p className="text-blue-600 text-sm font-medium hover:underline cursor-pointer truncate">
+                  <p className="text-(--color-primary) text-sm font-medium hover:underline cursor-pointer truncate">
                     {form.metaTitle || form.name || "Page Title"}
                   </p>
                   <p className="text-green-700 text-xs mt-0.5">

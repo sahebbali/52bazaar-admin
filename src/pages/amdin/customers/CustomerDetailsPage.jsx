@@ -46,7 +46,7 @@ const CustomerDetailsPage = () => {
   if (!customer) {
     return (
       <div className="flex items-center justify-center h-96">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-(--color-primary)"></div>
       </div>
     );
   }
@@ -57,7 +57,7 @@ const CustomerDetailsPage = () => {
       <div className="mb-6">
         <button
           onClick={() => navigate("/admin/customers")}
-          className="mb-4 text-blue-600 hover:text-blue-800 flex items-center gap-2"
+          className="mb-4 text-(--color-primary) hover:text-(--color-primary-hover) flex items-center gap-2"
         >
           <svg
             className="w-5 h-5"
@@ -88,7 +88,7 @@ const CustomerDetailsPage = () => {
           <div className="flex gap-3">
             <button
               onClick={() => setShowEmailModal(true)}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
+              className="px-4 py-2 bg-(--color-primary) text-white rounded-lg hover:bg-(--color-primary-hover) flex items-center gap-2"
             >
               <svg
                 className="w-5 h-5"
@@ -196,7 +196,7 @@ const CustomerDetailsPage = () => {
                     <div className="flex justify-between items-start">
                       <div>
                         {address.isDefault && (
-                          <span className="inline-block px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded mb-2">
+                          <span className="inline-block px-2 py-1 text-xs bg-(--color-primary) text-white rounded mb-2">
                             Default
                           </span>
                         )}
@@ -211,7 +211,7 @@ const CustomerDetailsPage = () => {
                           </p>
                         )}
                       </div>
-                      <button className="text-blue-600 hover:text-blue-800 text-sm">
+                      <button className="text-(--color-primary) hover:text-(--color-primary-hover) text-sm">
                         Edit
                       </button>
                     </div>
@@ -220,7 +220,7 @@ const CustomerDetailsPage = () => {
               ) : (
                 <p className="text-gray-500">No addresses added</p>
               )}
-              <button className="mt-2 text-blue-600 hover:text-blue-800 text-sm flex items-center gap-1">
+              <button className="mt-2 text-(--color-primary) hover:text-(--color-primary-hover) text-sm flex items-center gap-1">
                 <svg
                   className="w-4 h-4"
                   fill="none"
@@ -350,7 +350,7 @@ const CustomerDetailsPage = () => {
                 </button>
                 <button
                   onClick={handleSendEmail}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  className="px-4 py-2 bg-(--color-primary) text-white rounded-lg hover:bg-(--color-primary-hover)"
                 >
                   Send Email
                 </button>
