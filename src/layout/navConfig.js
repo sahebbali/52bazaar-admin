@@ -52,11 +52,17 @@ export const NAV = [
         path: "/admin/payments",
       },
       {
-        id: "coupon",
-        label: "Coupons",
-        icon: "🎟️",
-        path: "/admin/coupons",
+        id: "reports",
+        label: "Reports",
+        icon: "📈",
+        path: "/admin/reports",
       },
+      // {
+      //   id: "coupon",
+      //   label: "Coupons",
+      //   icon: "🎟️",
+      //   path: "/admin/coupons",
+      // },
     ],
   },
   {
@@ -67,6 +73,12 @@ export const NAV = [
         label: "Customers",
         icon: "👥",
         path: "/admin/customers",
+      },
+      {
+        id: "adminUsers",
+        label: "Users",
+        icon: "👤",
+        path: "/admin/users",
       },
       {
         id: "settings",
@@ -84,8 +96,10 @@ export const BREADCRUMBS = {
   product: ["Admin", "Catalog", "Product"],
   order: ["Admin", "Sales", "Order"],
   inventory: ["Admin", "Sales", "Inventory"],
-  coupon: ["Admin", "Sales", "Coupons"],
+
   customers: ["Admin", "Customers"],
   payments: ["Admin", "Payments"],
+  reports: ["Admin", "Reports"],
+  adminUsers: ["Admin", "Users"],
   settings: ["Admin", "Settings"],
 };

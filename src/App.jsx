@@ -21,6 +21,10 @@ import CustomerFormPage from "./pages/amdin/customers/CustomerFormPage";
 import PaymentList from "./pages/amdin/payments/PaymentList";
 import PaymentDetails from "./pages/amdin/payments/PaymentDetails";
 import RefundManagement from "./pages/amdin/payments/RefundManagement";
+import ReportsDashboard from "./pages/amdin/reports/ReportsDashboard";
+import SalesReport from "./pages/amdin/reports/SalesReport";
+import OrderReport from "./pages/amdin/reports/OrderReport";
+import ScheduledReports from "./pages/amdin/reports/ScheduledReports";
 
 // Dummy components for example
 
@@ -60,6 +64,13 @@ function App() {
           <Route path="payments" element={<PaymentList />} />
           <Route path="payments/:id" element={<PaymentDetails />} />
           <Route path="payments/:id/refund" element={<RefundManagement />} />
+
+          <Route path="reports" element={<ReportsDashboard />}>
+            <Route index element={<SalesReport />} />
+            <Route path="sales" element={<SalesReport />} />
+            <Route path="orders" element={<OrderReport />} />
+            <Route path="scheduled" element={<ScheduledReports />} />
+          </Route>
         </Route>
         {/* 404 Not Found Route */}
         <Route

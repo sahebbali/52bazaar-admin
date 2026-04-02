@@ -81,7 +81,7 @@ export default function OrdersTable() {
         <h3 className="text-sm md:text-base font-bold text-gray-800">
           🛍️ Recent Orders
         </h3>
-        <button className="text-xs md:text-sm text-green-600 font-semibold hover:underline">
+        <button className="text-xs md:text-sm text-(--color-primary) font-semibold hover:underline">
           View All Orders →
         </button>
       </div>
@@ -136,7 +136,7 @@ export default function OrdersTable() {
                   <StatusBadge status={order.status} />
                 </td>
                 <td className="px-5 py-3.5">
-                  <button className="text-xs font-semibold text-green-600 border border-green-600 hover:bg-green-600 hover:text-white px-3 py-1.5 rounded-lg transition-all">
+                  <button className="text-xs font-semibold text-(--color-primary) border border-(--color-primary) hover:bg-(--color-primary) hover:text-white px-3 py-1.5 rounded-lg transition-all">
                     View
                   </button>
                 </td>
@@ -173,7 +173,7 @@ export default function OrdersTable() {
                       {order.items} items • {order.date}
                     </p>
                   </div>
-                  <span className="font-mono text-base font-bold text-green-600">
+                  <span className="font-mono text-base font-bold text-(--color-primary)">
                     {order.amount}
                   </span>
                 </div>
@@ -219,12 +219,12 @@ export default function OrdersTable() {
                   </div>
                   <div>
                     <p className="text-xs text-gray-400">Amount</p>
-                    <p className="text-sm font-medium text-green-600 mt-0.5">
+                    <p className="text-sm font-medium text-(--color-primary) mt-0.5">
                       {order.amount}
                     </p>
                   </div>
                 </div>
-                <button className="w-full mt-3 text-xs font-semibold text-green-600 border border-green-600 hover:bg-green-600 hover:text-white px-3 py-2 rounded-lg transition-all">
+                <button className="w-full mt-3 text-xs font-semibold text-(--color-primary) border border-(--color-primary) hover:bg-(--color-primary) hover:text-white px-3 py-2 rounded-lg transition-all">
                   View Order Details
                 </button>
               </div>

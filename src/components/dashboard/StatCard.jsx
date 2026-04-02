@@ -15,7 +15,7 @@ export default function StatCard({ icon, label, value, change, up, iconBg }) {
         </p>
         <p
           className={`text-[11px] md:text-xs font-semibold flex items-center gap-1 ${
-            up ? "text-green-600" : "text-red-500"
+            up ? "text-(--color-primary)" : "text-red-500"
           }`}
         >
           {up ? "▲" : "▼"} {change}

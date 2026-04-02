@@ -65,10 +65,10 @@ export default function DashboardPage() {
           </p>
         </div>
         <div className="flex gap-2 md:gap-3 flex-shrink-0">
-          <button className="flex items-center gap-1 md:gap-2 px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm font-semibold text-green-600 bg-white border border-gray-200 hover:border-green-400 hover:bg-green-50 rounded-xl transition-all">
+          <button className="flex items-center gap-1 md:gap-2 px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm font-semibold text-(--color-primary) bg-white border border-gray-200 hover:border-(--color-primary) hover:bg-(--color-primary)/10 rounded-xl transition-all">
             📥 Export
           </button>
-          <button className="flex items-center gap-1 md:gap-2 px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm font-semibold text-white bg-green-600 hover:bg-green-700 rounded-xl shadow-md shadow-green-900/20 transition-all">
+          <button className="flex items-center gap-1 md:gap-2 px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm font-semibold text-white bg-(--color-primary) hover:bg-(--color-primary-hover) rounded-xl shadow-md shadow-(--color-primary)/20 transition-all">
             ➕ Add Product
           </button>
         </div>

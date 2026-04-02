@@ -54,7 +54,7 @@ export default function TopCategories() {
         <h3 className="text-sm md:text-base font-bold text-gray-800">
           🔥 Top Categories
         </h3>
-        <button className="text-xs md:text-sm text-green-600 font-semibold hover:underline">
+        <button className="text-xs md:text-sm text-(--color-primary) font-semibold hover:underline">
           See All →
         </button>
       </div>
@@ -78,7 +78,7 @@ export default function TopCategories() {
                 {cat.products} products · {cat.orders} orders
               </p>
             </div>
-            <span className="font-mono text-xs md:text-sm font-bold text-green-600 whitespace-nowrap">
+            <span className="font-mono text-xs md:text-sm font-bold text-(--color-primary) whitespace-nowrap">
               {cat.revenue}
             </span>
           </div>

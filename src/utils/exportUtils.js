@@ -1,28 +1,24 @@
 // utils/exportUtils.js
+
+// utils/exportUtils.js
+import * as XLSX from "xlsx";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+
 export const exportToCSV = (data, filename) => {
-  if (!data || data.length === 0) {
-    console.warn("No data to export");
-    return;
-  }
+  if (!data || data.length === 0) return;
 
   const headers = Object.keys(data[0]);
-  const csvRows = [];
+  const csvRows = [headers.join(",")];
 
-  // Add headers
-  csvRows.push(headers.join(","));
-
-  // Add data rows
   for (const row of data) {
     const values = headers.map((header) => {
       const value = row[header] || "";
-      // Escape quotes and wrap in quotes if contains comma
-      const escaped = String(value).replace(/"/g, '""');
-      return `"${escaped}"`;
+      return `"${String(value).replace(/"/g, '""')}"`;
     });
     csvRows.push(values.join(","));
   }
 
-  // Download file
   const blob = new Blob([csvRows.join("\n")], { type: "text/csv" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
@@ -34,7 +30,24 @@ export const exportToCSV = (data, filename) => {
   URL.revokeObjectURL(url);
 };
 
-export const exportToPDF = async (data, filename) => {
-  // You would need to install and use a library like jspdf
-  console.log("PDF export functionality would go here");
+export const exportToExcel = (data, filename) => {
+  const ws = XLSX.utils.json_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Report");
+  XLSX.writeFile(wb, filename);
+};
+
+export const exportToPDF = (data, filename) => {
+  const doc = new jsPDF();
+  doc.text("Sales Report", 14, 15);
+
+  autoTable(doc, {
+    head: [Object.keys(data[0])],
+    body: data.map((row) => Object.values(row)),
+    startY: 25,
+    theme: "striped",
+    headStyles: { fillColor: [16, 185, 129] },
+  });
+
+  doc.save(filename);
 };

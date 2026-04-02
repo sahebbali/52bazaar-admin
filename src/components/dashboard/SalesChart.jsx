@@ -52,7 +52,7 @@ export default function SalesChart() {
           </p>
         </div>
         <div className="flex gap-2">
-          <button className="px-2 md:px-3 py-1 text-xs font-semibold text-green-600 bg-green-50 rounded-lg">
+          <button className="px-2 md:px-3 py-1 text-xs font-semibold text-(--color-primary) bg-(--color-primary)/10 rounded-lg">
             Revenue
           </button>
           <button className="px-2 md:px-3 py-1 text-xs font-semibold text-gray-500 hover:bg-gray-50 rounded-lg transition-colors">
