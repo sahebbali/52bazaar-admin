@@ -8,12 +8,15 @@ export default function Breadcrumb({ activeNav }) {
   const crumbs = BREADCRUMBS[activeNav] ?? ["Admin", "Dashboard"];
 
   return (
-    <nav aria-label="breadcrumb" className="hidden sm:flex items-center gap-1.5 text-sm text-gray-400">
+    <nav
+      aria-label="breadcrumb"
+      className="hidden sm:flex items-center gap-1.5 text-sm text-gray-400"
+    >
       {crumbs.map((crumb, i) => (
         <span key={i} className="flex items-center gap-1.5">
           {i < crumbs.length - 1 ? (
             <>
-              <span className="hover:text-green-600 cursor-pointer transition-colors">
+              <span className="hover:text-(--color-primary) cursor-pointer transition-colors">
                 {crumb}
               </span>
               <span className="text-gray-300 text-xs select-none">›</span>

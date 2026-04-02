@@ -15,7 +15,7 @@ export default function NavSection({
   return (
     <div className="mb-5">
       {!collapsed && (
-        <p className="px-3 mb-2 text-[11px] uppercase tracking-wider font-semibold text-gray-500">
+        <p className="px-3 mb-2 text-[11px] uppercase tracking-wider font-semibold text-black">
           {section}
         </p>
       )}

@@ -13,10 +13,12 @@ export default function SearchBar() {
       className={`
         flex items-center gap-2 rounded-xl px-3 py-2
         bg-gray-50 border transition-all duration-200
-        ${focused ? "border-green-500 ring-2 ring-green-100 w-56 md:w-64" : "border-gray-200 hover:border-green-400 w-10 md:w-60"}
+        ${focused ? "border-(--color-primary) ring-2 ring-green-100 w-56 md:w-64" : "border-gray-200 hover:border-(--color-primary) w-10 md:w-60"}
       `}
     >
-      <span className="text-gray-400 text-sm flex-shrink-0" aria-hidden>🔍</span>
+      <span className="text-gray-400 text-sm flex-shrink-0" aria-hidden>
+        🔍
+      </span>
       <input
         value={value}
         onChange={(e) => setValue(e.target.value)}

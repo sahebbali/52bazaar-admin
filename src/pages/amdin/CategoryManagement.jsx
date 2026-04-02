@@ -226,7 +226,7 @@ function Btn({
   };
   const variants = {
     primary:
-      "bg-green-700 text-white border-green-700 hover:bg-green-800 hover:border-green-800 shadow-sm shadow-green-900/20",
+      "bg-(--color-primary) text-white border-(--color-primary) hover:bg-(--color-primary-hover) hover:border-(--color-primary-hover) shadow-sm shadow-green-900/20",
     secondary:
       "bg-white text-gray-700 border-gray-200 hover:border-gray-300 hover:bg-gray-50",
     danger:

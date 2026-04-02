@@ -27,8 +27,8 @@ export default function NavItem({
           ${collapsed ? "justify-center" : ""}
           ${
             active
-              ? "bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/20"
-              : "text-gray-300 hover:bg-white/10 hover:text-white"
+              ? "bg-(--color-primary) text-black shadow-lg shadow-green-500/20"
+              : "text-black hover:bg-(--color-primary-hover) hover:text-white"
           }
         `}
       >
@@ -52,7 +52,7 @@ export default function NavItem({
               <span
                 className={`
                   ml-2 px-2 py-0.5 text-xs font-bold rounded-full flex-shrink-0
-                  ${active ? "bg-white/20 text-white" : "bg-orange-500/20 text-orange-400"}
+                  ${active ? "bg-white/20 text-gray-400" : "bg-orange-500/20 text-orange-400"}
                 `}
               >
                 {item.badge}
@@ -61,7 +61,7 @@ export default function NavItem({
 
             {item.sub && (
               <svg
-                className="w-4 h-4 ml-1 flex-shrink-0 text-gray-400"
+                className="w-4 h-4 ml-1 flex-shrink-0 text-black"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -83,7 +83,7 @@ export default function NavItem({
             role="tooltip"
             className="
               absolute left-full ml-3 px-2.5 py-1.5 rounded-lg
-              bg-gray-900 text-white text-xs whitespace-nowrap
+              bg-gray-900 text-black text-xs whitespace-nowrap
               opacity-0 pointer-events-none group-hover:opacity-100
               transition-opacity duration-150 z-50 shadow-xl
               border border-gray-700

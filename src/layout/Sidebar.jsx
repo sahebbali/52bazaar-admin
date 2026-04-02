@@ -72,7 +72,7 @@ export default function Sidebar({
 
       <aside
         className={`
-          bg-gradient-to-b from-gray-900 to-gray-800
+          bg-white/10 backdrop-blur-lg text-gray-950
           flex flex-col shadow-2xl
           transition-all duration-300 ease-in-out
           ${positionClasses}
@@ -88,8 +88,8 @@ export default function Sidebar({
 
         {/* Scrollable nav */}
         <nav
-          className="flex-1 overflow-y-auto py-4 px-3"
-          style={{ scrollbarWidth: "thin" }}
+          className="flex-1 overflow-y-auto scrollbar-hide py-4 px-3"
+          style={{ scrollbarWidth: "none" }}
         >
           {NAV.map(({ section, items }) => (
             <NavSection
