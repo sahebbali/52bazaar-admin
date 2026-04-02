@@ -1,3 +1,5 @@
+import { useState, useEffect } from "react";
+
 const ORDERS = [
   {
     id: "#ORD-5812",
@@ -56,16 +58,36 @@ const STATUS_ICONS = {
 };
 
 export default function OrdersTable() {
+  const [isMobile, setIsMobile] = useState(false);
+  const [expandedRow, setExpandedRow] = useState(null);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  const toggleRow = (orderId) => {
+    setExpandedRow(expandedRow === orderId ? null : orderId);
+  };
+
   return (
-    <div className="bg-white rounded-2xl border border-green-100 shadow-sm overflow-hidden">
-      <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-        <h3 className="text-sm font-bold text-gray-800">🛍️ Recent Orders</h3>
-        <button className="text-xs text-(--color-primary) font-semibold hover:underline">
+    <div className="bg-white rounded-xl md:rounded-2xl border border-green-100 shadow-sm overflow-hidden">
+      <div className="flex items-center justify-between px-4 md:px-5 py-3 md:py-4 border-b border-gray-100">
+        <h3 className="text-sm md:text-base font-bold text-gray-800">
+          🛍️ Recent Orders
+        </h3>
+        <button className="text-xs md:text-sm text-green-600 font-semibold hover:underline">
           View All Orders →
         </button>
       </div>
 
-      <div className="overflow-x-auto">
+      {/* Desktop Table View */}
+      <div className="hidden md:block overflow-x-auto">
         <table className="w-full">
           <thead>
             <tr className="bg-gray-50">
@@ -114,7 +136,7 @@ export default function OrdersTable() {
                   <StatusBadge status={order.status} />
                 </td>
                 <td className="px-5 py-3.5">
-                  <button className="text-xs font-semibold text-(--color-primary) border border-(--color-primary) hover:bg-(--color-hover-primary) hover:text-white hover:border-(--color-hover-primary) px-3 py-1.5 rounded-lg transition-all">
+                  <button className="text-xs font-semibold text-green-600 border border-green-600 hover:bg-green-600 hover:text-white px-3 py-1.5 rounded-lg transition-all">
                     View
                   </button>
                 </td>
@@ -123,6 +145,93 @@ export default function OrdersTable() {
           </tbody>
         </table>
       </div>
+
+      {/* Mobile Card View */}
+      <div className="md:hidden divide-y divide-gray-100">
+        {ORDERS.map((order) => (
+          <div
+            key={order.id}
+            className="px-4 py-3 hover:bg-gray-50 transition-colors"
+          >
+            <div
+              className="flex items-center justify-between cursor-pointer"
+              onClick={() => toggleRow(order.id)}
+            >
+              <div className="flex-1">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="font-mono text-xs font-semibold text-gray-600">
+                    {order.id}
+                  </span>
+                  <StatusBadge status={order.status} />
+                </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-800">
+                      {order.customer}
+                    </p>
+                    <p className="text-xs text-gray-400 mt-0.5">
+                      {order.items} items • {order.date}
+                    </p>
+                  </div>
+                  <span className="font-mono text-base font-bold text-green-600">
+                    {order.amount}
+                  </span>
+                </div>
+              </div>
+              <svg
+                className={`w-5 h-5 text-gray-400 ml-2 transition-transform duration-200 ${
+                  expandedRow === order.id ? "rotate-180" : ""
+                }`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </div>
+
+            {/* Expanded Details */}
+            {expandedRow === order.id && (
+              <div className="mt-3 pt-3 border-t border-gray-100 animate-fadeIn">
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  <div>
+                    <p className="text-xs text-gray-400">Customer</p>
+                    <p className="text-sm font-medium text-gray-700 mt-0.5">
+                      {order.customer}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-400">Items</p>
+                    <p className="text-sm font-medium text-gray-700 mt-0.5">
+                      {order.items}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-400">Date</p>
+                    <p className="text-sm font-medium text-gray-700 mt-0.5">
+                      {order.date}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-400">Amount</p>
+                    <p className="text-sm font-medium text-green-600 mt-0.5">
+                      {order.amount}
+                    </p>
+                  </div>
+                </div>
+                <button className="w-full mt-3 text-xs font-semibold text-green-600 border border-green-600 hover:bg-green-600 hover:text-white px-3 py-2 rounded-lg transition-all">
+                  View Order Details
+                </button>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -130,10 +239,10 @@ export default function OrdersTable() {
 function StatusBadge({ status }) {
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold ${STATUS_STYLES[status]}`}
+      className={`inline-flex items-center gap-1 px-2 py-0.5 md:px-2.5 md:py-1 rounded-full text-[10px] md:text-[11px] font-bold ${STATUS_STYLES[status]}`}
     >
-      <span>{STATUS_ICONS[status]}</span>
-      {status}
+      <span className="text-xs">{STATUS_ICONS[status]}</span>
+      <span className="hidden xs:inline">{status}</span>
     </span>
   );
 }
