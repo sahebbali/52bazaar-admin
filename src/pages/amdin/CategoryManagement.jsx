@@ -115,98 +115,29 @@ function slugify(str) {
     .replace(/\s+/g, "-")
     .replace(/[^a-z0-9-]/g, "");
 }
-
 function cn(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-/* ─── SHARED UI COMPONENTS ────────────────────── */
+/* ─── SHARED UI ───────────────────────────────── */
 function Badge({ status }) {
   return (
     <span
       className={cn(
         "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wide",
         status === "active"
-          ? "bg-green-100 text-green-800"
+          ? "bg-green-100 text-(--color-primary)"
           : "bg-gray-100 text-gray-500",
       )}
     >
       <span
         className={cn(
           "w-1.5 h-1.5 rounded-full",
-          status === "active" ? "bg-green-500" : "bg-gray-400",
+          status === "active" ? "bg-(--color-primary)" : "bg-gray-400",
         )}
       />
       {status === "active" ? "Active" : "Inactive"}
     </span>
-  );
-}
-
-function Input({ label, required, error, hint, className, ...props }) {
-  return (
-    <div className="flex flex-col gap-1.5">
-      {label && (
-        <label className="text-xs font-semibold text-gray-700 uppercase tracking-wider">
-          {label} {required && <span className="text-red-500">*</span>}
-        </label>
-      )}
-      <input
-        className={cn(
-          "w-full px-3.5 py-2.5 rounded-xl border text-sm text-gray-800 bg-white placeholder-gray-400 outline-none transition-all",
-          "border-gray-200 hover:border-gray-300 focus:border-(--color-primary) focus:ring-2 focus:ring-green-100",
-          error && "border-red-400 focus:border-red-500 focus:ring-red-100",
-          className,
-        )}
-        {...props}
-      />
-      {hint && !error && <p className="text-[11px] text-gray-400">{hint}</p>}
-      {error && <p className="text-[11px] text-red-500">{error}</p>}
-    </div>
-  );
-}
-
-function Textarea({ label, required, error, hint, className, ...props }) {
-  return (
-    <div className="flex flex-col gap-1.5">
-      {label && (
-        <label className="text-xs font-semibold text-gray-700 uppercase tracking-wider">
-          {label} {required && <span className="text-red-500">*</span>}
-        </label>
-      )}
-      <textarea
-        className={cn(
-          "w-full px-3.5 py-2.5 rounded-xl border text-sm text-gray-800 bg-white placeholder-gray-400 outline-none transition-all resize-none",
-          "border-gray-200 hover:border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-100",
-          error && "border-red-400",
-          className,
-        )}
-        {...props}
-      />
-      {hint && <p className="text-[11px] text-gray-400">{hint}</p>}
-      {error && <p className="text-[11px] text-red-500">{error}</p>}
-    </div>
-  );
-}
-
-function Select({ label, required, children, className, ...props }) {
-  return (
-    <div className="flex flex-col gap-1.5">
-      {label && (
-        <label className="text-xs font-semibold text-gray-700 uppercase tracking-wider">
-          {label} {required && <span className="text-red-500">*</span>}
-        </label>
-      )}
-      <select
-        className={cn(
-          "w-full px-3.5 py-2.5 rounded-xl border text-sm text-gray-800 bg-white outline-none transition-all appearance-none cursor-pointer",
-          "border-gray-200 hover:border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-100",
-          className,
-        )}
-        {...props}
-      >
-        {children}
-      </select>
-    </div>
   );
 }
 
@@ -226,14 +157,13 @@ function Btn({
   };
   const variants = {
     primary:
-      "bg-(--color-primary) text-white border-(--color-primary) hover:bg-(--color-primary-hover) hover:border-(--color-primary-hover) shadow-sm shadow-green-900/20",
+      "bg-(--color-primary) text-white border-(--color-primary) hover:bg-(--color-primary-hover) hover:border-(--color-primary-hover) shadow-sm shadow-(--color-primary)/20",
     secondary:
       "bg-white text-gray-700 border-gray-200 hover:border-gray-300 hover:bg-gray-50",
     danger:
       "bg-red-600 text-white border-red-600 hover:bg-red-700 hover:border-red-700",
     ghost:
       "bg-transparent text-gray-500 border-transparent hover:bg-gray-100 hover:text-gray-700",
-    warning: "bg-orange-500 text-white border-orange-500 hover:bg-orange-600",
   };
   return (
     <button
@@ -256,7 +186,7 @@ function Checkbox({ checked, onChange, indeterminate }) {
       type="checkbox"
       checked={checked}
       onChange={onChange}
-      className="w-4 h-4 rounded border-gray-300 text-green-600 accent-green-600 cursor-pointer"
+      className="w-4 h-4 rounded border-gray-300 accent-(--color-primary) cursor-pointer"
     />
   );
 }
@@ -264,12 +194,12 @@ function Checkbox({ checked, onChange, indeterminate }) {
 function Modal({ open, onClose, title, children }) {
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div
         className="absolute inset-0 bg-black/40 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
+      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
           <h3 className="font-bold text-gray-900">{title}</h3>
           <button
@@ -287,14 +217,14 @@ function Modal({ open, onClose, title, children }) {
 
 function Toast({ toasts }) {
   return (
-    <div className="fixed bottom-6 right-6 z-[60] flex flex-col gap-2 pointer-events-none">
+    <div className="fixed bottom-4 right-4 z-[60] flex flex-col gap-2 pointer-events-none">
       {toasts.map((t) => (
         <div
           key={t.id}
           className={cn(
             "flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium text-white pointer-events-auto",
             t.type === "success"
-              ? "bg-green-700"
+              ? "bg-(--color-primary)"
               : t.type === "error"
                 ? "bg-red-600"
                 : "bg-gray-800",
@@ -310,6 +240,19 @@ function Toast({ toasts }) {
   );
 }
 
+/* ─── SECTION CARD ────────────────────────────── */
+function SectionCard({ title, icon, children }) {
+  return (
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      <div className="flex items-center gap-2 px-5 py-4 border-b border-gray-100 bg-gray-50/60">
+        <span className="text-base">{icon}</span>
+        <h3 className="font-bold text-gray-800 text-sm">{title}</h3>
+      </div>
+      <div className="p-5 flex flex-col gap-4">{children}</div>
+    </div>
+  );
+}
+
 /* ─── CATEGORY LIST PAGE ──────────────────────── */
 function CategoryList({ categories, onEdit, onDelete, onAdd, showToast }) {
   const [search, setSearch] = useState("");
@@ -317,7 +260,7 @@ function CategoryList({ categories, onEdit, onDelete, onAdd, showToast }) {
   const [sortBy, setSortBy] = useState("name");
   const [sortDir, setSortDir] = useState("asc");
   const [selected, setSelected] = useState([]);
-  const [deleteModal, setDeleteModal] = useState(null); // null | "single" | "bulk"
+  const [deleteModal, setDeleteModal] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [page, setPage] = useState(1);
   const PER_PAGE = 6;
@@ -338,7 +281,6 @@ function CategoryList({ categories, onEdit, onDelete, onAdd, showToast }) {
 
   const totalPages = Math.ceil(filtered.length / PER_PAGE);
   const paginated = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
-
   const allChecked =
     paginated.length > 0 && paginated.every((c) => selected.includes(c.id));
   const someChecked =
@@ -350,12 +292,10 @@ function CategoryList({ categories, onEdit, onDelete, onAdd, showToast }) {
     else
       setSelected((s) => [...new Set([...s, ...paginated.map((c) => c.id)])]);
   };
-
   const toggleOne = (id) =>
     setSelected((s) =>
       s.includes(id) ? s.filter((x) => x !== id) : [...s, id],
     );
-
   const handleSort = (col) => {
     if (sortBy === col) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
     else {
@@ -363,13 +303,11 @@ function CategoryList({ categories, onEdit, onDelete, onAdd, showToast }) {
       setSortDir("asc");
     }
   };
-
   const SortIcon = ({ col }) => (
     <span className="ml-1 opacity-40 text-[10px]">
       {sortBy === col ? (sortDir === "asc" ? "↑" : "↓") : "↕"}
     </span>
   );
-
   const getParentName = (parentId) => {
     if (!parentId) return "—";
     const p = categories.find((c) => c.id === parentId);
@@ -396,30 +334,34 @@ function CategoryList({ categories, onEdit, onDelete, onAdd, showToast }) {
 
   return (
     <div>
-      {/* Page Header */}
-      <div className="flex items-center justify-between mb-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">
             Category Management
           </h1>
           <p className="text-sm text-gray-400 mt-0.5">
             Manage your product categories and subcategories
           </p>
         </div>
-        <Btn onClick={onAdd} size="md">
+        <Btn
+          onClick={onAdd}
+          size="md"
+          className="w-full sm:w-auto justify-center"
+        >
           <span>＋</span> Add Category
         </Btn>
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-3 gap-3 mb-6">
         {[
           {
-            label: "Total Categories",
+            label: "Total",
             value: categories.length,
             icon: "🗂️",
             bg: "bg-green-50",
-            color: "text-green-700",
+            color: "text-(!--color-primary)",
           },
           {
             label: "Active",
@@ -439,16 +381,18 @@ function CategoryList({ categories, onEdit, onDelete, onAdd, showToast }) {
           <div
             key={s.label}
             className={cn(
-              "rounded-2xl border border-gray-100 p-4 flex items-center gap-4 shadow-sm",
+              "rounded-2xl border border-gray-100 p-3 sm:p-4 flex items-center gap-2 sm:gap-4 shadow-sm",
               s.bg,
             )}
           >
-            <div className="text-2xl">{s.icon}</div>
+            <div className="text-xl sm:text-2xl">{s.icon}</div>
             <div>
-              <p className="text-xs text-gray-500 font-medium">{s.label}</p>
+              <p className="text-[10px] sm:text-xs text-gray-500 font-medium">
+                {s.label}
+              </p>
               <p
                 className={cn(
-                  "text-2xl font-bold font-mono tracking-tight",
+                  "text-xl sm:text-2xl font-bold font-mono tracking-tight",
                   s.color,
                 )}
               >
@@ -459,11 +403,11 @@ function CategoryList({ categories, onEdit, onDelete, onAdd, showToast }) {
         ))}
       </div>
 
-      {/* Filters Bar */}
+      {/* Filters */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm mb-4">
-        <div className="flex items-center gap-3 px-5 py-4 flex-wrap">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 px-4 sm:px-5 py-4 flex-wrap">
           {/* Search */}
-          <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 focus-within:border-green-500 focus-within:ring-2 focus-within:ring-green-100 rounded-xl px-3 py-2 w-64 transition-all">
+          <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 focus-within:border-green-500 focus-within:ring-2 focus-within:ring-green-100 rounded-xl px-3 py-2 w-full sm:w-64 transition-all">
             <span className="text-gray-400 text-sm">🔍</span>
             <input
               value={search}
@@ -494,45 +438,39 @@ function CategoryList({ categories, onEdit, onDelete, onAdd, showToast }) {
                   setPage(1);
                 }}
                 className={cn(
-                  "px-3.5 py-1.5 rounded-lg text-xs font-semibold capitalize transition-all",
+                  "flex-1 sm:flex-none px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition-all",
                   statusFilter === s
-                    ? "bg-white text-green-700 shadow-sm"
+                    ? "bg-white text-(!--color-primary) shadow-sm"
                     : "text-gray-500 hover:text-gray-700",
                 )}
               >
-                {s === "all" ? "All Status" : s}
+                {s === "all" ? "All" : s}
               </button>
             ))}
           </div>
 
           {/* Sort */}
-          <div className="flex items-center gap-2 ml-auto">
-            <span className="text-xs text-gray-400 font-medium">Sort by:</span>
-            <button
-              onClick={() => handleSort("name")}
-              className={cn(
-                "px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border",
-                sortBy === "name"
-                  ? "bg-green-50 text-green-700 border-green-200"
-                  : "bg-white text-gray-500 border-gray-200 hover:border-gray-300",
-              )}
-            >
-              Name <SortIcon col="name" />
-            </button>
-            <button
-              onClick={() => handleSort("createdAt")}
-              className={cn(
-                "px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border",
-                sortBy === "createdAt"
-                  ? "bg-green-50 text-green-700 border-green-200"
-                  : "bg-white text-gray-500 border-gray-200 hover:border-gray-300",
-              )}
-            >
-              Date <SortIcon col="createdAt" />
-            </button>
+          <div className="flex items-center gap-2 sm:ml-auto">
+            <span className="text-xs text-gray-400 font-medium">Sort:</span>
+            {[
+              ["name", "Name"],
+              ["createdAt", "Date"],
+            ].map(([col, label]) => (
+              <button
+                key={col}
+                onClick={() => handleSort(col)}
+                className={cn(
+                  "px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border",
+                  sortBy === col
+                    ? "bg-green-50 text-(--color-primary) border-green-200"
+                    : "bg-white text-gray-500 border-gray-200 hover:border-gray-300",
+                )}
+              >
+                {label} <SortIcon col={col} />
+              </button>
+            ))}
           </div>
 
-          {/* Bulk delete */}
           {selected.length > 0 && (
             <Btn
               variant="danger"
@@ -544,8 +482,8 @@ function CategoryList({ categories, onEdit, onDelete, onAdd, showToast }) {
           )}
         </div>
 
-        {/* Table */}
-        <div className="overflow-x-auto">
+        {/* Table — desktop */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="bg-gray-50 border-t border-gray-100">
@@ -556,27 +494,22 @@ function CategoryList({ categories, onEdit, onDelete, onAdd, showToast }) {
                     onChange={toggleAll}
                   />
                 </th>
-                <th className="px-5 py-3 text-left text-[10px] uppercase tracking-widest text-gray-400 font-semibold">
-                  Category
-                </th>
-                <th className="px-5 py-3 text-left text-[10px] uppercase tracking-widest text-gray-400 font-semibold">
-                  Slug
-                </th>
-                <th className="px-5 py-3 text-left text-[10px] uppercase tracking-widest text-gray-400 font-semibold">
-                  Parent
-                </th>
-                <th className="px-5 py-3 text-left text-[10px] uppercase tracking-widest text-gray-400 font-semibold">
-                  Status
-                </th>
-                <th className="px-5 py-3 text-left text-[10px] uppercase tracking-widest text-gray-400 font-semibold">
-                  Products
-                </th>
-                <th className="px-5 py-3 text-left text-[10px] uppercase tracking-widest text-gray-400 font-semibold">
-                  Created
-                </th>
-                <th className="px-5 py-3 text-left text-[10px] uppercase tracking-widest text-gray-400 font-semibold">
-                  Actions
-                </th>
+                {[
+                  "Category",
+                  "Slug",
+                  "Parent",
+                  "Status",
+                  "Products",
+                  "Created",
+                  "Actions",
+                ].map((h) => (
+                  <th
+                    key={h}
+                    className="px-5 py-3 text-left text-[10px] uppercase tracking-widest text-gray-400 font-semibold"
+                  >
+                    {h}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
@@ -586,9 +519,6 @@ function CategoryList({ categories, onEdit, onDelete, onAdd, showToast }) {
                     <div className="flex flex-col items-center gap-2">
                       <span className="text-4xl">🔍</span>
                       <p className="font-medium">No categories found</p>
-                      <p className="text-sm">
-                        Try adjusting your search or filter
-                      </p>
                     </div>
                   </td>
                 </tr>
@@ -676,9 +606,79 @@ function CategoryList({ categories, onEdit, onDelete, onAdd, showToast }) {
           </table>
         </div>
 
+        {/* Cards — mobile */}
+        <div className="md:hidden divide-y divide-gray-100 border-t border-gray-100">
+          {paginated.length === 0 ? (
+            <div className="flex flex-col items-center gap-2 py-12 text-gray-400">
+              <span className="text-4xl">🔍</span>
+              <p className="font-medium">No categories found</p>
+            </div>
+          ) : (
+            paginated.map((cat) => (
+              <div
+                key={cat.id}
+                className={cn(
+                  "p-4 transition-colors",
+                  selected.includes(cat.id)
+                    ? "bg-green-50/60"
+                    : "hover:bg-gray-50/40",
+                )}
+              >
+                <div className="flex items-start gap-3">
+                  <Checkbox
+                    checked={selected.includes(cat.id)}
+                    onChange={() => toggleOne(cat.id)}
+                  />
+                  <div className="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center text-xl flex-shrink-0 border border-green-100">
+                    {cat.icon}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2 flex-wrap">
+                      <p className="font-semibold text-sm text-gray-800">
+                        {cat.name}
+                      </p>
+                      <Badge status={cat.status} />
+                    </div>
+                    <code className="text-[11px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded font-mono mt-1 inline-block">
+                      {cat.slug}
+                    </code>
+                    <div className="flex items-center gap-3 mt-1 text-xs text-gray-400">
+                      <span>Parent: {getParentName(cat.parent)}</span>
+                      <span>•</span>
+                      <span>{cat.products} products</span>
+                      <span>•</span>
+                      <span>{cat.createdAt}</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex gap-2 mt-3 ml-11">
+                  <Btn
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => onEdit(cat)}
+                  >
+                    ✏️ Edit
+                  </Btn>
+                  <Btn
+                    variant="ghost"
+                    size="sm"
+                    className="text-red-500 hover:bg-red-50 hover:text-red-600"
+                    onClick={() => {
+                      setDeleteModal("single");
+                      setDeleteTarget(cat.id);
+                    }}
+                  >
+                    🗑 Delete
+                  </Btn>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between px-5 py-4 border-t border-gray-100">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 sm:px-5 py-4 border-t border-gray-100">
             <p className="text-xs text-gray-400">
               Showing {(page - 1) * PER_PAGE + 1}–
               {Math.min(page * PER_PAGE, filtered.length)} of {filtered.length}{" "}
@@ -700,8 +700,8 @@ function CategoryList({ categories, onEdit, onDelete, onAdd, showToast }) {
                   className={cn(
                     "w-8 h-8 rounded-lg text-xs font-semibold transition-all",
                     page === p
-                      ? "bg-green-700 text-white"
-                      : "bg-white border border-gray-200 text-gray-500 hover:border-green-300",
+                      ? "bg-(--color-primary) text-white"
+                      : "bg-white border border-gray-200 text-gray-500 hover:border-(--color-primary)",
                   )}
                 >
                   {p}
@@ -720,7 +720,6 @@ function CategoryList({ categories, onEdit, onDelete, onAdd, showToast }) {
         )}
       </div>
 
-      {/* Delete Modal */}
       <Modal
         open={!!deleteModal}
         onClose={() => setDeleteModal(null)}
@@ -757,7 +756,7 @@ function CategoryList({ categories, onEdit, onDelete, onAdd, showToast }) {
   );
 }
 
-/* ─── ADD / EDIT FORM PAGE ─────────────────────── */
+/* ─── ADD / EDIT FORM (NO TABS) ────────────────── */
 function CategoryForm({ categories, editData, onSave, onCancel, showToast }) {
   const isEdit = !!editData;
 
@@ -775,7 +774,6 @@ function CategoryForm({ categories, editData, onSave, onCancel, showToast }) {
   const [slugManual, setSlugManual] = useState(isEdit);
   const [errors, setErrors] = useState({});
   const [imagePreview, setImagePreview] = useState(null);
-  const [activeTab, setActiveTab] = useState("general");
   const fileInputRef = useRef(null);
 
   const ICONS = [
@@ -799,7 +797,6 @@ function CategoryForm({ categories, editData, onSave, onCancel, showToast }) {
     "🧄",
   ];
 
-  // Auto-slug from name
   useEffect(() => {
     if (!slugManual) setForm((f) => ({ ...f, slug: slugify(f.name) }));
   }, [form.name, slugManual]);
@@ -843,142 +840,144 @@ function CategoryForm({ categories, editData, onSave, onCancel, showToast }) {
   const metaTitleLen = form.metaTitle.length;
   const metaDescLen = form.metaDesc.length;
 
-  const TABS = [
-    { id: "general", label: "General", icon: "📋" },
-    { id: "image", label: "Image", icon: "🖼️" },
-    { id: "seo", label: "SEO", icon: "🔍" },
-  ];
-
   return (
     <div>
       {/* Header */}
-      <div className="flex items-center gap-3 mb-6">
-        <button
-          onClick={onCancel}
-          className="w-9 h-9 rounded-xl border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
-        >
-          ←
-        </button>
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
-            {isEdit ? "Edit Category" : "Add New Category"}
-          </h1>
-          <p className="text-sm text-gray-400 mt-0.5">
-            {isEdit
-              ? `Editing: ${editData.name}`
-              : "Fill in the details to create a new category"}
-          </p>
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-6">
+        <div className="flex items-center gap-3 flex-1 min-w-0">
+          <button
+            onClick={onCancel}
+            className="w-9 h-9 rounded-xl border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors flex-shrink-0"
+          >
+            ←
+          </button>
+          <div className="min-w-0">
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight truncate">
+              {isEdit ? "Edit Category" : "Add New Category"}
+            </h1>
+            <p className="text-sm text-gray-400 mt-0.5 truncate">
+              {isEdit
+                ? `Editing: ${editData.name}`
+                : "Fill in the details below"}
+            </p>
+          </div>
         </div>
-        <div className="ml-auto flex gap-3">
-          <Btn variant="secondary" onClick={onCancel}>
+        <div className="flex gap-2 sm:gap-3 flex-shrink-0">
+          <Btn
+            variant="secondary"
+            onClick={onCancel}
+            className="flex-1 sm:flex-none justify-center"
+          >
             Discard
           </Btn>
-          <Btn variant="primary" onClick={handleSubmit}>
-            {isEdit ? "💾 Save Changes" : "✅ Create Category"}
+          <Btn
+            variant="primary"
+            onClick={handleSubmit}
+            className="flex-1 sm:flex-none justify-center"
+          >
+            {isEdit ? "💾 Save" : "✅ Create"}
           </Btn>
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-6">
-        {/* Left — Main Form */}
-        <div className="col-span-2 flex flex-col gap-5">
-          {/* Tabs */}
-          <div className="flex gap-1 bg-gray-100 rounded-xl p-1 w-fit">
-            {TABS.map((t) => (
-              <button
-                key={t.id}
-                onClick={() => setActiveTab(t.id)}
-                className={cn(
-                  "flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all",
-                  activeTab === t.id
-                    ? "bg-white text-green-700 shadow-sm"
-                    : "text-gray-500 hover:text-gray-700",
-                )}
-              >
-                {t.icon} {t.label}
-              </button>
-            ))}
-          </div>
-
-          {/* ── GENERAL TAB ── */}
-          {activeTab === "general" && (
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col gap-5">
-              <h3 className="font-bold text-gray-800 text-sm">
-                Basic Information
-              </h3>
-
-              {/* Name */}
-              <Input
-                label="Category Name"
-                required
+      {/* Two-column layout on large screens, stacked on mobile */}
+      <div className="flex flex-col lg:flex-row gap-5">
+        {/* ── LEFT: Main Form (all sections visible, no tabs) ── */}
+        <div className="flex-1 flex flex-col gap-5 min-w-0">
+          {/* ① Basic Information */}
+          <SectionCard title="Basic Information" icon="📋">
+            {/* Name */}
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                Category Name <span className="text-red-500">*</span>
+              </label>
+              <input
                 value={form.name}
                 onChange={(e) => set("name", e.target.value)}
                 placeholder="e.g. Fresh Vegetables"
-                error={errors.name}
-              />
-
-              {/* Slug */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                  Slug <span className="text-red-500">*</span>
-                </label>
-                <div className="flex gap-2">
-                  <div className="flex-1 relative">
-                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs text-gray-400 font-mono select-none">
-                      /categories/
-                    </span>
-                    <input
-                      value={form.slug}
-                      onChange={(e) => {
-                        setSlugManual(true);
-                        set("slug", e.target.value);
-                      }}
-                      placeholder="auto-generated-slug"
-                      className={cn(
-                        "w-full pl-[100px] pr-3.5 py-2.5 rounded-xl border text-sm text-gray-800 bg-white placeholder-gray-400 outline-none transition-all font-mono",
-                        "border-gray-200 hover:border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-100",
-                        errors.slug && "border-red-400",
-                      )}
-                    />
-                  </div>
-                  <Btn
-                    variant="secondary"
-                    size="md"
-                    onClick={() => {
-                      setSlugManual(false);
-                      set("slug", slugify(form.name));
-                    }}
-                    title="Regenerate from name"
-                  >
-                    🔄
-                  </Btn>
-                </div>
-                {errors.slug && (
-                  <p className="text-[11px] text-red-500">{errors.slug}</p>
+                className={cn(
+                  "w-full px-3.5 py-2.5 rounded-xl border text-sm text-gray-800 bg-white placeholder-gray-400 outline-none transition-all",
+                  "border-gray-200 hover:border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-100",
+                  errors.name && "border-red-400",
                 )}
-                <p className="text-[11px] text-gray-400">
-                  Auto-generated from name. Click 🔄 to reset.
-                </p>
-              </div>
+              />
+              {errors.name && (
+                <p className="text-[11px] text-red-500">{errors.name}</p>
+              )}
+            </div>
 
-              {/* Description */}
-              <Textarea
-                label="Description"
+            {/* Slug */}
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                Slug <span className="text-red-500">*</span>
+              </label>
+              <div className="flex gap-2">
+                <div className="flex-1 relative min-w-0">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs text-gray-400 font-mono select-none hidden sm:inline">
+                    /categories/
+                  </span>
+                  <input
+                    value={form.slug}
+                    onChange={(e) => {
+                      setSlugManual(true);
+                      set("slug", e.target.value);
+                    }}
+                    placeholder="auto-generated-slug"
+                    className={cn(
+                      "w-full sm:pl-[100px] pl-3.5 pr-3.5 py-2.5 rounded-xl border text-sm text-gray-800 bg-white placeholder-gray-400 outline-none transition-all font-mono",
+                      "border-gray-200 hover:border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-100",
+                      errors.slug && "border-red-400",
+                    )}
+                  />
+                </div>
+                <button
+                  onClick={() => {
+                    setSlugManual(false);
+                    set("slug", slugify(form.name));
+                  }}
+                  title="Regenerate"
+                  className="w-11 h-11 rounded-xl border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 flex-shrink-0"
+                >
+                  🔄
+                </button>
+              </div>
+              {errors.slug && (
+                <p className="text-[11px] text-red-500">{errors.slug}</p>
+              )}
+              <p className="text-[11px] text-gray-400">
+                Auto-generated from name. Click 🔄 to reset.
+              </p>
+            </div>
+
+            {/* Description */}
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                Description
+              </label>
+              <textarea
                 value={form.description}
                 onChange={(e) => set("description", e.target.value)}
                 placeholder="Describe this category…"
                 rows={3}
-                hint="Optional. Shown on category pages."
+                className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 hover:border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-100 text-sm text-gray-800 bg-white placeholder-gray-400 outline-none transition-all resize-none"
               />
+              <p className="text-[11px] text-gray-400">
+                Optional. Shown on category pages.
+              </p>
+            </div>
 
-              {/* Parent + Status Row */}
-              <div className="grid grid-cols-2 gap-4">
-                <Select
-                  label="Parent Category"
+            {/* Parent + Status */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  Parent Category
+                </label>
+                <select
                   value={form.parent ?? ""}
                   onChange={(e) =>
                     set("parent", e.target.value ? Number(e.target.value) : "")
                   }
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 hover:border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-100 text-sm text-gray-800 bg-white outline-none appearance-none cursor-pointer"
                 >
                   <option value="">— None (Top Level) —</option>
                   {parentOptions.map((c) => (
@@ -986,240 +985,228 @@ function CategoryForm({ categories, editData, onSave, onCancel, showToast }) {
                       {c.name}
                     </option>
                   ))}
-                </Select>
-
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                    Status
-                  </label>
-                  <div className="flex gap-2">
-                    {["active", "inactive"].map((s) => (
-                      <button
-                        key={s}
-                        onClick={() => set("status", s)}
-                        className={cn(
-                          "flex-1 py-2.5 rounded-xl border text-sm font-semibold capitalize transition-all",
-                          form.status === s
-                            ? s === "active"
-                              ? "bg-green-600 text-white border-green-600 shadow-sm"
-                              : "bg-gray-500 text-white border-gray-500"
-                            : "bg-white text-gray-500 border-gray-200 hover:border-gray-300",
-                        )}
-                      >
-                        {s === "active" ? "✅" : "⏸️"}{" "}
-                        {s.charAt(0).toUpperCase() + s.slice(1)}
-                      </button>
-                    ))}
-                  </div>
-                </div>
+                </select>
               </div>
-            </div>
-          )}
 
-          {/* ── IMAGE TAB ── */}
-          {activeTab === "image" && (
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col gap-6">
-              <h3 className="font-bold text-gray-800 text-sm">
-                Category Image / Icon
-              </h3>
-
-              {/* Icon Picker */}
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                  Choose Icon Emoji
+                  Status
                 </label>
-                <div className="flex flex-wrap gap-2">
-                  {ICONS.map((ic) => (
+                <div className="flex gap-2">
+                  {["active", "inactive"].map((s) => (
                     <button
-                      key={ic}
-                      onClick={() => set("icon", ic)}
+                      key={s}
+                      onClick={() => set("status", s)}
                       className={cn(
-                        "w-11 h-11 rounded-xl text-xl transition-all border",
-                        form.icon === ic
-                          ? "bg-green-100 border-green-400 scale-110 shadow"
-                          : "bg-gray-50 border-gray-200 hover:border-green-300 hover:bg-green-50",
+                        "flex-1 py-2.5 rounded-xl border text-sm font-semibold capitalize transition-all",
+                        form.status === s
+                          ? s === "active"
+                            ? "bg-(--color-primary) text-white border-(--color-primary) shadow-sm"
+                            : "bg-gray-500 text-white border-gray-500"
+                          : "bg-white text-gray-500 border-gray-200 hover:border-gray-300",
                       )}
                     >
-                      {ic}
+                      {s === "active" ? "✅" : "⏸️"}{" "}
+                      {s.charAt(0).toUpperCase() + s.slice(1)}
                     </button>
                   ))}
                 </div>
               </div>
+            </div>
+          </SectionCard>
 
-              {/* Image Upload */}
-              <div className="flex flex-col gap-2">
-                <label className="text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                  Upload Category Image
-                </label>
-                <div
-                  onClick={() => fileInputRef.current?.click()}
-                  className="relative border-2 border-dashed border-gray-200 hover:border-green-400 rounded-2xl p-8 flex flex-col items-center gap-3 cursor-pointer transition-all group"
-                >
-                  {imagePreview ? (
-                    <img
-                      src={imagePreview}
-                      alt="Preview"
-                      className="w-32 h-32 object-cover rounded-xl"
-                    />
-                  ) : (
-                    <>
-                      <div className="w-14 h-14 rounded-2xl bg-green-50 group-hover:bg-green-100 flex items-center justify-center text-2xl transition-colors">
-                        📁
-                      </div>
-                      <div className="text-center">
-                        <p className="text-sm font-semibold text-gray-700">
-                          Click to upload
-                        </p>
-                        <p className="text-xs text-gray-400 mt-1">
-                          PNG, JPG, WEBP up to 2MB
-                        </p>
-                      </div>
-                    </>
-                  )}
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleImageChange}
-                  />
-                </div>
-                {imagePreview && (
-                  <Btn
-                    variant="secondary"
-                    size="sm"
-                    className="w-fit"
-                    onClick={() => setImagePreview(null)}
+          {/* ② Icon & Image */}
+          <SectionCard title="Icon & Image" icon="🖼️">
+            {/* Icon Picker */}
+            <div className="flex flex-col gap-2">
+              <label className="text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                Choose Icon Emoji
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {ICONS.map((ic) => (
+                  <button
+                    key={ic}
+                    onClick={() => set("icon", ic)}
+                    className={cn(
+                      "w-10 h-10 sm:w-11 sm:h-11 rounded-xl text-xl transition-all border",
+                      form.icon === ic
+                        ? "bg-green-100 border-(--color-primary) scale-110 shadow"
+                        : "bg-gray-50 border-gray-200 hover:border-(--color-primary) hover:bg-(--color-primary)/10",
+                    )}
                   >
-                    ✕ Remove Image
-                  </Btn>
-                )}
+                    {ic}
+                  </button>
+                ))}
               </div>
             </div>
-          )}
 
-          {/* ── SEO TAB ── */}
-          {activeTab === "seo" && (
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col gap-5">
-              <h3 className="font-bold text-gray-800 text-sm">SEO Settings</h3>
-
-              {/* Meta Title */}
-              <div className="flex flex-col gap-1.5">
-                <div className="flex items-center justify-between">
-                  <label className="text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                    Meta Title
-                  </label>
-                  <span
-                    className={cn(
-                      "text-[11px] font-mono",
-                      metaTitleLen > 60 ? "text-red-500" : "text-gray-400",
-                    )}
-                  >
-                    {metaTitleLen}/60
-                  </span>
-                </div>
+            {/* Image Upload */}
+            <div className="flex flex-col gap-2">
+              <label className="text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                Upload Category Image
+              </label>
+              <div
+                onClick={() => fileInputRef.current?.click()}
+                className="relative border-2 border-dashed border-gray-200 hover:border-green-400 rounded-2xl p-8 flex flex-col items-center gap-3 cursor-pointer transition-all group"
+              >
+                {imagePreview ? (
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                    className="w-28 h-28 object-cover rounded-xl"
+                  />
+                ) : (
+                  <>
+                    <div className="w-14 h-14 rounded-2xl bg-green-50 group-hover:bg-green-100 flex items-center justify-center text-2xl transition-colors">
+                      📁
+                    </div>
+                    <div className="text-center">
+                      <p className="text-sm font-semibold text-gray-700">
+                        Click to upload
+                      </p>
+                      <p className="text-xs text-gray-400 mt-1">
+                        PNG, JPG, WEBP up to 2MB
+                      </p>
+                    </div>
+                  </>
+                )}
                 <input
-                  value={form.metaTitle}
-                  onChange={(e) => set("metaTitle", e.target.value)}
-                  placeholder="SEO friendly page title…"
-                  className={cn(
-                    "w-full px-3.5 py-2.5 rounded-xl border text-sm text-gray-800 bg-white placeholder-gray-400 outline-none transition-all",
-                    "border-gray-200 hover:border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-100",
-                    errors.metaTitle && "border-red-400",
-                  )}
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleImageChange}
                 />
-                {errors.metaTitle && (
-                  <p className="text-[11px] text-red-500">{errors.metaTitle}</p>
-                )}
-                <div className="w-full bg-gray-100 rounded-full h-1">
-                  <div
-                    className={cn(
-                      "h-1 rounded-full transition-all",
-                      metaTitleLen > 60
-                        ? "bg-red-500"
-                        : metaTitleLen > 45
-                          ? "bg-yellow-500"
-                          : "bg-green-500",
-                    )}
-                    style={{
-                      width: `${Math.min(100, (metaTitleLen / 60) * 100)}%`,
-                    }}
-                  />
-                </div>
               </div>
-
-              {/* Meta Description */}
-              <div className="flex flex-col gap-1.5">
-                <div className="flex items-center justify-between">
-                  <label className="text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                    Meta Description
-                  </label>
-                  <span
-                    className={cn(
-                      "text-[11px] font-mono",
-                      metaDescLen > 160 ? "text-red-500" : "text-gray-400",
-                    )}
-                  >
-                    {metaDescLen}/160
-                  </span>
-                </div>
-                <textarea
-                  value={form.metaDesc}
-                  onChange={(e) => set("metaDesc", e.target.value)}
-                  placeholder="Brief description for search engines…"
-                  rows={4}
-                  className={cn(
-                    "w-full px-3.5 py-2.5 rounded-xl border text-sm text-gray-800 bg-white placeholder-gray-400 outline-none transition-all resize-none",
-                    "border-gray-200 hover:border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-100",
-                    errors.metaDesc && "border-red-400",
-                  )}
-                />
-                {errors.metaDesc && (
-                  <p className="text-[11px] text-red-500">{errors.metaDesc}</p>
-                )}
-                <div className="w-full bg-gray-100 rounded-full h-1">
-                  <div
-                    className={cn(
-                      "h-1 rounded-full transition-all",
-                      metaDescLen > 160
-                        ? "bg-red-500"
-                        : metaDescLen > 130
-                          ? "bg-yellow-500"
-                          : "bg-green-500",
-                    )}
-                    style={{
-                      width: `${Math.min(100, (metaDescLen / 160) * 100)}%`,
-                    }}
-                  />
-                </div>
-              </div>
-
-              {/* Preview */}
-              {(form.metaTitle || form.metaDesc) && (
-                <div className="border border-gray-200 rounded-xl p-4 bg-gray-50">
-                  <p className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold mb-2">
-                    Search Preview
-                  </p>
-                  <p className="text-(--color-primary) text-sm font-medium hover:underline cursor-pointer truncate">
-                    {form.metaTitle || form.name || "Page Title"}
-                  </p>
-                  <p className="text-green-700 text-xs mt-0.5">
-                    yourstore.com/categories/{form.slug || "slug"}
-                  </p>
-                  <p className="text-gray-500 text-xs mt-1 line-clamp-2">
-                    {form.metaDesc ||
-                      form.description ||
-                      "No description provided."}
-                  </p>
-                </div>
+              {imagePreview && (
+                <button
+                  onClick={() => setImagePreview(null)}
+                  className="text-xs text-red-500 hover:text-red-600 font-medium w-fit"
+                >
+                  ✕ Remove Image
+                </button>
               )}
             </div>
-          )}
+          </SectionCard>
+
+          {/* ③ SEO */}
+          <SectionCard title="SEO Settings" icon="🔍">
+            {/* Meta Title */}
+            <div className="flex flex-col gap-1.5">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  Meta Title
+                </label>
+                <span
+                  className={cn(
+                    "text-[11px] font-mono",
+                    metaTitleLen > 60 ? "text-red-500" : "text-gray-400",
+                  )}
+                >
+                  {metaTitleLen}/60
+                </span>
+              </div>
+              <input
+                value={form.metaTitle}
+                onChange={(e) => set("metaTitle", e.target.value)}
+                placeholder="SEO friendly page title…"
+                className={cn(
+                  "w-full px-3.5 py-2.5 rounded-xl border text-sm text-gray-800 bg-white placeholder-gray-400 outline-none transition-all",
+                  "border-gray-200 hover:border-gray-300 focus:border-(--color-primary) focus:ring-2 focus:ring-(--color-primary)/30",
+                  errors.metaTitle && "border-red-400",
+                )}
+              />
+              {errors.metaTitle && (
+                <p className="text-[11px] text-red-500">{errors.metaTitle}</p>
+              )}
+              <div className="w-full bg-gray-100 rounded-full h-1">
+                <div
+                  className={cn(
+                    "h-1 rounded-full transition-all",
+                    metaTitleLen > 60
+                      ? "bg-red-500"
+                      : metaTitleLen > 45
+                        ? "bg-yellow-500"
+                        : "bg-green-500",
+                  )}
+                  style={{
+                    width: `${Math.min(100, (metaTitleLen / 60) * 100)}%`,
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Meta Description */}
+            <div className="flex flex-col gap-1.5">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  Meta Description
+                </label>
+                <span
+                  className={cn(
+                    "text-[11px] font-mono",
+                    metaDescLen > 160 ? "text-red-500" : "text-gray-400",
+                  )}
+                >
+                  {metaDescLen}/160
+                </span>
+              </div>
+              <textarea
+                value={form.metaDesc}
+                onChange={(e) => set("metaDesc", e.target.value)}
+                placeholder="Brief description for search engines…"
+                rows={4}
+                className={cn(
+                  "w-full px-3.5 py-2.5 rounded-xl border text-sm text-gray-800 bg-white placeholder-gray-400 outline-none transition-all resize-none",
+                  "border-gray-200 hover:border-gray-300 focus:border-(--color-primary) focus:ring-2 focus:ring-(--color-primary)/30",
+                  errors.metaDesc && "border-red-400",
+                )}
+              />
+              {errors.metaDesc && (
+                <p className="text-[11px] text-red-500">{errors.metaDesc}</p>
+              )}
+              <div className="w-full bg-gray-100 rounded-full h-1">
+                <div
+                  className={cn(
+                    "h-1 rounded-full transition-all",
+                    metaDescLen > 160
+                      ? "bg-red-500"
+                      : metaDescLen > 130
+                        ? "bg-yellow-500"
+                        : "bg-(--color-primary)",
+                  )}
+                  style={{
+                    width: `${Math.min(100, (metaDescLen / 160) * 100)}%`,
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Search Preview */}
+            {(form.metaTitle || form.metaDesc) && (
+              <div className="border border-gray-200 rounded-xl p-4 bg-gray-50">
+                <p className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold mb-2">
+                  Search Preview
+                </p>
+                <p className="text-blue-600 text-sm font-medium hover:underline cursor-pointer truncate">
+                  {form.metaTitle || form.name || "Page Title"}
+                </p>
+                <p className="text-(--color-primary) text-xs mt-0.5">
+                  yourstore.com/categories/{form.slug || "slug"}
+                </p>
+                <p className="text-gray-500 text-xs mt-1 line-clamp-2">
+                  {form.metaDesc ||
+                    form.description ||
+                    "No description provided."}
+                </p>
+              </div>
+            )}
+          </SectionCard>
         </div>
 
         {/* ── RIGHT SIDEBAR ── */}
-        <div className="flex flex-col gap-5">
-          {/* Preview Card */}
+        <div className="w-full lg:w-72 xl:w-80 flex flex-col gap-5 flex-shrink-0">
+          {/* Live Preview */}
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
             <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4">
               Live Preview
@@ -1251,58 +1238,56 @@ function CategoryForm({ categories, editData, onSave, onCancel, showToast }) {
             </div>
           </div>
 
-          {/* Quick Fields Card */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col gap-4">
+          {/* Quick Details */}
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col gap-3">
             <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-              Quick Actions
+              Quick Details
             </h3>
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600 font-medium">Status</span>
-                <button
-                  onClick={() =>
-                    set(
-                      "status",
-                      form.status === "active" ? "inactive" : "active",
-                    )
-                  }
-                  className={cn(
-                    "px-3 py-1 rounded-full text-xs font-bold transition-all",
-                    form.status === "active"
-                      ? "bg-green-100 text-green-700 hover:bg-red-100 hover:text-red-600"
-                      : "bg-gray-100 text-gray-500 hover:bg-green-100 hover:text-green-700",
-                  )}
-                >
-                  {form.status === "active" ? "Active" : "Inactive"}
-                </button>
-              </div>
-              <div className="h-px bg-gray-100" />
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600 font-medium">Icon</span>
-                <span className="text-xl">{form.icon}</span>
-              </div>
-              {isEdit && (
-                <>
-                  <div className="h-px bg-gray-100" />
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600 font-medium">Products</span>
-                    <span className="font-mono font-bold text-gray-800">
-                      {editData.products}
-                    </span>
-                  </div>
-                  <div className="h-px bg-gray-100" />
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600 font-medium">Created</span>
-                    <span className="text-xs text-gray-400">
-                      {editData.createdAt}
-                    </span>
-                  </div>
-                </>
-              )}
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-gray-600 font-medium">Status</span>
+              <button
+                onClick={() =>
+                  set(
+                    "status",
+                    form.status === "active" ? "inactive" : "active",
+                  )
+                }
+                className={cn(
+                  "px-3 py-1 rounded-full text-xs font-bold transition-all",
+                  form.status === "active"
+                    ? "bg-green-100 text-(--color-primary) hover:bg-red-100 hover:text-red-600"
+                    : "bg-gray-100 text-gray-500 hover:bg-(--color-primary) hover:text-(--color-primary)",
+                )}
+              >
+                {form.status === "active" ? "Active" : "Inactive"}
+              </button>
             </div>
+            <div className="h-px bg-gray-100" />
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-gray-600 font-medium">Icon</span>
+              <span className="text-xl">{form.icon}</span>
+            </div>
+            {isEdit && (
+              <>
+                <div className="h-px bg-gray-100" />
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-600 font-medium">Products</span>
+                  <span className="font-mono font-bold text-gray-800">
+                    {editData.products}
+                  </span>
+                </div>
+                <div className="h-px bg-gray-100" />
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-600 font-medium">Created</span>
+                  <span className="text-xs text-gray-400">
+                    {editData.createdAt}
+                  </span>
+                </div>
+              </>
+            )}
           </div>
 
-          {/* Save Button (sticky) */}
+          {/* Save / Cancel */}
           <Btn
             variant="primary"
             className="w-full justify-center py-3"
@@ -1326,7 +1311,7 @@ function CategoryForm({ categories, editData, onSave, onCancel, showToast }) {
 /* ─── ROOT APP ────────────────────────────────── */
 export default function CategoryManagement() {
   const [categories, setCategories] = useState(INITIAL_CATEGORIES);
-  const [view, setView] = useState("list"); // "list" | "add" | "edit"
+  const [view, setView] = useState("list");
   const [editData, setEditData] = useState(null);
   const [toasts, setToasts] = useState([]);
 
@@ -1372,7 +1357,7 @@ export default function CategoryManagement() {
 
   return (
     <div
-      className="min-h-screen bg-gray-50 p-6"
+      className="min-h-screen bg-gray-50 p-3 sm:p-6"
       style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
     >
       <div className="max-w-7xl mx-auto">
