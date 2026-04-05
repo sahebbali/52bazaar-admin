@@ -27,6 +27,9 @@ import OrderReport from "./pages/amdin/reports/OrderReport";
 import ScheduledReports from "./pages/amdin/reports/ScheduledReports";
 import NotFound from "./pages/amdin/not found/NotFound";
 import Settings from "./pages/amdin/settings/Settings";
+import AdminUsers from "./pages/amdin/users/AdminUsers";
+import AddEditUser from "./pages/amdin/users/AddEditUser";
+import RoleManagement from "./pages/amdin/users/RoleManagement";
 
 // Dummy components for example
 
@@ -73,6 +76,10 @@ function App() {
             <Route path="orders" element={<OrderReport />} />
             <Route path="scheduled" element={<ScheduledReports />} />
           </Route>
+          {/* 🔥 User Routes */}
+          <Route path="users" element={<AdminUsers />} />
+          <Route path="users/add" element={<AddEditUser />} />
+          <Route path="users/edit/:id" element={<AddEditUser />} />
           {/* 🔥 setting Routes */}
           <Route path="settings" element={<Settings />} />
           <Route path="*" element={<NotFound />} />

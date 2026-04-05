@@ -1,4 +1,3 @@
-// Settings.jsx
 import React, { useState, useEffect } from "react";
 import { Save, Globe, CreditCard, Mail, Bell, Upload, X } from "lucide-react";
 
