@@ -96,7 +96,7 @@ const AddEditProduct = () => {
           </div>
           <button
             onClick={() => navigate("/admin/products")}
-            className="text-gray-600 hover:text-gray-900 transition-colors"
+            className="text-gray-600 cursor-pointer hover:text-red-600 transition-colors"
             aria-label="Close"
           >
             <X size={24} />

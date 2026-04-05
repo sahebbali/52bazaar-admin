@@ -7,7 +7,7 @@ export default function ActionButton({ icon, badge, label = "" }) {
   return (
     <button
       aria-label={label}
-      className="relative w-9 h-9 rounded-xl bg-gray-50 hover:bg-green-50 hover:text-green-700 text-gray-500 flex items-center justify-center transition-all text-base flex-shrink-0"
+      className="relative w-9 h-9 cursor-pointer rounded-xl bg-gray-50 hover:bg-green-50 hover:text-green-700 text-gray-500 flex items-center justify-center transition-all text-base flex-shrink-0"
     >
       {icon}
       {badge && (

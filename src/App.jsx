@@ -26,6 +26,7 @@ import SalesReport from "./pages/amdin/reports/SalesReport";
 import OrderReport from "./pages/amdin/reports/OrderReport";
 import ScheduledReports from "./pages/amdin/reports/ScheduledReports";
 import NotFound from "./pages/amdin/not found/NotFound";
+import Settings from "./pages/amdin/settings/Settings";
 
 // Dummy components for example
 
@@ -65,13 +66,15 @@ function App() {
           <Route path="payments" element={<PaymentList />} />
           <Route path="payments/:id" element={<PaymentDetails />} />
           <Route path="payments/:id/refund" element={<RefundManagement />} />
-
+          {/* 🔥 Reports Routes */}
           <Route path="reports" element={<ReportsDashboard />}>
             <Route index element={<SalesReport />} />
             <Route path="sales" element={<SalesReport />} />
             <Route path="orders" element={<OrderReport />} />
             <Route path="scheduled" element={<ScheduledReports />} />
           </Route>
+          {/* 🔥 setting Routes */}
+          <Route path="settings" element={<Settings />} />
           <Route path="*" element={<NotFound />} />
         </Route>
         {/* 404 Not Found Route */}
