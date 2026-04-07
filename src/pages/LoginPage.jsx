@@ -1,7 +1,8 @@
-import React, { use, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import { Eye, EyeOff, Mail, Lock, ArrowRight } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import MyLogo from "../components/MyLogo";
+import { useAdminLoginMutation } from "../services/authApi";
 
 export default function LoginPage() {
   const navigat = useNavigate();
@@ -9,12 +10,22 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [adminLogin, { data, isLoading, isError, error }] =
+    useAdminLoginMutation();
 
   const handleLogin = () => {
     console.log("Login:", { email, password, rememberMe });
+    const obj = { email, password };
+    adminLogin(obj);
     // Simulate successful login and navigate to dashboard
-    navigat("/admin/dashboard");
   };
+  useEffect(() => {
+    if (data) {
+      console.log("Login successful:", data);
+      navigat("/admin/dashboard");
+    }
+  }, [data]);
+  console.log("Login Data:", { data, isLoading, isError, error });
 
   return (
     <div className="min-h-screen w-full bg-gray-50">
@@ -69,7 +80,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
-                  className="w-full pl-12 pr-12 py-3 border border-gray-300 rounded-xl focus:border-green-500 focus:outline-none"
+                  className="w-full pl-12 pr-12 py-3 border text-black border-gray-300 rounded-xl focus:border-green-500 focus:outline-none"
                 />
                 <button
                   type="button"

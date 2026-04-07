@@ -1,0 +1,26 @@
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+
+export const authApi = createApi({
+  reducerPath: "api",
+  baseQuery: fetchBaseQuery({
+    baseUrl: "http://localhost:5000/api",
+    prepareHeaders: (headers) => {
+      const token = localStorage.getItem("token");
+      if (token) headers.set("authorization", `Bearer ${token}`);
+      return headers;
+    },
+  }),
+  tagTypes: ["Task", "User", "Auth"],
+  endpoints: (builder) => ({
+    adminLogin: builder.mutation({
+      query: (body) => ({
+        url: "/admin/login",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["User", "Auth"],
+    }),
+  }),
+});
+
+export const { useAdminLoginMutation } = authApi;

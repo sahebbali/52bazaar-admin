@@ -4,13 +4,17 @@ import { BrowserRouter } from "react-router-dom"; // 1. Import this
 import App from "./App";
 import "./index.css";
 import { CartProvider } from "./context/CartContext";
+import { Provider } from "react-redux";
+import { store } from "./store/store";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     {/* 2. Wrap your App component here */}
     <BrowserRouter>
       <CartProvider>
-        <App />
+        <Provider store={store}>
+          <App />
+        </Provider>
       </CartProvider>
     </BrowserRouter>
   </React.StrictMode>,
