@@ -3,9 +3,10 @@ import { Eye, EyeOff, Mail, Lock, ArrowRight } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import MyLogo from "../components/MyLogo";
 import { useAdminLoginMutation } from "../services/authApi";
+import { Notification } from "../components/ToastNotification";
 
 export default function LoginPage() {
-  const navigat = useNavigate();
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -22,9 +23,14 @@ export default function LoginPage() {
   useEffect(() => {
     if (data) {
       console.log("Login successful:", data);
-      navigat("/admin/dashboard");
+      localStorage.setItem("52bazaarToken", data.token);
+      Notification(data.message, "success");
+      navigate("/admin/dashboard");
+    } else if (isError) {
+      console.log("Login failed:", error);
+      Notification(error?.data?.message || "Login failed", "error");
     }
-  }, [data]);
+  }, [data, isError, error, navigate]);
   console.log("Login Data:", { data, isLoading, isError, error });
 
   return (
@@ -61,7 +67,7 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email"
-                  className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:border-green-500 focus:outline-none"
+                  className="w-full pl-12 pr-4 py-3 text-black border border-gray-300 rounded-xl focus:border-(--color-primary) focus:outline-none"
                 />
               </div>
             </div>
@@ -80,7 +86,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
-                  className="w-full pl-12 pr-12 py-3 border text-black border-gray-300 rounded-xl focus:border-green-500 focus:outline-none"
+                  className="w-full pl-12 pr-12 py-3 border text-black border-gray-300 rounded-xl focus:border-(--color-primary) focus:outline-none"
                 />
                 <button
                   type="button"
@@ -110,7 +116,7 @@ export default function LoginPage() {
 
               <Link
                 to="/forgot-password"
-                className="text-sm font-semibold text-green-600"
+                className="text-sm font-semibold text-(--color-primary) hover:underline"
               >
                 Forgot Password?
               </Link>
@@ -121,7 +127,8 @@ export default function LoginPage() {
               onClick={handleLogin}
               className="w-full cursor-pointer bg-(--color-primary) text-white font-semibold py-4 rounded-xl hover:bg-(--color-primary-hover) transition flex items-center justify-center gap-2"
             >
-              Sign In
+              {isLoading ? "Signing In..." : "Sign In"}
+
               <ArrowRight className="w-5 h-5" />
             </button>
 
