@@ -21,7 +21,7 @@ export default function LoginPage() {
     // Simulate successful login and navigate to dashboard
   };
   useEffect(() => {
-    if (data) {
+    if (data?.data?.role === "admin") {
       console.log("Login successful:", data);
       localStorage.setItem("52bazaarToken", data.token);
       Notification(data.message, "success");
