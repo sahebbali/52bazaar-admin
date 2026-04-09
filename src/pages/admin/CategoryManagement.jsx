@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from "react";
+import { useAddCategoryMutation } from "../../services/categoryApi";
+import { Notification } from "../../components/ToastNotification";
 
 /* ─── MOCK DATA ───────────────────────────────── */
 const INITIAL_CATEGORIES = [
@@ -361,7 +363,7 @@ function CategoryList({ categories, onEdit, onDelete, onAdd, showToast }) {
             value: categories.length,
             icon: "🗂️",
             bg: "bg-green-50",
-            color: "text-(!--color-primary)",
+            color: "text-black ",
           },
           {
             label: "Active",
@@ -387,7 +389,7 @@ function CategoryList({ categories, onEdit, onDelete, onAdd, showToast }) {
           >
             <div className="text-xl sm:text-2xl">{s.icon}</div>
             <div>
-              <p className="text-[10px] sm:text-xs text-gray-500 font-medium">
+              <p className="text-[10px]  sm:text-xs text-black font-medium">
                 {s.label}
               </p>
               <p
@@ -776,6 +778,20 @@ function CategoryForm({ categories, editData, onSave, onCancel, showToast }) {
   const [imagePreview, setImagePreview] = useState(null);
   const fileInputRef = useRef(null);
 
+  const [addCategory, { data, isLoading, isError }] = useAddCategoryMutation();
+
+  useEffect(() => {
+    if (data) {
+      Notification(data.message, "success");
+      onCancel();
+    }
+
+    if (isError) {
+      console.log("Error:", isError);
+      Notification(isError?.data?.message || "Something went wrong", "error");
+    }
+  }, [data, isError]);
+
   const ICONS = [
     "🗂️",
     "🥦",
@@ -818,12 +834,23 @@ function CategoryForm({ categories, editData, onSave, onCancel, showToast }) {
     return Object.keys(e).length === 0;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!validate()) {
       showToast("Please fix the errors.", "error");
       return;
     }
-    onSave({ ...form, parent: form.parent || null });
+    const object = {
+      name: form.name,
+      slug: form.slug,
+      description: form.description,
+      parent: form.parent,
+      status: form.status,
+      icon: form.icon,
+      metaTitle: form.metaTitle,
+      metaDesc: form.metaDesc,
+    };
+    console.log({ object });
+    await addCategory(object);
     showToast(isEdit ? "Category updated!" : "Category created!", "success");
   };
 
@@ -1292,7 +1319,9 @@ function CategoryForm({ categories, editData, onSave, onCancel, showToast }) {
             variant="primary"
             className="w-full justify-center py-3"
             onClick={handleSubmit}
+            disabled={isLoading}
           >
+            {/* {loading ? "Saving..." : null} */}
             {isEdit ? "💾 Save Changes" : "✅ Create Category"}
           </Btn>
           <Btn

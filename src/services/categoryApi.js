@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { API_BASE_URL } from "../../env";
 
-export const authApi = createApi({
+export const categoryApi = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({
     baseUrl: API_BASE_URL,
@@ -11,17 +11,17 @@ export const authApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ["Task", "User", "Auth"],
+  tagTypes: ["Category"],
   endpoints: (builder) => ({
-    adminLogin: builder.mutation({
+    addCategory: builder.mutation({
       query: (body) => ({
-        url: "/admin/login",
+        url: "/admin/add-category",
         method: "POST",
         body,
       }),
-      invalidatesTags: ["User", "Auth"],
+      invalidatesTags: ["Category"],
     }),
   }),
 });
 
-export const { useAdminLoginMutation } = authApi;
+export const { useAddCategoryMutation } = categoryApi;
