@@ -1,5 +1,10 @@
 import { useState, useEffect, useRef } from "react";
-import { useAddCategoryMutation } from "../../services/categoryApi";
+import {
+  useAddCategoryMutation,
+  useDeleteCategoryMutation,
+  useGetAllCategoriesQuery,
+  useUpdateCategoryMutation,
+} from "../../services/categoryApi";
 import { Notification } from "../../components/ToastNotification";
 
 /* ─── MOCK DATA ───────────────────────────────── */
@@ -319,10 +324,9 @@ function CategoryList({ categories, onEdit, onDelete, onAdd, showToast }) {
   const confirmDelete = () => {
     if (deleteModal === "single") {
       onDelete([deleteTarget]);
-      showToast("Category deleted successfully.", "success");
     } else {
       onDelete(selected);
-      showToast(`${selected.length} categories deleted.`, "success");
+
       setSelected([]);
     }
     setDeleteModal(null);
@@ -728,9 +732,9 @@ function CategoryList({ categories, onEdit, onDelete, onAdd, showToast }) {
         title="Confirm Delete"
       >
         <div className="flex flex-col gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-red-100 flex items-center justify-center text-3xl mx-auto">
+          {/* <div className="w-14 h-14 rounded-2xl bg-red-100 flex items-center justify-center text-3xl mx-auto">
             🗑️
-          </div>
+          </div> */}
           <p className="text-center text-gray-700 text-sm leading-relaxed">
             {deleteModal === "bulk"
               ? `Are you sure you want to delete ${selected.length} selected categories? This action cannot be undone.`
@@ -779,18 +783,35 @@ function CategoryForm({ categories, editData, onSave, onCancel, showToast }) {
   const fileInputRef = useRef(null);
 
   const [addCategory, { data, isLoading, isError }] = useAddCategoryMutation();
+  const [
+    updateCategory,
+    { data: updateData, isLoading: updateLoading, isError: updateIsError },
+  ] = useUpdateCategoryMutation();
 
   useEffect(() => {
     if (data) {
       Notification(data.message, "success");
       onCancel();
     }
-
     if (isError) {
       console.log("Error:", isError);
       Notification(isError?.data?.message || "Something went wrong", "error");
     }
   }, [data, isError]);
+
+  useEffect(() => {
+    if (updateData) {
+      Notification(updateData.message, "success");
+      onCancel();
+    }
+    if (updateIsError) {
+      console.log("Error:", updateIsError);
+      Notification(
+        updateIsError?.data?.message || "Something went wrong",
+        "error",
+      );
+    }
+  }, [updateData, updateIsError]);
 
   const ICONS = [
     "🗂️",
@@ -850,7 +871,11 @@ function CategoryForm({ categories, editData, onSave, onCancel, showToast }) {
       metaDesc: form.metaDesc,
     };
     console.log({ object });
-    await addCategory(object);
+    if (isEdit) {
+      await updateCategory({ id: editData.id, ...object });
+    } else {
+      await addCategory(object);
+    }
     showToast(isEdit ? "Category updated!" : "Category created!", "success");
   };
 
@@ -1339,10 +1364,29 @@ function CategoryForm({ categories, editData, onSave, onCancel, showToast }) {
 
 /* ─── ROOT APP ────────────────────────────────── */
 export default function CategoryManagement() {
-  const [categories, setCategories] = useState(INITIAL_CATEGORIES);
+  const [categories, setCategories] = useState([]);
   const [view, setView] = useState("list");
   const [editData, setEditData] = useState(null);
   const [toasts, setToasts] = useState([]);
+
+  const { data, isLoading } = useGetAllCategoriesQuery();
+  // console.log("Categories from API:", data, "Loading:", isLoading);
+  const [deleteCategory, { data: deleteData, isError: deleteError }] =
+    useDeleteCategoryMutation();
+
+  useEffect(() => {
+    if (data) {
+      setCategories(data);
+    }
+  }, [data]);
+
+  useEffect(() => {
+    if (deleteData) {
+      showToast(deleteData.message, "success");
+    } else if (deleteError) {
+      showToast(deleteError.data.message, "error");
+    }
+  }, [deleteData, deleteError]);
 
   const showToast = (message, type = "success") => {
     const id = Date.now();
@@ -1380,8 +1424,13 @@ export default function CategoryManagement() {
     setView("list");
   };
 
-  const handleDelete = (ids) => {
-    setCategories((cats) => cats.filter((c) => !ids.includes(c.id)));
+  const handleDelete = async (ids) => {
+    console.log("Deleting categories with IDs:", ids);
+    const object = {
+      id: ids[0],
+    };
+    await deleteCategory(object);
+    // setCategories((cats) => cats.filter((c) => !ids.includes(c.id)));
   };
 
   return (
