@@ -1,23 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import {
-  Plus,
-  Search,
-  Filter,
-  Grid3x3,
-  Table2,
-  Edit,
-  Trash2,
-  Eye,
-} from "lucide-react";
+import { Plus, Search, Grid3x3, Table2 } from "lucide-react";
 import ProductTable from "./components/ProductTable";
 import ProductGrid from "./components/ProductGrid";
 import DeleteConfirmation from "./components/DeleteConfirmation";
+import { useGetAllProductsQuery } from "../../../services/productApi";
+import Pagination from "./components/Pagination";
 
 const ProductList = () => {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [viewMode, setViewMode] = useState("table"); // 'table' or 'grid'
+  const [viewMode, setViewMode] = useState("table");
   const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState({
     category: "",
@@ -28,55 +19,36 @@ const ProductList = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
 
-  // Mock data - replace with API call
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
+  // API call with all parameters
+  const { data, isLoading, refetch } = useGetAllProductsQuery({
+    page: currentPage,
+    limit: itemsPerPage,
+    search: searchTerm,
+    category: filters.category,
+    status: filters.status,
+    stockStatus: filters.stockStatus,
+  });
+
+  // Extract data from API response
+  const products = data?.data || [];
+  const totalItems = data?.total || 0;
+  const categories = data?.categories || []; // Assuming API returns categories list
+
+  // Reset to first page when filters/search change
   useEffect(() => {
-    fetchProducts();
-  }, []);
+    setCurrentPage(1);
+  }, [searchTerm, filters]);
 
-  const fetchProducts = async () => {
-    // Simulate API call
-    const mockProducts = [
-      {
-        id: 1,
-        name: "Wireless Headphones",
-        sku: "WH-001",
-        price: 99.99,
-        salePrice: 79.99,
-        stock: 45,
-        status: "active",
-        category: "Electronics",
-        image: "https://via.placeholder.com/100",
-        lowStockThreshold: 10,
-      },
-      {
-        id: 2,
-        name: "Smart Watch",
-        sku: "SW-002",
-        price: 199.99,
-        salePrice: null,
-        stock: 5,
-        status: "active",
-        category: "Electronics",
-        image: "https://via.placeholder.com/100",
-        lowStockThreshold: 10,
-      },
-      {
-        id: 3,
-        name: "Cotton T-Shirt",
-        sku: "CT-003",
-        price: 29.99,
-        salePrice: 19.99,
-        stock: 0,
-        status: "inactive",
-        category: "Clothing",
-        image: "https://via.placeholder.com/100",
-        lowStockThreshold: 20,
-      },
-    ];
-    setProducts(mockProducts);
-    setLoading(false);
-  };
+  // Refetch data when dependencies change
+  useEffect(() => {
+    refetch();
+  }, [currentPage, itemsPerPage, searchTerm, filters, refetch]);
 
+  // Stock status helper function
   const getStockStatus = (stock, threshold) => {
     if (stock <= 0)
       return { label: "Out of Stock", color: "bg-red-100 text-red-800" };
@@ -85,42 +57,53 @@ const ProductList = () => {
     return { label: "In Stock", color: "bg-green-100 text-green-800" };
   };
 
+  // Handle delete
   const handleDelete = async (id) => {
-    // API call to delete
-    setProducts(products.filter((p) => p.id !== id));
-    setShowDeleteModal(false);
-    setProductToDelete(null);
-  };
+    try {
+      // API call to delete
+      // await deleteProductMutation(id).unwrap();
 
-  const handleBulkAction = async (action) => {
-    if (action === "delete") {
-      setProducts(products.filter((p) => !selectedProducts.includes(p.id)));
-      setSelectedProducts([]);
+      // Refetch products after deletion
+      refetch();
+      setShowDeleteModal(false);
+      setProductToDelete(null);
+    } catch (error) {
+      console.error("Delete failed:", error);
     }
   };
 
-  const filteredProducts = products.filter((product) => {
-    const matchesSearch =
-      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.sku.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory =
-      !filters.category || product.category === filters.category;
-    const matchesStatus = !filters.status || product.status === filters.status;
+  // Handle bulk actions
+  const handleBulkAction = async (action) => {
+    if (action === "delete") {
+      try {
+        // API call to bulk delete
+        // await bulkDeleteProducts(selectedProducts).unwrap();
 
-    let matchesStockStatus = true;
-    if (filters.stockStatus === "in")
-      matchesStockStatus = product.stock > product.lowStockThreshold;
-    if (filters.stockStatus === "low")
-      matchesStockStatus =
-        product.stock <= product.lowStockThreshold && product.stock > 0;
-    if (filters.stockStatus === "out") matchesStockStatus = product.stock === 0;
+        refetch();
+        setSelectedProducts([]);
+      } catch (error) {
+        console.error("Bulk delete failed:", error);
+      }
+    }
+  };
 
-    return (
-      matchesSearch && matchesCategory && matchesStatus && matchesStockStatus
-    );
-  });
+  // Calculate pagination values
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const startIndex =
+    totalItems === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
+  const endIndex = Math.min(currentPage * itemsPerPage, totalItems);
 
-  const categories = [...new Set(products.map((p) => p.category))];
+  // Handle page change
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  // Handle items per page change
+  const handleItemsPerPageChange = (value) => {
+    setItemsPerPage(value);
+    setCurrentPage(1);
+  };
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
@@ -132,7 +115,7 @@ const ProductList = () => {
         </div>
         <Link
           to="/admin/products/add"
-          className="bg-(--color-primary) hover:bg-(--color-primary-hover) text-white px-4 py-2 rounded-lg flex items-center gap-2 transition"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition"
         >
           <Plus size={20} />
           Add Product
@@ -246,28 +229,58 @@ const ProductList = () => {
       )}
 
       {/* Products View */}
-      {loading ? (
+      {isLoading ? (
         <div className="text-center py-12">Loading...</div>
       ) : viewMode === "table" ? (
-        <ProductTable
-          products={filteredProducts}
-          selectedProducts={selectedProducts}
-          setSelectedProducts={setSelectedProducts}
-          onDelete={(product) => {
-            setProductToDelete(product);
-            setShowDeleteModal(true);
-          }}
-          getStockStatus={getStockStatus}
-        />
+        <>
+          <ProductTable
+            products={products}
+            selectedProducts={selectedProducts}
+            setSelectedProducts={setSelectedProducts}
+            onDelete={(product) => {
+              setProductToDelete(product);
+              setShowDeleteModal(true);
+            }}
+            getStockStatus={getStockStatus}
+          />
+
+          {totalItems > 0 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              itemsPerPage={itemsPerPage}
+              totalItems={totalItems}
+              startIndex={startIndex}
+              endIndex={endIndex}
+              onPageChange={handlePageChange}
+              onItemsPerPageChange={handleItemsPerPageChange}
+            />
+          )}
+        </>
       ) : (
-        <ProductGrid
-          products={filteredProducts}
-          onDelete={(product) => {
-            setProductToDelete(product);
-            setShowDeleteModal(true);
-          }}
-          getStockStatus={getStockStatus}
-        />
+        <>
+          <ProductGrid
+            products={products}
+            onDelete={(product) => {
+              setProductToDelete(product);
+              setShowDeleteModal(true);
+            }}
+            getStockStatus={getStockStatus}
+          />
+
+          {totalItems > 0 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              itemsPerPage={itemsPerPage}
+              totalItems={totalItems}
+              startIndex={startIndex}
+              endIndex={endIndex}
+              onPageChange={handlePageChange}
+              onItemsPerPageChange={handleItemsPerPageChange}
+            />
+          )}
+        </>
       )}
 
       {/* Delete Confirmation Modal */}
