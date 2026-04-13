@@ -144,7 +144,7 @@ const ProductTable = ({
                       </Link>
                       <button
                         onClick={() => onDelete(product)}
-                        className="text-red-600 hover:text-red-900"
+                        className="text-red-600 cursor-pointer hover:text-red-900"
                       >
                         <Trash2 size={18} />
                       </button>

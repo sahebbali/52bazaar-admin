@@ -12,6 +12,7 @@ import {
 import {
   useAddProductMutation,
   useGetProductByIdQuery,
+  useUpdateProductMutation,
 } from "../../../services/productApi";
 import { Notification } from "../../../components/ToastNotification";
 import { getStatusColor } from "./../../../utils/orderUtils";
@@ -52,6 +53,24 @@ const AddEditProduct = () => {
       Notification(isError?.data?.message || "Something went wrong", "error");
     }
   }, [data, isError]);
+  // update product
+  const [
+    updateProduct,
+    { data: updateData, isLoading: isUpdating, isError: isUpdateError },
+  ] = useUpdateProductMutation();
+  console.log("updateData", updateData);
+  console.log("isUpdateError", isUpdateError);
+  useEffect(() => {
+    if (updateData) {
+      Notification(updateData.message, "success");
+      navigate("/admin/products");
+    }
+    if (isUpdateError) {
+      console.log("Error:", isUpdateError);
+      Notification(isUpdateError?.data?.message, "error");
+    }
+  }, [updateData, isUpdateError]);
+
   // console.log("my id", id);
 
   const { data: productData } = useGetProductByIdQuery(id);
@@ -64,6 +83,7 @@ const AddEditProduct = () => {
   }, [id, productData]);
 
   const fetchProduct = async () => {
+    console.log("Fetching product data...");
     setLoading(true);
     // const mockProduct = {
     //   name: "Wireless Headphones",
@@ -135,6 +155,9 @@ const AddEditProduct = () => {
 
       // ── Append tags array as JSON ────────────────────────────────────────
       formDataToSend.append("tags", JSON.stringify(formData.tags));
+      if (id) {
+        formDataToSend.append("id", id);
+      }
 
       // ── Append image files (new uploads only) ────────────────────────────
       // Images that came from the server (existing) have a `url` but no `file`
@@ -144,13 +167,16 @@ const AddEditProduct = () => {
           formDataToSend.append("images", img.file);
         }
       });
-
-      await addProduct(formDataToSend); // pass FormData, NOT formData
+      if (id) {
+        console.log("Updating product with data:", formDataToSend);
+        await updateProduct(formDataToSend); // pass FormData, NOT formData
+      } else {
+        await addProduct(formDataToSend); // pass FormData, NOT formData
+      }
     } catch (err) {
       console.error("Save failed:", err);
     } finally {
       setLoading(false);
-      // navigate("/admin/products");
     }
   };
 

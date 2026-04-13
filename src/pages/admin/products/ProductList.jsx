@@ -4,8 +4,12 @@ import { Plus, Search, Grid3x3, Table2 } from "lucide-react";
 import ProductTable from "./components/ProductTable";
 import ProductGrid from "./components/ProductGrid";
 import DeleteConfirmation from "./components/DeleteConfirmation";
-import { useGetAllProductsQuery } from "../../../services/productApi";
+import {
+  useDeleteProductMutation,
+  useGetAllProductsQuery,
+} from "../../../services/productApi";
 import Pagination from "./components/Pagination";
+import { Notification } from "../../../components/ToastNotification";
 
 const ProductList = () => {
   const [viewMode, setViewMode] = useState("table");
@@ -22,7 +26,31 @@ const ProductList = () => {
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [
+    deleteProduct,
+    { data: deleteData, isLoading: isDeleting, error: deleteError },
+  ] = useDeleteProductMutation();
 
+  useEffect(() => {
+    if (deleteData) {
+      console.log("Delete successful:", deleteData);
+      Notification(
+        deleteData?.message || "Product deleted successfully",
+        "success",
+      );
+      setShowDeleteModal(false);
+      setProductToDelete(null);
+      // Optionally show a success notification here
+    }
+    if (deleteError) {
+      console.error("Delete failed:", deleteError);
+      Notification(
+        deleteError?.data?.message || "Failed to delete product",
+        "error",
+      );
+      // Optionally show an error notification here
+    }
+  }, [deleteData, deleteError]);
   // API call with all parameters
   const { data, isLoading, refetch } = useGetAllProductsQuery({
     page: currentPage,
@@ -60,13 +88,13 @@ const ProductList = () => {
   // Handle delete
   const handleDelete = async (id) => {
     try {
+      console.log("Delete product:", id);
       // API call to delete
       // await deleteProductMutation(id).unwrap();
 
       // Refetch products after deletion
-      refetch();
-      setShowDeleteModal(false);
-      setProductToDelete(null);
+
+      await deleteProduct({ id }).unwrap();
     } catch (error) {
       console.error("Delete failed:", error);
     }
@@ -287,7 +315,7 @@ const ProductList = () => {
       {showDeleteModal && productToDelete && (
         <DeleteConfirmation
           product={productToDelete}
-          onConfirm={() => handleDelete(productToDelete.id)}
+          onConfirm={() => handleDelete(productToDelete._id)}
           onCancel={() => {
             setShowDeleteModal(false);
             setProductToDelete(null);

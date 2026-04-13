@@ -48,6 +48,22 @@ export const productApi = createApi({
       }),
       providesTags: ["Product"],
     }),
+    updateProduct: builder.mutation({
+      query: (body) => ({
+        url: `/admin/update-product`, // RESTful approach (preferred)
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: ["Product"],
+    }),
+    deleteProduct: builder.mutation({
+      query: (body) => ({
+        url: `/admin/delete-product/${body.id}`, // RESTful approach (preferred)
+        method: "DELETE",
+        body,
+      }),
+      invalidatesTags: ["Product"],
+    }),
   }),
 });
 
@@ -55,4 +71,6 @@ export const {
   useAddProductMutation,
   useGetAllProductsQuery,
   useGetProductByIdQuery,
+  useUpdateProductMutation,
+  useDeleteProductMutation,
 } = productApi;
