@@ -41,6 +41,10 @@ export const categoryApi = createApi({
       query: () => "/admin/get-all-categories",
       providesTags: ["Category"],
     }),
+    getCategoryTree: builder.query({
+      query: () => "/admin/get-category-tree",
+      providesTags: ["Category"],
+    }),
   }),
 });
 
@@ -49,4 +53,5 @@ export const {
   useGetAllCategoriesQuery,
   useUpdateCategoryMutation,
   useDeleteCategoryMutation,
+  useGetCategoryTreeQuery,
 } = categoryApi;

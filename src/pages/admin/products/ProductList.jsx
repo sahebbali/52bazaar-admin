@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Plus, Search, Grid3x3, Table2 } from "lucide-react";
 import ProductTable from "./components/ProductTable";
@@ -10,6 +10,7 @@ import {
 } from "../../../services/productApi";
 import Pagination from "./components/Pagination";
 import { Notification } from "../../../components/ToastNotification";
+import { useGetCategoryTreeQuery } from "../../../services/categoryApi";
 
 const ProductList = () => {
   const [viewMode, setViewMode] = useState("table");
@@ -20,6 +21,7 @@ const ProductList = () => {
     stockStatus: "",
   });
   const [selectedProducts, setSelectedProducts] = useState([]);
+  // const [categoryTree, setCategoryTree] = useState([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
 
@@ -28,10 +30,16 @@ const ProductList = () => {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [
     deleteProduct,
-    { data: deleteData, isLoading: isDeleting, error: deleteError },
+    {
+      data: deleteData,
+      isLoading: isDeleting,
+      isError: deleteError,
+      error: mutationError,
+    },
   ] = useDeleteProductMutation();
 
   useEffect(() => {
+    // Only proceed if we have data or error
     if (deleteData) {
       console.log("Delete successful:", deleteData);
       Notification(
@@ -40,17 +48,18 @@ const ProductList = () => {
       );
       setShowDeleteModal(false);
       setProductToDelete(null);
-      // Optionally show a success notification here
     }
-    if (deleteError) {
-      console.error("Delete failed:", deleteError);
-      Notification(
-        deleteError?.data?.message || "Failed to delete product",
-        "error",
-      );
-      // Optionally show an error notification here
+
+    if (deleteError || mutationError) {
+      const errorMessage =
+        deleteError?.data?.message ||
+        mutationError?.data?.message ||
+        "Failed to delete product";
+      console.error("Delete failed:", deleteError || mutationError);
+      Notification(errorMessage, "error");
+      // Don't clear modal on error so user can retry
     }
-  }, [deleteData, deleteError]);
+  }, [deleteData, deleteError, mutationError]);
   // API call with all parameters
   const { data, isLoading, refetch } = useGetAllProductsQuery({
     page: currentPage,
@@ -64,7 +73,19 @@ const ProductList = () => {
   // Extract data from API response
   const products = data?.data || [];
   const totalItems = data?.total || 0;
-  const categories = data?.categories || []; // Assuming API returns categories list
+
+  const { data: categoryData = [] } = useGetCategoryTreeQuery();
+
+  console.log("Categories Tree from API:", categoryData);
+  const categoryTree = useMemo(() => {
+    return (categoryData || []).map(({ name, icon }) => ({
+      name,
+      icon,
+    }));
+  }, [categoryData]);
+
+  console.log("Categories Treee :", categoryTree);
+  // Assuming API returns categories list
 
   // Reset to first page when filters/search change
   useEffect(() => {
@@ -72,9 +93,9 @@ const ProductList = () => {
   }, [searchTerm, filters]);
 
   // Refetch data when dependencies change
-  useEffect(() => {
-    refetch();
-  }, [currentPage, itemsPerPage, searchTerm, filters, refetch]);
+  // useEffect(() => {
+  //   refetch();
+  // }, [currentPage, itemsPerPage, searchTerm, filters, refetch]);
 
   // Stock status helper function
   const getStockStatus = (stock, threshold) => {
@@ -86,17 +107,15 @@ const ProductList = () => {
   };
 
   // Handle delete
-  const handleDelete = async (id) => {
+  const handleDelete = async (productId) => {
     try {
-      console.log("Delete product:", id);
-      // API call to delete
-      // await deleteProductMutation(id).unwrap();
-
-      // Refetch products after deletion
-
-      await deleteProduct({ id }).unwrap();
-    } catch (error) {
-      console.error("Delete failed:", error);
+      if (!deleteProduct) {
+        throw new Error("Delete function not available");
+      }
+      await deleteProduct(productId).unwrap();
+    } catch (err) {
+      console.error("Delete operation failed:", err);
+      Notification(err?.data?.message || "Delete operation failed", "error");
     }
   };
 
@@ -143,7 +162,7 @@ const ProductList = () => {
         </div>
         <Link
           to="/admin/products/add"
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition"
+          className="bg-(--color-primary) hover:bg-(--color-primary-hover) text-white px-4 py-2 rounded-lg flex items-center gap-2 transition"
         >
           <Plus size={20} />
           Add Product
@@ -177,9 +196,9 @@ const ProductList = () => {
             className="px-4 py-2 border text-black border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">All Categories</option>
-            {categories.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
+            {categoryTree.map((cat) => (
+              <option key={cat.name} value={cat.name}>
+                {cat.name}
               </option>
             ))}
           </select>

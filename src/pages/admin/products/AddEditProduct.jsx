@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   Save,
@@ -16,6 +16,7 @@ import {
 } from "../../../services/productApi";
 import { Notification } from "../../../components/ToastNotification";
 import { getStatusColor } from "./../../../utils/orderUtils";
+import { useGetCategoryTreeQuery } from "../../../services/categoryApi";
 
 const AddEditProduct = () => {
   const { id } = useParams();
@@ -72,6 +73,15 @@ const AddEditProduct = () => {
   }, [updateData, isUpdateError]);
 
   // console.log("my id", id);
+  const { data: categoryData = [] } = useGetCategoryTreeQuery();
+
+  console.log("Categories Tree from API:", categoryData);
+  const categoryTree = useMemo(() => {
+    return (categoryData || []).map(({ name, icon }) => ({
+      name,
+      icon,
+    }));
+  }, [categoryData]);
 
   const { data: productData } = useGetProductByIdQuery(id);
   // console.log("Fetched product data:", productData);
@@ -321,13 +331,19 @@ const AddEditProduct = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Category
                     </label>
-                    <input
-                      type="text"
+                    <select
                       name="category"
                       value={formData.category}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent"
-                    />
+                      className="px-4 py-2 border text-black border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-(--color-primary) focus:border-transparent w-full"
+                    >
+                      <option value="">All Categories</option>
+                      {categoryTree.map((cat) => (
+                        <option key={cat.name} value={cat.name}>
+                          {cat.name}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
