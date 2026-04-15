@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 
 const OrderStatusModal = ({ currentStatus, onClose, onUpdate }) => {
+  console.log("Current Status in Modal:", currentStatus);
   const [status, setStatus] = useState(currentStatus);
   const [note, setNote] = useState("");
   const [sendEmail, setSendEmail] = useState(true);
@@ -56,7 +57,7 @@ const OrderStatusModal = ({ currentStatus, onClose, onUpdate }) => {
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-(--color-primary)"
               >
                 {statusOptions.map((option) => (
                   <option
@@ -88,7 +89,7 @@ const OrderStatusModal = ({ currentStatus, onClose, onUpdate }) => {
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
                 rows="3"
-                className="w-full px-3 py-2  border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-(--color-primary)"
                 placeholder="Add a note for the customer..."
               />
             </div>
@@ -99,7 +100,7 @@ const OrderStatusModal = ({ currentStatus, onClose, onUpdate }) => {
                 id="sendEmail"
                 checked={sendEmail}
                 onChange={(e) => setSendEmail(e.target.checked)}
-                className="h-4 w-4 text-black focus:ring-blue-500 border-gray-300 rounded"
+                className="h-4 w-4 text-black focus:ring-(--color-primary) border-gray-300 rounded"
               />
               <label
                 htmlFor="sendEmail"
@@ -114,7 +115,7 @@ const OrderStatusModal = ({ currentStatus, onClose, onUpdate }) => {
         <div className="bg-gray-50 px-6 py-3 rounded-b-lg flex justify-end space-x-3">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-red border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            className="px-4 py-2 text-sm cursor-pointer font-medium text-gray-700 bg-red border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           >
             Cancel
           </button>
@@ -125,7 +126,7 @@ const OrderStatusModal = ({ currentStatus, onClose, onUpdate }) => {
               (status !== currentStatus &&
                 !getAvailableStatuses().includes(status))
             }
-            className="px-4 py-2 text-sm font-medium text-white bg-(--color-primary) border border-transparent rounded-md hover:bg-(--color-primary-hover) focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 text-sm font-medium cursor-pointer text-white bg-(--color-primary) border border-transparent rounded-md hover:bg-(--color-primary-hover) focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? "Updating..." : "Update Status"}
           </button>

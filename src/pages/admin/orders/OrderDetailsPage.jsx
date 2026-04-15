@@ -3,7 +3,11 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import OrderTimeline from "./components/OrderTimeline";
 import OrderStatusModal from "./components/OrderStatusModal";
-import { useGetOrdersByIdQuery } from "../../../services/orderApi";
+import {
+  useGetOrdersByIdQuery,
+  useUpdateOrderStatusMutation,
+} from "../../../services/orderApi";
+import { Notification } from "../../../components/ToastNotification";
 
 const OrderDetailsPage = () => {
   const { id } = useParams();
@@ -16,24 +20,38 @@ const OrderDetailsPage = () => {
 
   const { data: orderDetails, isLoading } = useGetOrdersByIdQuery(id);
   console.log("API Response for order details:", orderDetails, isLoading);
+  const [
+    updateOrderStatus,
+    { data: updateData, isError, isLoading: isUpdating },
+  ] = useUpdateOrderStatusMutation();
 
   useEffect(() => {
-    console.log("Fetching details for order ID:", id);
+    if (updateData) {
+      Notification(updateData.message, "success");
+      navigate("/admin/orders");
+    } else if (isError) {
+      Notification("Failed to update status", "error");
+    }
+  }, [updateData, isError]);
+
+  useEffect(() => {
     // Fetch order details
     const fetchOrder = async () => {
       setLoading(true);
-      // Simulate API call
-
       setOrder(orderDetails?.order || null); // Adjust based on actual API response structure
       setLoading(false);
     };
     fetchOrder();
   }, [id, orderDetails]);
-  // console.log("Order ID from URL:", id);
+
   console.log("Order Details:", order);
   const handleUpdateStatus = async (status, note, sendEmail) => {
+    // console.log(orderDetails.order.orderId);
+    const id = orderDetails.order.orderId;
+    // consol.log("Updating order status with:", { status, note, sendEmail });
     // API call to update status
-    console.log("Updating status:", status, note, sendEmail);
+    console.log("Updating status:", id, status, note, sendEmail);
+    await updateOrderStatus({ id, status, note, sendEmail });
     setShowStatusModal(false);
     // Refresh order data
   };
