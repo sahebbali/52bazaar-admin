@@ -115,7 +115,7 @@ const OrderTable = ({ orders, selectedOrders, onSelectAll, onSelectOrder }) => {
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                 <Link
-                  to={`/admin/orders/${order.id}`}
+                  to={`/admin/orders/${order.orderId}`}
                   className="text-(--color-primary) hover:text-(--color-primary-hover) mr-3"
                 >
                   View

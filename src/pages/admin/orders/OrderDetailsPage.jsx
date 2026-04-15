@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import OrderTimeline from "./components/OrderTimeline";
 import OrderStatusModal from "./components/OrderStatusModal";
+import { useGetOrdersByIdQuery } from "../../../services/orderApi";
 
 const OrderDetailsPage = () => {
   const { id } = useParams();
@@ -11,20 +12,24 @@ const OrderDetailsPage = () => {
   const [loading, setLoading] = useState(true);
   const [showStatusModal, setShowStatusModal] = useState(false);
 
+  // console.log("OrderDetailsPage rendered with ID:", id);
+
+  const { data: orderDetails, isLoading } = useGetOrdersByIdQuery(id);
+  console.log("API Response for order details:", orderDetails, isLoading);
+
   useEffect(() => {
     console.log("Fetching details for order ID:", id);
     // Fetch order details
     const fetchOrder = async () => {
       setLoading(true);
       // Simulate API call
-      setTimeout(() => {
-        setOrder(mockOrderDetails);
-        setLoading(false);
-      }, 1000);
+
+      setOrder(orderDetails?.order || null); // Adjust based on actual API response structure
+      setLoading(false);
     };
     fetchOrder();
-  }, [id]);
-  console.log("Order ID from URL:", id);
+  }, [id, orderDetails]);
+  // console.log("Order ID from URL:", id);
   console.log("Order Details:", order);
   const handleUpdateStatus = async (status, note, sendEmail) => {
     // API call to update status
@@ -62,7 +67,7 @@ const OrderDetailsPage = () => {
           <div className="flex justify-between items-start">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">
-                Order {order.id}
+                Order {order.orderId}
               </h1>
               <p className="mt-2 text-sm text-gray-600">
                 Placed on {new Date(order.date).toLocaleString()}
@@ -100,12 +105,12 @@ const OrderDetailsPage = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-gray-600">Order ID</p>
-                  <p className="font-medium text-black">{order.id}</p>
+                  <p className="font-medium text-black">{order.orderId}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Date</p>
                   <p className="font-medium text-black">
-                    {new Date(order.date).toLocaleString()}
+                    {new Date(order.timeline[0].date).toLocaleString()}
                   </p>
                 </div>
                 <div>

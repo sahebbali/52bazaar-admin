@@ -20,7 +20,14 @@ export const orderApi = createApi({
       }),
       invalidatesTags: ["Order"],
     }),
+    getOrdersById: builder.query({
+      query: (id) => ({
+        url: `/admin/get-order-by-id/${id}`,
+        method: "GET",
+      }),
+      invalidatesTags: ["Order"],
+    }),
   }),
 });
 
-export const { useGetAllOrdersQuery } = orderApi;
+export const { useGetAllOrdersQuery, useGetOrdersByIdQuery } = orderApi;
