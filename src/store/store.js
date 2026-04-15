@@ -3,6 +3,7 @@ import { authApi } from "../services/authApi";
 import { categoryApi } from "../services/categoryApi";
 import { productApi } from "../services/productApi";
 import { orderApi } from "../services/orderApi";
+import { inventoryApi } from "../services/inventoryApi";
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
     [categoryApi.reducerPath]: categoryApi.reducer,
     [productApi.reducerPath]: productApi.reducer,
     [orderApi.reducerPath]: orderApi.reducer,
+    [inventoryApi.reducerPath]: inventoryApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -17,5 +19,6 @@ export const store = configureStore({
       categoryApi.middleware,
       productApi.middleware,
       orderApi.middleware,
+      inventoryApi.middleware,
     ),
 });

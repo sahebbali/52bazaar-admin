@@ -1,4 +1,3 @@
-// components/inventory/StockAdjustmentModal.jsx
 import React, { useState } from "react";
 
 const StockAdjustmentModal = ({ product, onClose, onAdjust }) => {
@@ -20,7 +19,7 @@ const StockAdjustmentModal = ({ product, onClose, onAdjust }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (adjustment.quantity !== 0) {
-      onAdjust(product.id, adjustment.quantity, adjustment);
+      onAdjust(product._id, adjustment.quantity, adjustment);
     }
   };
 
@@ -36,10 +35,7 @@ const StockAdjustmentModal = ({ product, onClose, onAdjust }) => {
           <h2 className="text-xl font-semibold text-gray-800">
             Adjust Stock - {product.name}
           </h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
-          >
+          <button onClick={onClose} className="text-black hover:text-gray-600">
             <svg
               className="w-6 h-6"
               fill="none"
@@ -58,12 +54,9 @@ const StockAdjustmentModal = ({ product, onClose, onAdjust }) => {
 
         <form onSubmit={handleSubmit} className="p-6">
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Current Stock
+            <label className="block text-lg text-black font-medium mb-2">
+              Current Stock: {product.stockQuantity}
             </label>
-            <p className="text-lg font-semibold text-gray-900">
-              {product.currentStock}
-            </p>
           </div>
 
           <div className="mb-4">
@@ -74,7 +67,7 @@ const StockAdjustmentModal = ({ product, onClose, onAdjust }) => {
               <button
                 type="button"
                 onClick={() => handleQuantityChange(adjustment.quantity - 1)}
-                className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                className="px-3 py-2 border text-black border-gray-300 rounded-lg hover:bg-gray-50"
               >
                 -
               </button>
@@ -82,13 +75,13 @@ const StockAdjustmentModal = ({ product, onClose, onAdjust }) => {
                 type="number"
                 value={adjustment.quantity}
                 onChange={(e) => handleQuantityChange(e.target.value)}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 px-3 py-2 text-black border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-(--color-primary)"
                 placeholder="Enter quantity"
               />
               <button
                 type="button"
                 onClick={() => handleQuantityChange(adjustment.quantity + 1)}
-                className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                className="px-3 py-2 border text-black border-gray-300 rounded-lg hover:bg-gray-50"
               >
                 +
               </button>
@@ -107,7 +100,7 @@ const StockAdjustmentModal = ({ product, onClose, onAdjust }) => {
               onChange={(e) =>
                 setAdjustment({ ...adjustment, reason: e.target.value })
               }
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border text-black border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-(--color-primary)"
             >
               {reasons.map((reason) => (
                 <option key={reason.value} value={reason.value}>
@@ -126,7 +119,7 @@ const StockAdjustmentModal = ({ product, onClose, onAdjust }) => {
               onChange={(e) =>
                 setAdjustment({ ...adjustment, note: e.target.value })
               }
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-(!--color-primary)"
               rows="3"
               placeholder="Add any additional notes..."
             />
@@ -136,13 +129,13 @@ const StockAdjustmentModal = ({ product, onClose, onAdjust }) => {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+              className="flex-1 px-4 py-2 border cursor-pointer border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="flex-1 px-4 py-2 cursor-pointer bg-(--color-primary) text-white rounded-lg hover:bg-(--color-primary-hover)"
             >
               Apply Adjustment
             </button>

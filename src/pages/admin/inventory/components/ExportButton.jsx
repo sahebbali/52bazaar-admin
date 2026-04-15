@@ -7,7 +7,7 @@ const ExportButton = ({ products }) => {
     const exportData = products.map((product) => ({
       "Product Name": product.name,
       SKU: product.sku,
-      "Current Stock": product.currentStock,
+      "Current Stock": product.stockQuantity,
       "Low Stock Threshold": product.lowStockThreshold,
       Status: getStatusText(product.currentStock, product.lowStockThreshold),
       "Last Updated": new Date().toLocaleDateString(),

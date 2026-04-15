@@ -75,7 +75,7 @@ const InventoryTable = ({ products, onStockUpdate, onAdjustStock }) => {
                     <div className="h-10 w-10 flex-shrink-0">
                       <img
                         className="h-10 w-10 rounded-lg object-cover"
-                        src={product.image || "/api/placeholder/40/40"}
+                        src={product.images[0]?.url || "/api/placeholder/40/40"}
                         alt={product.name}
                       />
                     </div>
@@ -106,7 +106,7 @@ const InventoryTable = ({ products, onStockUpdate, onAdjustStock }) => {
                       className="text-sm text-gray-900 cursor-pointer hover:text-blue-600"
                       onClick={() => handleStockEdit(product)}
                     >
-                      {product.currentStock}
+                      {product.stockQuantity}
                     </span>
                   )}
                 </td>
@@ -128,11 +128,11 @@ const InventoryTable = ({ products, onStockUpdate, onAdjustStock }) => {
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <button
                     onClick={() => onAdjustStock(product)}
-                    className="text-blue-600 hover:text-blue-900 mr-3"
+                    className="text-(--color-primary) cursor-pointer hover:text-(--color-primary-hover) mr-3"
                   >
                     Adjust
                   </button>
-                  <button className="text-gray-600 hover:text-gray-900">
+                  <button className="text-gray-600 cursor-pointer hover:text-gray-900">
                     View
                   </button>
                 </td>
