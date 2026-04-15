@@ -79,7 +79,7 @@ const OrderTable = ({ orders, selectedOrders, onSelectAll, onSelectOrder }) => {
                 />
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                {order.id}
+                {order.orderId}
               </td>
               <td className="px-6 py-4">
                 <div className="text-sm font-medium text-gray-900">
@@ -90,13 +90,13 @@ const OrderTable = ({ orders, selectedOrders, onSelectAll, onSelectOrder }) => {
                 </div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {new Date(order.date).toLocaleDateString()}
+                {new Date(order?.timeline[0]?.date).toDateString()}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 {order.itemsCount} items
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                ${order.total.toFixed(2)}
+                ৳{order.total.toFixed(2)}
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
                 <span
