@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Loading } from "../../../common/Loading";
 import { METHOD_CONFIG, STATUS_CONFIG } from "./PaymentList";
+import { useGetPaymentsByIdQuery } from "../../../services/paymentApi";
 // Mock data for demonstration
 
 export default function PaymentDetails() {
@@ -12,14 +13,15 @@ export default function PaymentDetails() {
   const [loading, setLoading] = useState(true);
   const [showRefundModal, setShowRefundModal] = useState(false);
 
+  const { data: paymentData, isLoading } = useGetPaymentsByIdQuery(id);
   useEffect(() => {
+    console.log("Payment data fetched:", paymentData);
     // Simulate API call
     setTimeout(() => {
-      const paymentData = [];
       setPayment(paymentData);
       setLoading(false);
     }, 500);
-  }, [id]);
+  }, [id, paymentData]);
 
   const handleRefund = () => {
     navigate(`/admin/payments/${id}/refund`);
@@ -70,18 +72,19 @@ export default function PaymentDetails() {
                 Payment Details
               </h1>
               <p className="text-sm text-gray-500 mt-1">
-                Transaction ID: {payment.transactionId}
+                Transaction ID: {payment.data.transactionId}
               </p>
             </div>
             <div className="flex gap-3">
-              {payment.refundable && payment.status === "completed" && (
-                <button
-                  onClick={handleRefund}
-                  className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
-                >
-                  ↩️ Process Refund
-                </button>
-              )}
+              {payment.data.refundable &&
+                payment.data.status === "completed" && (
+                  <button
+                    onClick={handleRefund}
+                    className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
+                  >
+                    ↩️ Process Refund
+                  </button>
+                )}
               <button className="px-4 py-2 border bg-(--color-primary) border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
                 📥 Download Receipt
               </button>
@@ -103,7 +106,7 @@ export default function PaymentDetails() {
                     Transaction ID
                   </label>
                   <p className="font-mono text-sm font-semibold text-gray-900 mt-1">
-                    {payment.transactionId}
+                    {payment.data.transactionId}
                   </p>
                 </div>
                 <div>
@@ -111,10 +114,10 @@ export default function PaymentDetails() {
                     Order ID
                   </label>
                   <Link
-                    to={`/admin/orders/${payment.orderId}`}
+                    to={`/admin/orders/${payment.data.orderId}`}
                     className="text-sm text-(--color-primary) hover:underline block mt-1"
                   >
-                    {payment.orderId} →
+                    {payment.data.orderId} →
                   </Link>
                 </div>
                 <div>
@@ -122,10 +125,7 @@ export default function PaymentDetails() {
                     Amount
                   </label>
                   <p className="text-2xl font-bold text-(--color-primary) mt-1">
-                    {new Intl.NumberFormat("en-US", {
-                      style: "currency",
-                      currency: "USD",
-                    }).format(payment.amount)}
+                    {"৳ " + payment.data.total.toFixed(2)}
                   </p>
                 </div>
                 <div>
@@ -134,10 +134,10 @@ export default function PaymentDetails() {
                   </label>
                   <div className="mt-1">
                     <span
-                      className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${STATUS_CONFIG[payment.status]?.color}`}
+                      className={`inline-flex items-center text-black gap-1 px-2 py-1 rounded-full text-xs font-medium ${STATUS_CONFIG[payment.status]?.color}`}
                     >
-                      {STATUS_CONFIG[payment.status]?.icon}{" "}
-                      {STATUS_CONFIG[payment.status]?.label}
+                      {STATUS_CONFIG[payment.data.status]?.icon}{" "}
+                      {STATUS_CONFIG[payment.data.status]?.label}
                     </span>
                   </div>
                 </div>
@@ -147,10 +147,10 @@ export default function PaymentDetails() {
                   </label>
                   <div className="mt-1">
                     <span
-                      className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium ${METHOD_CONFIG[payment.method]?.color}`}
+                      className={`inline-flex items-center text-black gap-1 px-2 py-1 rounded-lg text-xs font-medium ${METHOD_CONFIG[payment.method]?.color}`}
                     >
-                      {METHOD_CONFIG[payment.method]?.icon}{" "}
-                      {METHOD_CONFIG[payment.method]?.label}
+                      {METHOD_CONFIG[payment.data.method]?.icon}{" "}
+                      {METHOD_CONFIG[payment.data.method]?.label}
                     </span>
                   </div>
                 </div>
@@ -159,7 +159,7 @@ export default function PaymentDetails() {
                     Transaction Date
                   </label>
                   <p className="text-sm text-gray-900 mt-1">
-                    {new Date(payment.date).toLocaleString()}
+                    {new Date(payment.data.date).toDateString()}
                   </p>
                 </div>
               </div>
@@ -176,7 +176,7 @@ export default function PaymentDetails() {
                     Customer Name
                   </label>
                   <p className="text-sm font-medium text-gray-900 mt-1">
-                    {payment.customer}
+                    {payment.data.customer.name}
                   </p>
                 </div>
                 <div>
@@ -184,22 +184,24 @@ export default function PaymentDetails() {
                     Customer Email
                   </label>
                   <p className="text-sm text-gray-900 mt-1">
-                    {payment.customer.toLowerCase().replace(/\s/g, ".")}
-                    @example.com
+                    {payment.data.customer.email}
                   </p>
                 </div>
                 <div>
                   <label className="text-xs text-gray-500 uppercase">
                     Phone Number
                   </label>
-                  <p className="text-sm text-gray-900 mt-1">+880 1XXX-XXXXXX</p>
+                  <p className="text-sm text-gray-900 mt-1">
+                    {" "}
+                    {payment.data.customer.phone}
+                  </p>
                 </div>
                 <div>
                   <label className="text-xs text-gray-500 uppercase">
                     Billing Address
                   </label>
                   <p className="text-sm text-gray-900 mt-1">
-                    123 Main Street, Dhaka, Bangladesh
+                    {payment.data.customer.address}
                   </p>
                 </div>
               </div>
@@ -258,7 +260,7 @@ export default function PaymentDetails() {
                       Payment Created
                     </p>
                     <p className="text-xs text-gray-500">
-                      {new Date(payment.date).toLocaleString()}
+                      {new Date(payment.data.date).toLocaleString()}
                     </p>
                   </div>
                 </div>
@@ -272,7 +274,7 @@ export default function PaymentDetails() {
                         Payment Completed
                       </p>
                       <p className="text-xs text-gray-500">
-                        {new Date(payment.date).toLocaleString()}
+                        {new Date(payment.data.date).toLocaleString()}
                       </p>
                     </div>
                   </div>
@@ -287,7 +289,7 @@ export default function PaymentDetails() {
                         Refund Processed
                       </p>
                       <p className="text-xs text-gray-500">
-                        {new Date().toLocaleString()}
+                        {new Date(payment.data.date).toLocaleString()}
                       </p>
                     </div>
                   </div>
@@ -323,11 +325,15 @@ export default function PaymentDetails() {
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-gray-500">Payment ID:</span>
-                  <span className="font-mono text-gray-900">{payment.id}</span>
+                  <span className="font-mono text-gray-900">
+                    {payment.data.id}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500">IP Address:</span>
-                  <span className="font-mono text-gray-900">192.168.1.1</span>
+                  <span className="font-mono text-gray-900">
+                    {payment.data.customer.ipAddress}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500">User Agent:</span>

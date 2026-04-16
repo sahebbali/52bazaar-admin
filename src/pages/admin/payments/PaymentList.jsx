@@ -527,7 +527,7 @@ export default function PaymentList() {
                       </td>
                       <td className="px-4 py-3 text-center">
                         <Link
-                          to={`/admin/payments/${payment.id}`}
+                          to={`/admin/payments/${payment.orderId}`}
                           className="text-green-600 hover:text-green-700 text-sm font-medium"
                         >
                           View →
@@ -628,7 +628,7 @@ export default function PaymentList() {
 
                   <div className="mt-3 pt-3 border-t border-gray-100 flex gap-2">
                     <Link
-                      to={`/admin/payments/${payment.id}`}
+                      to={`/admin/payments/${payment.orderId}`}
                       className="flex-1 text-center px-3 py-2 bg-green-50 text-green-600 rounded-lg text-sm font-medium hover:bg-green-100"
                     >
                       View Details
