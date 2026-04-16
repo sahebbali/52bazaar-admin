@@ -20,13 +20,7 @@ export const inventoryApi = createApi({
       }),
       invalidatesTags: ["Inventory"],
     }),
-    // getOrdersById: builder.query({
-    //   query: (id) => ({
-    //     url: `/admin/get-order-by-id/${id}`,
-    //     method: "GET",
-    //   }),
-    //   invalidatesTags: ["Order"],
-    // }),
+
     updateStock: builder.mutation({
       query: (body) => ({
         url: `/admin/update-stock`,

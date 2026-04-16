@@ -1,88 +1,21 @@
 // pages/admin/payments/PaymentList.jsx
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { Link } from "react-router-dom";
-
+import { useGetAllPaymentsQuery } from "../../../services/paymentApi"; // Adjust import path as needed
 import { exportToCSV } from "../../../utils/exportUtils";
 import { Loading } from "../../../common/Loading";
+import Pagination from "./../products/components/Pagination";
+import { PanelRightDashedIcon } from "lucide-react";
 
-export const PAYMENTS_DATA = [
-  {
-    id: "PAY-001",
-    transactionId: "TXN123456789",
-    orderId: "ORD-5812",
-    customer: "Rahim Uddin",
-    amount: 128.0,
-    method: "bkash",
-    status: "completed",
-    date: "2026-03-31T10:30:00",
-    gatewayResponse: "Success",
-    refundable: true,
-  },
-  {
-    id: "PAY-002",
-    transactionId: "TXN123456790",
-    orderId: "ORD-5811",
-    customer: "Karim Hossain",
-    amount: 245.5,
-    method: "nagad",
-    status: "pending",
-    date: "2026-03-31T09:15:00",
-    gatewayResponse: "Processing",
-    refundable: false,
-  },
-  {
-    id: "PAY-003",
-    transactionId: "TXN123456791",
-    orderId: "ORD-5810",
-    customer: "Nasrin Akter",
-    amount: 64.0,
-    method: "credit_card",
-    status: "completed",
-    date: "2026-03-30T14:20:00",
-    gatewayResponse: "Success",
-    refundable: true,
-  },
-  {
-    id: "PAY-004",
-    transactionId: "TXN123456792",
-    orderId: "ORD-5809",
-    customer: "Sohel Rana",
-    amount: 389.0,
-    method: "bkash",
-    status: "failed",
-    date: "2026-03-30T11:45:00",
-    gatewayResponse: "Insufficient balance",
-    refundable: false,
-  },
-  {
-    id: "PAY-005",
-    transactionId: "TXN123456793",
-    orderId: "ORD-5808",
-    customer: "Fatema Begum",
-    amount: 172.25,
-    method: "cash_on_delivery",
-    status: "pending",
-    date: "2026-03-29T16:00:00",
-    gatewayResponse: "Awaiting payment",
-    refundable: false,
-  },
-  {
-    id: "PAY-006",
-    transactionId: "TXN123456794",
-    orderId: "ORD-5807",
-    customer: "Minhaz Rahman",
-    amount: 95.75,
-    method: "nagad",
-    status: "refunded",
-    date: "2026-03-28T13:10:00",
-    gatewayResponse: "Refund processed",
-    refundable: false,
-  },
-];
-
+// Constants
 export const STATUS_CONFIG = {
   completed: {
     label: "Completed",
+    color: "bg-green-100 text-green-800",
+    icon: "✓",
+  },
+  paid: {
+    label: "Paid",
     color: "bg-green-100 text-green-800",
     icon: "✓",
   },
@@ -91,7 +24,11 @@ export const STATUS_CONFIG = {
     color: "bg-yellow-100 text-yellow-800",
     icon: "⏳",
   },
-  failed: { label: "Failed", color: "bg-red-100 text-red-800", icon: "✕" },
+  failed: {
+    label: "Failed",
+    color: "bg-red-100 text-red-800",
+    icon: "✕",
+  },
   refunded: {
     label: "Refunded",
     color: "bg-gray-100 text-gray-800",
@@ -114,10 +51,29 @@ export const METHOD_CONFIG = {
   },
 };
 
+// Custom hook for responsive design
+const useMediaQuery = (query) => {
+  const [matches, setMatches] = useState(false);
+
+  useEffect(() => {
+    const media = window.matchMedia(query);
+    if (media.matches !== matches) {
+      setMatches(media.matches);
+    }
+    const listener = () => setMatches(media.matches);
+    window.addEventListener("resize", listener);
+    return () => window.removeEventListener("resize", listener);
+  }, [matches, query]);
+
+  return matches;
+};
+
 export default function PaymentList() {
-  const [payments, setPayments] = useState([]);
-  const [filteredPayments, setFilteredPayments] = useState([]);
-  const [loading, setLoading] = useState(true);
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
+  // Filter state
   const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState({
     status: "",
@@ -125,77 +81,74 @@ export default function PaymentList() {
     startDate: "",
     endDate: "",
   });
-  const [isMobile, setIsMobile] = useState(false);
+
+  // Selection state
   const [selectedPayments, setSelectedPayments] = useState([]);
-  const [expandedRow, setExpandedRow] = useState(null);
 
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
+  // Responsive design
+  const isMobile = useMediaQuery("(max-width: 768px)");
 
-    // Simulate API call
-    setTimeout(() => {
-      setPayments(PAYMENTS_DATA);
-      setFilteredPayments(PAYMENTS_DATA);
-      setLoading(false);
-    }, 1000);
+  // API call with pagination and filters
+  const {
+    data: paymentData,
+    isLoading,
+    isError,
+    error,
+  } = useGetAllPaymentsQuery({
+    page: currentPage,
+    limit: itemsPerPage,
+    search: searchTerm,
+    status: filters.status,
+    paymentMethod: filters.method,
+    dateFrom: filters.startDate,
+    dateTo: filters.endDate,
+  });
 
-    return () => window.removeEventListener("resize", checkMobile);
+  // Extract data from API response
+  const payments = paymentData?.data || [];
+  const totalItems = paymentData?.pagination?.totalCount || 0;
+  const totalPages = paymentData?.pagination?.totalPages || 0;
+
+  // Calculate pagination indices
+  const startIndex = (currentPage - 1) * itemsPerPage + 1;
+  const endIndex = Math.min(currentPage * itemsPerPage, totalItems);
+
+  // Handle page change
+  const handlePageChange = useCallback((page) => {
+    setCurrentPage(page);
+    setSelectedPayments([]); // Clear selection when changing page
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
+  // Handle items per page change
+  const handleItemsPerPageChange = useCallback((newItemsPerPage) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1); // Reset to first page
+    setSelectedPayments([]);
+  }, []);
+
+  // Reset to first page when filters change
   useEffect(() => {
-    filterPayments();
-  }, [searchTerm, filters, payments]);
+    setCurrentPage(1);
+    setSelectedPayments([]);
+  }, [searchTerm, filters]);
 
-  const filterPayments = () => {
-    let filtered = [...payments];
+  // Debounced search to avoid too many API calls
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
 
-    // Search filter
-    if (searchTerm) {
-      filtered = filtered.filter(
-        (payment) =>
-          payment.transactionId
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase()) ||
-          payment.orderId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          payment.customer.toLowerCase().includes(searchTerm.toLowerCase()),
-      );
-    }
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500);
 
-    // Status filter
-    if (filters.status) {
-      filtered = filtered.filter(
-        (payment) => payment.status === filters.status,
-      );
-    }
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
-    // Method filter
-    if (filters.method) {
-      filtered = filtered.filter(
-        (payment) => payment.method === filters.method,
-      );
-    }
+  // Handle export
+  const handleExport = useCallback(() => {
+    if (!payments.length) return;
 
-    // Date range filter
-    if (filters.startDate) {
-      filtered = filtered.filter(
-        (payment) => new Date(payment.date) >= new Date(filters.startDate),
-      );
-    }
-    if (filters.endDate) {
-      filtered = filtered.filter(
-        (payment) => new Date(payment.date) <= new Date(filters.endDate),
-      );
-    }
-
-    setFilteredPayments(filtered);
-  };
-
-  const handleExport = () => {
-    const exportData = filteredPayments.map((payment) => ({
+    const exportData = payments.map((payment) => ({
       "Transaction ID": payment.transactionId,
       "Order ID": payment.orderId,
       Customer: payment.customer,
@@ -203,34 +156,48 @@ export default function PaymentList() {
       Method: METHOD_CONFIG[payment.method]?.label || payment.method,
       Status: STATUS_CONFIG[payment.status]?.label || payment.status,
       Date: new Date(payment.date).toLocaleString(),
+      "Gateway Response": payment.gatewayResponse || "",
     }));
-    exportToCSV(exportData, `payments_export_${new Date().toISOString()}.csv`);
-  };
 
-  const handleSelectAll = () => {
-    if (selectedPayments.length === filteredPayments.length) {
+    exportToCSV(exportData, `payments_export_${new Date().toISOString()}.csv`);
+  }, [payments]);
+
+  // Handle select all on current page
+  const handleSelectAll = useCallback(() => {
+    if (selectedPayments.length === payments.length) {
       setSelectedPayments([]);
     } else {
-      setSelectedPayments(filteredPayments.map((p) => p.id));
+      setSelectedPayments(payments.map((p) => p.id));
     }
-  };
+  }, [selectedPayments.length, payments]);
 
-  const handleSelectPayment = (id) => {
-    if (selectedPayments.includes(id)) {
-      setSelectedPayments(selectedPayments.filter((p) => p !== id));
-    } else {
-      setSelectedPayments([...selectedPayments, id]);
-    }
-  };
+  // Handle single payment selection
+  const handleSelectPayment = useCallback((id) => {
+    setSelectedPayments((prev) =>
+      prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id],
+    );
+  }, []);
 
-  const formatAmount = (amount) => {
+  // Clear all filters
+  const clearAllFilters = useCallback(() => {
+    setFilters({
+      status: "",
+      method: "",
+      startDate: "",
+      endDate: "",
+    });
+    setSearchTerm("");
+  }, []);
+
+  // Format helpers
+  const formatAmount = useCallback((amount) => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
-      currency: "USD",
+      currency: "৳",
     }).format(amount);
-  };
+  }, []);
 
-  const formatDate = (date) => {
+  const formatDate = useCallback((date) => {
     return new Date(date).toLocaleDateString("en-US", {
       year: "numeric",
       month: "short",
@@ -238,10 +205,34 @@ export default function PaymentList() {
       hour: "2-digit",
       minute: "2-digit",
     });
-  };
+  }, []);
 
-  if (loading) {
+  // Loading state
+  if (isLoading) {
     return <Loading type="spinner" size="lg" text="Loading payments..." />;
+  }
+
+  // Error state
+  if (isError) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-6xl mb-4">⚠️</div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            Error loading payments
+          </h3>
+          <p className="text-gray-500">
+            {error?.message || "Please try again later"}
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-4 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -271,7 +262,7 @@ export default function PaymentList() {
                   placeholder="Search by transaction ID, order ID or customer..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border text-black cursor-pointer border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-2 border text-gray-900 cursor-pointer border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 />
               </div>
             </div>
@@ -282,13 +273,14 @@ export default function PaymentList() {
               onChange={(e) =>
                 setFilters({ ...filters, status: e.target.value })
               }
-              className="px-4 py-2 border text-black cursor-pointer border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+              className="px-4 py-2 border text-gray-900 cursor-pointer border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
             >
               <option value="">All Status</option>
-              <option value="completed">Completed</option>
-              <option value="pending">Pending</option>
-              <option value="failed">Failed</option>
-              <option value="refunded">Refunded</option>
+              {Object.entries(STATUS_CONFIG).map(([key, config]) => (
+                <option key={key} value={key}>
+                  {config.label}
+                </option>
+              ))}
             </select>
 
             {/* Method Filter */}
@@ -297,13 +289,14 @@ export default function PaymentList() {
               onChange={(e) =>
                 setFilters({ ...filters, method: e.target.value })
               }
-              className="px-4 py-2 border text-black cursor-pointer border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+              className="px-4 py-2 border text-gray-900 cursor-pointer border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
             >
               <option value="">All Methods</option>
-              <option value="bkash">bKash</option>
-              <option value="nagad">Nagad</option>
-              <option value="credit_card">Credit Card</option>
-              <option value="cash_on_delivery">Cash on Delivery</option>
+              {Object.entries(METHOD_CONFIG).map(([key, config]) => (
+                <option key={key} value={key}>
+                  {config.label}
+                </option>
+              ))}
             </select>
 
             {/* Date Range */}
@@ -313,7 +306,7 @@ export default function PaymentList() {
               onChange={(e) =>
                 setFilters({ ...filters, startDate: e.target.value })
               }
-              className="px-4 py-2 border text-black cursor-pointer border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+              className="px-4 py-2 border text-gray-900 cursor-pointer border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
               placeholder="Start Date"
             />
             <input
@@ -322,14 +315,15 @@ export default function PaymentList() {
               onChange={(e) =>
                 setFilters({ ...filters, endDate: e.target.value })
               }
-              className="px-4 py-2 border  text-black cursor-pointer border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+              className="px-4 py-2 border text-gray-900 cursor-pointer border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
               placeholder="End Date"
             />
 
             {/* Export Button */}
             <button
               onClick={handleExport}
-              className="flex items-center cursor-pointer gap-2 px-4 py-2 bg-(--color-primary) text-white rounded-lg hover:bg-(--color-primary-hover) transition-colors"
+              disabled={!payments.length}
+              className="flex items-center cursor-pointer gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               📥 Export
             </button>
@@ -339,9 +333,21 @@ export default function PaymentList() {
           {(filters.status ||
             filters.method ||
             filters.startDate ||
-            filters.endDate) && (
+            filters.endDate ||
+            searchTerm) && (
             <div className="flex flex-wrap gap-2 mt-4">
-              <span className="text-sm text-black">Active filters:</span>
+              <span className="text-sm text-gray-600">Active filters:</span>
+              {searchTerm && (
+                <span className="px-2 py-1 bg-gray-100 rounded-lg text-xs flex items-center gap-1">
+                  Search: {searchTerm}
+                  <button
+                    onClick={() => setSearchTerm("")}
+                    className="hover:text-red-500"
+                  >
+                    ✕
+                  </button>
+                </span>
+              )}
               {filters.status && (
                 <span className="px-2 py-1 bg-gray-100 rounded-lg text-xs flex items-center gap-1">
                   Status: {STATUS_CONFIG[filters.status]?.label}
@@ -364,15 +370,14 @@ export default function PaymentList() {
                   </button>
                 </span>
               )}
+              {(filters.startDate || filters.endDate) && (
+                <span className="px-2 py-1 bg-gray-100 rounded-lg text-xs">
+                  Date: {filters.startDate || "any"} to{" "}
+                  {filters.endDate || "any"}
+                </span>
+              )}
               <button
-                onClick={() =>
-                  setFilters({
-                    status: "",
-                    method: "",
-                    startDate: "",
-                    endDate: "",
-                  })
-                }
+                onClick={clearAllFilters}
                 className="text-sm text-red-600 hover:text-red-700"
               >
                 Clear all
@@ -383,15 +388,38 @@ export default function PaymentList() {
 
         {/* Bulk Actions */}
         {selectedPayments.length > 0 && (
-          <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4 flex items-center justify-between">
-            <span className="text-sm text-(--color-primary)">
-              {selectedPayments.length} payment(s) selected
+          <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <span className="text-sm text-green-700">
+              {selectedPayments.length} payment(s) selected on current page
             </span>
             <div className="flex gap-2">
-              <button className="px-3 py-1 text-sm text-black cursor-pointer bg-white border border-green-300 rounded-lg hover:bg-green-100">
+              <button
+                onClick={() => {
+                  const selectedData = payments.filter((p) =>
+                    selectedPayments.includes(p.id),
+                  );
+                  exportToCSV(
+                    selectedData,
+                    `selected_payments_${new Date().toISOString()}.csv`,
+                  );
+                }}
+                className="px-3 py-1 text-sm text-gray-700 cursor-pointer bg-white border border-green-300 rounded-lg hover:bg-green-100"
+              >
                 Export Selected
               </button>
-              <button className="px-3 py-1 text-sm  cursor-pointer bg-red-50 text-red-600 rounded-lg hover:bg-red-100">
+              <button
+                onClick={() => {
+                  if (
+                    window.confirm(
+                      `Process ${selectedPayments.length} selected payments?`,
+                    )
+                  ) {
+                    // Handle bulk action
+                    console.log("Bulk action for:", selectedPayments);
+                  }
+                }}
+                className="px-3 py-1 text-sm cursor-pointer bg-red-50 text-red-600 rounded-lg hover:bg-red-100"
+              >
                 Bulk Action
               </button>
             </div>
@@ -399,225 +427,245 @@ export default function PaymentList() {
         )}
 
         {/* Desktop Table View */}
-        <div className="hidden md:block bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="px-4 py-3">
-                    <input
-                      type="checkbox"
-                      checked={
-                        selectedPayments.length === filteredPayments.length &&
-                        filteredPayments.length > 0
-                      }
-                      onChange={handleSelectAll}
-                      className="rounded border-gray-300"
-                    />
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
-                    Transaction ID
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
-                    Order ID
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
-                    Customer
-                  </th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase">
-                    Amount
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
-                    Method
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
-                    Status
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
-                    Date
-                  </th>
-                  <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase">
-                    Action
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {filteredPayments.map((payment) => (
-                  <tr
-                    key={payment.id}
-                    className="hover:bg-gray-50 transition-colors"
-                  >
-                    <td className="px-4 py-3">
+        {!isMobile && (
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="px-4 py-3">
+                      <input
+                        type="checkbox"
+                        checked={
+                          payments.length > 0 &&
+                          selectedPayments.length === payments.length
+                        }
+                        onChange={handleSelectAll}
+                        className="rounded border-gray-300 cursor-pointer"
+                      />
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
+                      Transaction ID
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
+                      Order ID
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
+                      Customer
+                    </th>
+                    <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase">
+                      Amount
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
+                      Method
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
+                      Status
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
+                      Date
+                    </th>
+                    <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase">
+                      Action
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {payments.map((payment) => (
+                    <tr
+                      key={payment.id}
+                      className="hover:bg-gray-50 transition-colors"
+                    >
+                      <td className="px-4 py-3">
+                        <input
+                          type="checkbox"
+                          checked={selectedPayments.includes(payment.id)}
+                          onChange={() => handleSelectPayment(payment.id)}
+                          className="rounded border-gray-300 cursor-pointer"
+                        />
+                      </td>
+                      <td className="px-4 py-3">
+                        <Link
+                          to={`/admin/payments/${payment.id}`}
+                          className="font-mono text-sm text-green-600 hover:underline"
+                        >
+                          {payment.transactionId}
+                        </Link>
+                      </td>
+                      <td className="px-4 py-3">
+                        <Link
+                          to={`/admin/orders/${payment.orderId}`}
+                          className="text-sm text-gray-700 hover:text-green-600"
+                        >
+                          {payment.orderId}
+                        </Link>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-700">
+                        {payment.customer}
+                      </td>
+                      <td className="px-4 py-3 text-right text-sm font-semibold text-gray-900">
+                        {"৳ " + payment.amount.toFixed(2)}
+                      </td>
+                      <td className="px-4 py-3">
+                        <span
+                          className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium ${METHOD_CONFIG[payment.method]?.color}`}
+                        >
+                          {METHOD_CONFIG[payment.method]?.icon}{" "}
+                          {METHOD_CONFIG[payment.method]?.label}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span
+                          className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${STATUS_CONFIG[payment.status]?.color}`}
+                        >
+                          {STATUS_CONFIG[payment.status]?.icon}{" "}
+                          {STATUS_CONFIG[payment.status]?.label}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-500">
+                        {formatDate(payment.date)}
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        <Link
+                          to={`/admin/payments/${payment.id}`}
+                          className="text-green-600 hover:text-green-700 text-sm font-medium"
+                        >
+                          View →
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination Component */}
+            {totalItems > 0 && (
+              <div className="border-t border-gray-200">
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  itemsPerPage={itemsPerPage}
+                  totalItems={totalItems}
+                  startIndex={startIndex}
+                  endIndex={endIndex}
+                  onPageChange={handlePageChange}
+                  onItemsPerPageChange={handleItemsPerPageChange}
+                />
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Mobile Card View */}
+        {isMobile && (
+          <>
+            <div className="space-y-3">
+              {payments.map((payment) => (
+                <div
+                  key={payment.id}
+                  className="bg-white rounded-xl shadow-sm border border-gray-200 p-4"
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-2">
                       <input
                         type="checkbox"
                         checked={selectedPayments.includes(payment.id)}
                         onChange={() => handleSelectPayment(payment.id)}
-                        className="rounded border-gray-300"
+                        className="rounded border-gray-300 cursor-pointer"
                       />
-                    </td>
-                    <td className="px-4 py-3">
-                      <Link
-                        to={`/admin/payments/${payment.id}`}
-                        className="font-mono text-sm text-green-600 hover:underline"
-                      >
-                        {payment.transactionId}
-                      </Link>
-                    </td>
-                    <td className="px-4 py-3">
+                      <div>
+                        <Link
+                          to={`/admin/payments/${payment.id}`}
+                          className="font-mono text-sm font-semibold text-green-600"
+                        >
+                          {payment.transactionId}
+                        </Link>
+                        <p className="text-xs text-gray-500 mt-0.5">
+                          {formatDate(payment.date)}
+                        </p>
+                      </div>
+                    </div>
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${STATUS_CONFIG[payment.status]?.color}`}
+                    >
+                      {STATUS_CONFIG[payment.status]?.label}
+                    </span>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-500">Order ID:</span>
                       <Link
                         to={`/admin/orders/${payment.orderId}`}
-                        className="text-sm text-gray-700 hover:text-green-600"
+                        className="text-sm font-medium text-gray-700"
                       >
                         {payment.orderId}
                       </Link>
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-700">
-                      {payment.customer}
-                    </td>
-                    <td className="px-4 py-3 text-right text-sm font-semibold text-gray-900">
-                      {formatAmount(payment.amount)}
-                    </td>
-                    <td className="px-4 py-3">
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-500">Customer:</span>
+                      <span className="text-sm font-medium text-gray-700">
+                        {payment.customer}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-500">Amount:</span>
+                      <span className="text-lg font-bold text-green-600">
+                        {"৳ " + payment.amount.toFixed(2)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-500">Method:</span>
                       <span
                         className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium ${METHOD_CONFIG[payment.method]?.color}`}
                       >
                         {METHOD_CONFIG[payment.method]?.icon}{" "}
                         {METHOD_CONFIG[payment.method]?.label}
                       </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span
-                        className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${STATUS_CONFIG[payment.status]?.color}`}
-                      >
-                        {STATUS_CONFIG[payment.status]?.icon}{" "}
-                        {STATUS_CONFIG[payment.status]?.label}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-500">
-                      {formatDate(payment.date)}
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      <Link
-                        to={`/admin/payments/${payment.id}`}
-                        className="text-(--color-primary) hover:text-(--color-primary-hover) text-sm font-medium"
-                      >
-                        View →
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                    </div>
+                  </div>
 
-          {/* Pagination */}
-          <div className="px-4 py-3 border-t border-gray-200 flex items-center justify-between">
-            <div className="text-sm text-gray-600">
-              Showing {filteredPayments.length} of {payments.length} payments
-            </div>
-            <div className="flex gap-2">
-              <button
-                className="px-3 py-1 border rounded-lg hover:bg-gray-50 disabled:opacity-50"
-                disabled
-              >
-                Previous
-              </button>
-              <button className="px-3 py-1 bg-(--color-primary) text-white rounded-lg hover:bg-(--color-primary-hover)">
-                Next
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Mobile Card View */}
-        <div className="md:hidden space-y-3">
-          {filteredPayments.map((payment) => (
-            <div
-              key={payment.id}
-              className="bg-white rounded-xl shadow-sm border border-gray-200 p-4"
-            >
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={selectedPayments.includes(payment.id)}
-                    onChange={() => handleSelectPayment(payment.id)}
-                    className="rounded border-gray-300"
-                  />
-                  <div>
+                  <div className="mt-3 pt-3 border-t border-gray-100 flex gap-2">
                     <Link
                       to={`/admin/payments/${payment.id}`}
-                      className="font-mono text-sm font-semibold text-green-600"
+                      className="flex-1 text-center px-3 py-2 bg-green-50 text-green-600 rounded-lg text-sm font-medium hover:bg-green-100"
                     >
-                      {payment.transactionId}
+                      View Details
                     </Link>
-                    <p className="text-xs text-gray-500 mt-0.5">
-                      {formatDate(payment.date)}
-                    </p>
+                    {payment.refundable && payment.status === "completed" && (
+                      <Link
+                        to={`/admin/payments/${payment.id}/refund`}
+                        className="px-3 py-2 bg-orange-50 text-orange-600 rounded-lg text-sm font-medium hover:bg-orange-100"
+                      >
+                        Refund
+                      </Link>
+                    )}
                   </div>
                 </div>
-                <span
-                  className={`px-2 py-1 rounded-full text-xs font-medium ${STATUS_CONFIG[payment.status]?.color}`}
-                >
-                  {STATUS_CONFIG[payment.status]?.label}
-                </span>
-              </div>
-
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-500">Order ID:</span>
-                  <Link
-                    to={`/admin/orders/${payment.orderId}`}
-                    className="text-sm font-medium text-gray-700"
-                  >
-                    {payment.orderId}
-                  </Link>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-500">Customer:</span>
-                  <span className="text-sm font-medium text-gray-700">
-                    {payment.customer}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-500">Amount:</span>
-                  <span className="text-lg font-bold text-green-600">
-                    {formatAmount(payment.amount)}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-500">Method:</span>
-                  <span
-                    className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium ${METHOD_CONFIG[payment.method]?.color}`}
-                  >
-                    {METHOD_CONFIG[payment.method]?.icon}{" "}
-                    {METHOD_CONFIG[payment.method]?.label}
-                  </span>
-                </div>
-              </div>
-
-              <div className="mt-3 pt-3 border-t border-gray-100 flex gap-2">
-                <Link
-                  to={`/admin/payments/${payment.id}`}
-                  className="flex-1 text-center px-3 py-2 bg-green-50 text-green-600 rounded-lg text-sm font-medium hover:bg-green-100"
-                >
-                  View Details
-                </Link>
-                {payment.refundable && payment.status === "completed" && (
-                  <Link
-                    to={`/admin/payments/${payment.id}/refund`}
-                    className="px-3 py-2 bg-orange-50 text-orange-600 rounded-lg text-sm font-medium hover:bg-orange-100"
-                  >
-                    Refund
-                  </Link>
-                )}
-              </div>
+              ))}
             </div>
-          ))}
-        </div>
+
+            {/* Pagination Component for Mobile */}
+            {totalItems > 0 && (
+              <div className="mt-4">
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  itemsPerPage={itemsPerPage}
+                  totalItems={totalItems}
+                  startIndex={startIndex}
+                  endIndex={endIndex}
+                  onPageChange={handlePageChange}
+                  onItemsPerPageChange={handleItemsPerPageChange}
+                />
+              </div>
+            )}
+          </>
+        )}
 
         {/* Empty State */}
-        {filteredPayments.length === 0 && (
+        {!isLoading && payments.length === 0 && (
           <div className="text-center py-12 bg-white rounded-xl border border-gray-200">
             <div className="text-6xl mb-4">💳</div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
@@ -626,6 +674,12 @@ export default function PaymentList() {
             <p className="text-gray-500">
               Try adjusting your search or filters
             </p>
+            <button
+              onClick={clearAllFilters}
+              className="mt-4 px-4 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700"
+            >
+              Clear all filters
+            </button>
           </div>
         )}
       </div>

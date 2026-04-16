@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { Loading } from "../../../common/Loading";
-import { METHOD_CONFIG, PAYMENTS_DATA } from "./PaymentList";
+import { METHOD_CONFIG } from "./PaymentList";
 export default function RefundManagement() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -16,7 +16,7 @@ export default function RefundManagement() {
   useEffect(() => {
     // Simulate API call
     setTimeout(() => {
-      const paymentData = PAYMENTS_DATA.find((p) => p.id === id);
+      const paymentData = [];
       setPayment(paymentData);
       setRefundAmount(paymentData?.amount.toString() || "");
       setLoading(false);

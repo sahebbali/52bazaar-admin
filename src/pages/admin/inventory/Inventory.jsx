@@ -260,7 +260,7 @@ const Inventory = () => {
             {products.filter((p) => p.currentStock === 0).length}
           </p>
         </div>
-        <div className="bg-white rounded-lg shadow-sm p-4 border-l-4 border-green-500">
+        {/* <div className="bg-white rounded-lg shadow-sm p-4 border-l-4 border-green-500">
           <p className="text-sm text-gray-600">Total Value</p>
           <p className="text-2xl text-black font-bold">
             $
@@ -268,7 +268,7 @@ const Inventory = () => {
               .reduce((sum, p) => sum + p.currentStock * (p.price || 0), 0)
               .toLocaleString()}
           </p>
-        </div>
+        </div> */}
       </div>
 
       {/* Filters and Actions */}

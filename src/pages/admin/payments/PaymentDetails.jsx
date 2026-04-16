@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Loading } from "../../../common/Loading";
-import { METHOD_CONFIG, PAYMENTS_DATA, STATUS_CONFIG } from "./PaymentList";
+import { METHOD_CONFIG, STATUS_CONFIG } from "./PaymentList";
 // Mock data for demonstration
 
 export default function PaymentDetails() {
@@ -15,7 +15,7 @@ export default function PaymentDetails() {
   useEffect(() => {
     // Simulate API call
     setTimeout(() => {
-      const paymentData = PAYMENTS_DATA.find((p) => p.id === id);
+      const paymentData = [];
       setPayment(paymentData);
       setLoading(false);
     }, 500);
