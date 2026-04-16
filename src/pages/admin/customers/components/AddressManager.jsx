@@ -107,7 +107,7 @@ const AddressManager = ({ addresses, onChange }) => {
         {addresses.map((address) => (
           <div
             key={address.id}
-            className="border border-gray-200 rounded-lg p-4"
+            className="border text-black border-gray-200 rounded-lg p-4"
           >
             <div className="flex justify-between items-start">
               <div className="flex-1">
@@ -180,7 +180,7 @@ const AddressManager = ({ addresses, onChange }) => {
                     onChange={(e) =>
                       setAddressForm({ ...addressForm, street: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border text-black border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
@@ -194,7 +194,7 @@ const AddressManager = ({ addresses, onChange }) => {
                       onChange={(e) =>
                         setAddressForm({ ...addressForm, city: e.target.value })
                       }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border text-black border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                   <div>
@@ -210,7 +210,7 @@ const AddressManager = ({ addresses, onChange }) => {
                           state: e.target.value,
                         })
                       }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border text-black border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                 </div>
@@ -228,7 +228,7 @@ const AddressManager = ({ addresses, onChange }) => {
                           zipCode: e.target.value,
                         })
                       }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border text-black border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                   <div>
@@ -244,7 +244,7 @@ const AddressManager = ({ addresses, onChange }) => {
                           country: e.target.value,
                         })
                       }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border text-black border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                 </div>
@@ -272,7 +272,7 @@ const AddressManager = ({ addresses, onChange }) => {
                         isDefault: e.target.checked,
                       })
                     }
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    className="h-4 w-4 text-(--color-primary) focus:ring-(--color-primary) border-gray-300 rounded"
                   />
                   <label
                     htmlFor="isDefault"
@@ -290,7 +290,7 @@ const AddressManager = ({ addresses, onChange }) => {
                     setEditingAddress(null);
                     resetForm();
                   }}
-                  className="px-4 py-2 border bg-red-500 text-black border-gray-300 rounded-lg hover:bg-gray-50"
+                  className="px-4 py-2 border cursor-pointer bg-red-500 text-black border-gray-300 rounded-lg hover:bg-gray-50"
                 >
                   Cancel
                 </button>
@@ -299,7 +299,7 @@ const AddressManager = ({ addresses, onChange }) => {
                   onClick={
                     editingAddress ? handleEditAddress : handleAddAddress
                   }
-                  className="px-4 py-2 bg-(--color-primary) text-white rounded-lg hover:bg-(--color-hover-primary)"
+                  className="px-4 py-2 bg-(--color-primary) cursor-pointer text-white rounded-lg hover:bg-(--color-primary-hover)"
                 >
                   {editingAddress ? "Update Address" : "Add Address"}
                 </button>

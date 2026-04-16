@@ -4,6 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 
 import AddressManager from "./components/AddressManager";
 import { useCustomers } from "../../../hooks/useCustomers";
+import { useCreateCustomerMutation } from "../../../services/customerApi";
 
 const CustomerFormPage = () => {
   const { id } = useParams();
@@ -18,6 +19,9 @@ const CustomerFormPage = () => {
     addresses: [],
   });
   const [errors, setErrors] = useState({});
+
+  const [addCustomer, { data: customerData, isLoading, isError }] =
+    useCreateCustomerMutation();
 
   useEffect(() => {
     if (id) {
@@ -59,7 +63,8 @@ const CustomerFormPage = () => {
       if (id) {
         await updateCustomer(id, formData);
       } else {
-        await createCustomer(formData);
+        console.log("Creating customer with data:", formData);
+        await addCustomer(formData);
       }
       navigate("/admin/customers");
     } catch (error) {
