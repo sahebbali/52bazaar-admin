@@ -143,7 +143,7 @@ const AddEditProduct = () => {
         "description",
         "category",
         "regularPrice",
-        "salePrice",
+        "originalPrice",
         "cost",
         "stockQuantity",
         "lowStockThreshold",
@@ -314,19 +314,7 @@ const AddEditProduct = () => {
                       required
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      SKU *
-                    </label>
-                    <input
-                      type="text"
-                      name="sku"
-                      value={formData.sku}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent"
-                      required
-                    />
-                  </div>
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Category
@@ -388,7 +376,7 @@ const AddEditProduct = () => {
                       name: "regularPrice",
                       required: true,
                     },
-                    { label: "Sale Price", name: "salePrice" },
+                    { label: "Original Price", name: "originalPrice" },
                     { label: "Cost", name: "cost" },
                   ].map(({ label, name, required }) => (
                     <div key={name}>

@@ -270,7 +270,7 @@ function CategoryList({ categories, onEdit, onDelete, onAdd, showToast }) {
   const [deleteModal, setDeleteModal] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [page, setPage] = useState(1);
-  const PER_PAGE = 6;
+  const PER_PAGE = 10;
 
   const filtered = categories
     .filter((c) => {
@@ -500,22 +500,16 @@ function CategoryList({ categories, onEdit, onDelete, onAdd, showToast }) {
                     onChange={toggleAll}
                   />
                 </th>
-                {[
-                  "Category",
-                  "Slug",
-                  "Parent",
-                  "Status",
-                  "Products",
-                  "Created",
-                  "Actions",
-                ].map((h) => (
-                  <th
-                    key={h}
-                    className="px-5 py-3 text-left text-[10px] uppercase tracking-widest text-gray-400 font-semibold"
-                  >
-                    {h}
-                  </th>
-                ))}
+                {["Category", "Slug", "Status", "Created", "Actions"].map(
+                  (h) => (
+                    <th
+                      key={h}
+                      className="px-5 py-3 text-left text-[10px] uppercase tracking-widest text-gray-400 font-semibold"
+                    >
+                      {h}
+                    </th>
+                  ),
+                )}
               </tr>
             </thead>
             <tbody>
@@ -548,7 +542,15 @@ function CategoryList({ categories, onEdit, onDelete, onAdd, showToast }) {
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-9 h-9 rounded-xl bg-green-50 flex items-center justify-center text-xl flex-shrink-0 border border-green-100">
-                          {cat.icon}
+                          {cat.icon.includes("http") ? (
+                            <img
+                              src={cat.icon}
+                              alt={cat.name}
+                              className="w-9 h-9 rounded-xl object-cover"
+                            />
+                          ) : (
+                            <span>{cat.icon}</span>
+                          )}
                         </div>
                         <div>
                           <p className="text-sm font-semibold text-gray-800">
@@ -565,19 +567,11 @@ function CategoryList({ categories, onEdit, onDelete, onAdd, showToast }) {
                         {cat.slug}
                       </code>
                     </td>
-                    <td className="px-5 py-4">
-                      <span className="text-sm text-gray-500">
-                        {getParentName(cat.parent)}
-                      </span>
-                    </td>
+
                     <td className="px-5 py-4">
                       <Badge status={cat.status} />
                     </td>
-                    <td className="px-5 py-4">
-                      <span className="font-mono text-sm font-bold text-gray-800">
-                        {cat.products}
-                      </span>
-                    </td>
+
                     <td className="px-5 py-4">
                       <span className="text-xs text-gray-400">
                         {cat.createdAt}
@@ -775,11 +769,13 @@ function CategoryForm({ categories, editData, onSave, onCancel, showToast }) {
     icon: editData?.icon ?? "🗂️",
     metaTitle: editData?.metaTitle ?? "",
     metaDesc: editData?.metaDesc ?? "",
+    subcategories: editData?.subcategories ?? [], // Add this line
   });
 
   const [slugManual, setSlugManual] = useState(isEdit);
   const [errors, setErrors] = useState({});
-  const [imagePreview, setImagePreview] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null); // UI فقط
+  const [imageFile, setImageFile] = useState(null); // REAL FILE
   const fileInputRef = useRef(null);
 
   const [addCategory, { data, isLoading, isError }] = useAddCategoryMutation();
@@ -834,6 +830,7 @@ function CategoryForm({ categories, editData, onSave, onCancel, showToast }) {
     "🧄",
   ];
 
+  const isSubmitting = isLoading || updateLoading;
   useEffect(() => {
     if (!slugManual) setForm((f) => ({ ...f, slug: slugify(f.name) }));
   }, [form.name, slugManual]);
@@ -860,32 +857,76 @@ function CategoryForm({ categories, editData, onSave, onCancel, showToast }) {
       showToast("Please fix the errors.", "error");
       return;
     }
-    const object = {
-      name: form.name,
-      slug: form.slug,
-      description: form.description,
-      parent: form.parent,
-      status: form.status,
-      icon: form.icon,
-      metaTitle: form.metaTitle,
-      metaDesc: form.metaDesc,
-    };
-    console.log({ object });
-    if (isEdit) {
-      await updateCategory({ id: editData.id, ...object });
-    } else {
-      await addCategory(object);
+
+    console.log({ imagePreview });
+    try {
+      const formData = new FormData();
+
+      // Basic fields
+      formData.append("name", form.name);
+      formData.append("slug", form.slug);
+      formData.append("description", form.description);
+      formData.append("parent", form.parent || "");
+      formData.append("status", form.status);
+      formData.append("icon", form.icon);
+      formData.append("metaTitle", form.metaTitle);
+      formData.append("metaDesc", form.metaDesc);
+
+      // Array fields (important)
+      formData.append(
+        "subcategories",
+        JSON.stringify(form.subcategories || []),
+      );
+
+      // Images (REAL FILES, not preview URLs)
+
+      if (imageFile) {
+        formData.append("images", imageFile); // ✅ correct
+      } else if (isEdit && imagePreview) {
+        // User didn't change the image, but we have a preview URL (from existing data)
+        // We need to convert that back to a File object if we want to send it again
+        const response = await fetch(imagePreview);
+        const blob = await response.blob();
+        formData.append("images", blob); // ✅ correct
+      }
+
+      let response;
+
+      if (isEdit) {
+        response = await updateCategory({
+          id: editData.id,
+          body: formData,
+        });
+      } else {
+        response = await addCategory(formData);
+      }
+    } catch (err) {
+      console.error(err);
     }
-    showToast(isEdit ? "Category updated!" : "Category created!", "success");
   };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (ev) => setImagePreview(ev.target.result);
-      reader.readAsDataURL(file);
+
+    if (!file) return;
+
+    // ✅ Validation (important)
+    if (!file.type.startsWith("image/")) {
+      showToast("Only image files are allowed", "error");
+      return;
     }
+
+    if (file.size > 2 * 1024 * 1024) {
+      showToast("Image must be less than 2MB", "error");
+      return;
+    }
+
+    // ✅ Save real file
+    setImageFile(file);
+
+    // ✅ Preview (UI only)
+    const previewUrl = URL.createObjectURL(file);
+    setImagePreview(previewUrl);
   };
 
   const parentOptions = categories.filter((c) => c.id !== editData?.id);
@@ -958,6 +999,83 @@ function CategoryForm({ categories, editData, onSave, onCancel, showToast }) {
               )}
             </div>
 
+            {/* Subcategories Management */}
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                Subcategories
+              </label>
+
+              {/* Display existing subcategories as tags */}
+              {form.subcategories.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {form.subcategories.map((sub, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center gap-1.5 bg-gray-100 rounded-full pl-3 pr-2 py-1.5 text-sm"
+                    >
+                      <span className="text-gray-700">{sub}</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const newSubs = form.subcategories.filter(
+                            (_, i) => i !== index,
+                          );
+                          setForm({ ...form, subcategories: newSubs });
+                        }}
+                        className="w-5 h-5 cursor-pointer rounded-full bg-gray-200 hover:bg-red-200 text-gray-600 hover:text-red-600 flex items-center justify-center transition-colors"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Add new subcategory */}
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  id="newSubcategory"
+                  placeholder="Enter subcategory name..."
+                  className="flex-1 px-3.5 py-2.5 rounded-xl border border-gray-200 hover:border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-100 text-sm text-gray-800 bg-white placeholder-gray-400 outline-none transition-all"
+                  onKeyPress={(e) => {
+                    if (e.key === "Enter") {
+                      const input = e.target;
+                      const value = input.value.trim();
+                      if (value && !form.subcategories.includes(value)) {
+                        setForm({
+                          ...form,
+                          subcategories: [...form.subcategories, value],
+                        });
+                        input.value = "";
+                      }
+                    }
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    const input = document.getElementById("newSubcategory");
+                    const value = input.value.trim();
+                    if (value && !form.subcategories.includes(value)) {
+                      setForm({
+                        ...form,
+                        subcategories: [...form.subcategories, value],
+                      });
+                      input.value = "";
+                    }
+                  }}
+                  className="px-4 py-2.5 cursor-pointer rounded-xl bg-(--color-primary) text-white hover:bg-(--color-primary-hover) transition-colors flex items-center gap-1"
+                >
+                  + Add
+                </button>
+              </div>
+              <p className="text-[11px] text-gray-400">
+                Add subcategories that belong under this category. Press Enter
+                or click Add to add each one.
+              </p>
+            </div>
+
             {/* Slug */}
             <div className="flex flex-col gap-1.5">
               <label className="text-xs font-semibold text-gray-700 uppercase tracking-wider">
@@ -1020,26 +1138,6 @@ function CategoryForm({ categories, editData, onSave, onCancel, showToast }) {
 
             {/* Parent + Status */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                  Parent Category
-                </label>
-                <select
-                  value={form.parent ?? ""}
-                  onChange={(e) =>
-                    set("parent", e.target.value ? Number(e.target.value) : "")
-                  }
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 hover:border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-100 text-sm text-gray-800 bg-white outline-none appearance-none cursor-pointer"
-                >
-                  <option value="">— None (Top Level) —</option>
-                  {parentOptions.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-semibold text-gray-700 uppercase tracking-wider">
                   Status
@@ -1265,7 +1363,19 @@ function CategoryForm({ categories, editData, onSave, onCancel, showToast }) {
             </h3>
             <div className="flex flex-col items-center gap-3 py-4">
               <div className="w-20 h-20 rounded-2xl bg-green-50 border-2 border-green-100 flex items-center justify-center text-5xl shadow-inner">
-                {form.icon || "🗂️"}
+                {form.icon ? (
+                  form.icon.startsWith("http") ? (
+                    <img
+                      src={form.icon}
+                      alt="Icon"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-2xl">{form.icon}</span>
+                  )
+                ) : (
+                  "🗂️"
+                )}
               </div>
               <div className="text-center">
                 <p className="font-bold text-gray-900 text-lg leading-tight">
@@ -1344,10 +1454,13 @@ function CategoryForm({ categories, editData, onSave, onCancel, showToast }) {
             variant="primary"
             className="w-full justify-center py-3"
             onClick={handleSubmit}
-            disabled={isLoading}
+            disabled={isSubmitting}
           >
-            {/* {loading ? "Saving..." : null} */}
-            {isEdit ? "💾 Save Changes" : "✅ Create Category"}
+            {isSubmitting
+              ? "⏳ Saving..."
+              : isEdit
+                ? "💾 Save Changes"
+                : "✅ Create Category"}
           </Btn>
           <Btn
             variant="secondary"

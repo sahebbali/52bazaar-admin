@@ -4,21 +4,39 @@ import { Link } from "react-router-dom";
 import CustomerTable from "./components/CustomerTable";
 import ExportCustomers from "./components/ExportCustomers";
 import { useCustomers } from "../../../hooks/useCustomers";
+import { useGetAllCustomerQuery } from "../../../services/customerApi";
+import Pagination from "../products/components/Pagination";
 
 const Customers = () => {
   const { customers, loading, error, fetchCustomers } = useCustomers();
   const [searchTerm, setSearchTerm] = useState("");
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [filters, setFilters] = useState({
     dateRange: { start: "", end: "" },
     minOrders: "",
     maxOrders: "",
-    status: "all",
+    status: "",
   });
   const [showFilters, setShowFilters] = useState(false);
+
+  const { data, isLoading } = useGetAllCustomerQuery({
+    page: currentPage,
+    limit: itemsPerPage,
+    search: searchTerm,
+    status: filters.status,
+    dateRange: filters.dateRange,
+    minOrders: filters.dateRange,
+    maxOrders: filters.maxOrders,
+  });
 
   useEffect(() => {
     fetchCustomers();
   }, []);
+
+  const Customers = data?.data || [];
+  const totalItems = data?.total || 0;
 
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
@@ -61,6 +79,24 @@ const Customers = () => {
 
     return matchesSearch && matchesDate && matchesOrders && matchesStatus;
   });
+
+  // Calculate pagination values
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const startIndex =
+    totalItems === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
+  const endIndex = Math.min(currentPage * itemsPerPage, totalItems);
+
+  // Handle page change
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  // Handle items per page change
+  const handleItemsPerPageChange = (value) => {
+    setItemsPerPage(value);
+    setCurrentPage(1);
+  };
 
   if (loading) {
     return (
@@ -255,7 +291,19 @@ const Customers = () => {
       )}
 
       {/* Customer Table */}
-      <CustomerTable customers={filteredCustomers} />
+      <CustomerTable customers={Customers} />
+      {totalItems > 0 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          itemsPerPage={itemsPerPage}
+          totalItems={totalItems}
+          startIndex={startIndex}
+          endIndex={endIndex}
+          onPageChange={handlePageChange}
+          onItemsPerPageChange={handleItemsPerPageChange}
+        />
+      )}
     </div>
   );
 };

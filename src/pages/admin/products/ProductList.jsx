@@ -76,7 +76,7 @@ const ProductList = () => {
 
   const { data: categoryData = [] } = useGetCategoryTreeQuery();
 
-  console.log("Categories Tree from API:", categoryData);
+  // console.log("Categories Tree from API:", categoryData);
   const categoryTree = useMemo(() => {
     return (categoryData || []).map(({ name, icon }) => ({
       name,
@@ -84,7 +84,7 @@ const ProductList = () => {
     }));
   }, [categoryData]);
 
-  console.log("Categories Treee :", categoryTree);
+  // console.log("Categories Treee :", categoryTree);
   // Assuming API returns categories list
 
   // Reset to first page when filters/search change
@@ -108,14 +108,23 @@ const ProductList = () => {
 
   // Handle delete
   const handleDelete = async (productId) => {
+    if (!productId) {
+      Notification("Invalid product ID", "error");
+      return;
+    }
+
     try {
-      if (!deleteProduct) {
-        throw new Error("Delete function not available");
-      }
+      // optional: prevent duplicate clicks if using RTK loading state
+
       await deleteProduct(productId).unwrap();
     } catch (err) {
-      console.error("Delete operation failed:", err);
-      Notification(err?.data?.message || "Delete operation failed", "error");
+      const message =
+        err?.data?.message ||
+        err?.error ||
+        err?.message ||
+        "Delete operation failed";
+
+      Notification(message, "error");
     }
   };
 

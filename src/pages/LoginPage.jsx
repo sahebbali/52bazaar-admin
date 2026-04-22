@@ -14,10 +14,10 @@ export default function LoginPage() {
   const [adminLogin, { data, isLoading, isError, error }] =
     useAdminLoginMutation();
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     console.log("Login:", { email, password, rememberMe });
     const obj = { email, password };
-    adminLogin(obj);
+    await adminLogin(obj);
     // Simulate successful login and navigate to dashboard
   };
   useEffect(() => {

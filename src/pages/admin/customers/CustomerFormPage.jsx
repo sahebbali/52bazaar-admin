@@ -5,6 +5,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import AddressManager from "./components/AddressManager";
 import { useCustomers } from "../../../hooks/useCustomers";
 import { useCreateCustomerMutation } from "../../../services/customerApi";
+import { Notification } from "../../../components/ToastNotification";
 
 const CustomerFormPage = () => {
   const { id } = useParams();
@@ -28,6 +29,16 @@ const CustomerFormPage = () => {
       loadCustomer();
     }
   }, [id]);
+
+  useEffect(() => {
+    if (customerData) {
+      Notification(customerData.message, "success");
+      navigate("/admin/customers");
+    }
+    if (isError) {
+      Notification(isError?.data?.message, "error");
+    }
+  }, [customerData, isError, navigate]);
 
   const loadCustomer = async () => {
     const data = await getCustomer(id);
@@ -58,6 +69,7 @@ const CustomerFormPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
+    console.log({ formData });
 
     try {
       if (id) {
@@ -66,7 +78,7 @@ const CustomerFormPage = () => {
         console.log("Creating customer with data:", formData);
         await addCustomer(formData);
       }
-      navigate("/admin/customers");
+      // navigate("/admin/customers");
     } catch (error) {
       console.error("Failed to save customer:", error);
     }

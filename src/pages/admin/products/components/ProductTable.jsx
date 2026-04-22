@@ -55,7 +55,7 @@ const ProductTable = ({
                 Image
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Name / SKU
+                Name / SLUG
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Price
@@ -99,14 +99,16 @@ const ProductTable = ({
                       {product.name}
                     </div>
                     <div className="text-sm text-gray-500">
-                      SKU: {product.sku}
+                      Slug: {product.slug}
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="font-medium">${product.salePrice}</div>
-                    {product.salePrice && (
-                      <div className="text-sm text-green-600">
-                        Sale: ${product.salePrice}
+                    <div className="font-medium text-black">
+                      Original: ৳{product.originalPrice}
+                    </div>
+                    {product.originalPrice && (
+                      <div className="text-sm text-gray-500 line-through">
+                        Regular: ৳{product.regularPrice}
                       </div>
                     )}
                   </td>

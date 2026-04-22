@@ -13,9 +13,9 @@ export const customerApi = createApi({
   }),
   tagTypes: ["Payment"],
   endpoints: (builder) => ({
-    getAllPayments: builder.query({
+    getAllCustomer: builder.query({
       query: (body) => ({
-        url: `/admin/get-all-payments?page=${body.page}&limit=${body.limit}&search=${body.search}&status=${body.status}&paymentMethod=${body.paymentMethod}&dateFrom=${body.dateFrom}&dateTo=${body.dateTo}`,
+        url: `/admin/get-all-customers?page=${body.page}&limit=${body.limit}&search=${body.search}&status=${body.status}&dateFrom=${body.dateFrom}&dateTo=${body.dateTo}`,
         method: "GET",
       }),
       invalidatesTags: ["Payment"],
@@ -40,7 +40,7 @@ export const customerApi = createApi({
 });
 
 export const {
-  useGetAllPaymentsQuery,
+  useGetAllCustomerQuery,
   useGetPaymentsByIdQuery,
   useCreateCustomerMutation,
 } = customerApi;
