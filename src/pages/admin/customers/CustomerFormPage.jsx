@@ -4,7 +4,10 @@ import { useParams, useNavigate } from "react-router-dom";
 
 import AddressManager from "./components/AddressManager";
 import { useCustomers } from "../../../hooks/useCustomers";
-import { useCreateCustomerMutation } from "../../../services/customerApi";
+import {
+  useCreateCustomerMutation,
+  useGetCustomerByIdQuery,
+} from "../../../services/customerApi";
 import { Notification } from "../../../components/ToastNotification";
 
 const CustomerFormPage = () => {
@@ -12,6 +15,8 @@ const CustomerFormPage = () => {
   const navigate = useNavigate();
   const { getCustomer, createCustomer, updateCustomer, loading } =
     useCustomers();
+  const { data: getCustomerData, isLoading: isGettingCustomer } =
+    useGetCustomerByIdQuery(id);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -26,9 +31,17 @@ const CustomerFormPage = () => {
 
   useEffect(() => {
     if (id) {
-      loadCustomer();
+      if (getCustomerData) {
+        setFormData({
+          name: getCustomerData?.data?.name || "",
+          email: getCustomerData?.data?.email || "",
+          phone: getCustomerData?.data?.phone || "",
+          status: getCustomerData?.data?.status || "active",
+          addresses: getCustomerData?.data?.addresses || [],
+        });
+      }
     }
-  }, [id]);
+  }, [id, getCustomerData]);
 
   useEffect(() => {
     if (customerData) {

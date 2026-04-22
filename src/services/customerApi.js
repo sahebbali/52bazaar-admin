@@ -20,9 +20,9 @@ export const customerApi = createApi({
       }),
       invalidatesTags: ["Payment"],
     }),
-    getPaymentsById: builder.query({
+    getCustomerById: builder.query({
       query: (id) => ({
-        url: `/admin/get-payment/${id}`,
+        url: `/admin/get-customer/${id}`,
         method: "GET",
       }),
       invalidatesTags: ["Payment"],
@@ -41,6 +41,6 @@ export const customerApi = createApi({
 
 export const {
   useGetAllCustomerQuery,
-  useGetPaymentsByIdQuery,
+  useGetCustomerByIdQuery,
   useCreateCustomerMutation,
 } = customerApi;
