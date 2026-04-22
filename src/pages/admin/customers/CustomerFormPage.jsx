@@ -7,14 +7,14 @@ import { useCustomers } from "../../../hooks/useCustomers";
 import {
   useCreateCustomerMutation,
   useGetCustomerByIdQuery,
+  useUpdateCustomerMutation,
 } from "../../../services/customerApi";
 import { Notification } from "../../../components/ToastNotification";
 
 const CustomerFormPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { getCustomer, createCustomer, updateCustomer, loading } =
-    useCustomers();
+  const { getCustomer, createCustomer, loading } = useCustomers();
   const { data: getCustomerData, isLoading: isGettingCustomer } =
     useGetCustomerByIdQuery(id);
   const [formData, setFormData] = useState({
@@ -28,6 +28,14 @@ const CustomerFormPage = () => {
 
   const [addCustomer, { data: customerData, isLoading, isError }] =
     useCreateCustomerMutation();
+  const [
+    updateCustomer,
+    {
+      data: updateCustomerData,
+      isLoading: updateLoading,
+      isError: updateIsError,
+    },
+  ] = useUpdateCustomerMutation();
 
   useEffect(() => {
     if (id) {
@@ -52,6 +60,16 @@ const CustomerFormPage = () => {
       Notification(isError?.data?.message, "error");
     }
   }, [customerData, isError, navigate]);
+
+  useEffect(() => {
+    if (updateCustomerData) {
+      Notification(updateCustomerData.message, "success");
+      navigate("/admin/customers");
+    }
+    if (updateIsError) {
+      Notification(updateIsError?.data?.message, "error");
+    }
+  }, [updateCustomerData, updateIsError, navigate]);
 
   const loadCustomer = async () => {
     const data = await getCustomer(id);
@@ -86,7 +104,9 @@ const CustomerFormPage = () => {
 
     try {
       if (id) {
-        await updateCustomer(id, formData);
+        const obj = { ...formData, id };
+        console.log("Updating customer with data:", obj);
+        await updateCustomer(obj);
       } else {
         console.log("Creating customer with data:", formData);
         await addCustomer(formData);

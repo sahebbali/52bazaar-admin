@@ -11,21 +11,21 @@ export const customerApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ["Payment"],
+  tagTypes: ["Customer"],
   endpoints: (builder) => ({
     getAllCustomer: builder.query({
       query: (body) => ({
         url: `/admin/get-all-customers?page=${body.page}&limit=${body.limit}&search=${body.search}&status=${body.status}&dateFrom=${body.dateFrom}&dateTo=${body.dateTo}`,
         method: "GET",
       }),
-      invalidatesTags: ["Payment"],
+      invalidatesTags: ["Customer"],
     }),
     getCustomerById: builder.query({
       query: (id) => ({
         url: `/admin/get-customer/${id}`,
         method: "GET",
       }),
-      invalidatesTags: ["Payment"],
+      invalidatesTags: ["Customer"],
     }),
 
     createCustomer: builder.mutation({
@@ -34,7 +34,15 @@ export const customerApi = createApi({
         method: "POST",
         body,
       }),
-      invalidatesTags: ["Payment"],
+      invalidatesTags: ["Customer"],
+    }),
+    updateCustomer: builder.mutation({
+      query: (body) => ({
+        url: `/admin/update-customer/${body.id}`,
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: ["Customer"],
     }),
   }),
 });
@@ -43,4 +51,5 @@ export const {
   useGetAllCustomerQuery,
   useGetCustomerByIdQuery,
   useCreateCustomerMutation,
+  useUpdateCustomerMutation,
 } = customerApi;
