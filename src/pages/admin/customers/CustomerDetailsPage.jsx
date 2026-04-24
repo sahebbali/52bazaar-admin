@@ -7,6 +7,7 @@ import ActivityLog from "./components/ActivityLog";
 
 import { useCustomers } from "./../../../hooks/useCustomers";
 import Modal from "./../../../common/Modal";
+import { useGetCustomerByIdQuery } from "../../../services/customerApi";
 
 const CustomerDetailsPage = () => {
   const { id } = useParams();
@@ -20,10 +21,22 @@ const CustomerDetailsPage = () => {
     message: "",
   });
   const [showBlockConfirm, setShowBlockConfirm] = useState(false);
+  const { data: getCustomerData, isLoading: isGettingCustomer } =
+    useGetCustomerByIdQuery(id);
 
   useEffect(() => {
-    loadCustomer();
-  }, [id]);
+    if (id) {
+      if (getCustomerData) {
+        setCustomer({
+          name: getCustomerData?.data?.name || "",
+          email: getCustomerData?.data?.email || "",
+          phone: getCustomerData?.data?.phone || "",
+          status: getCustomerData?.data?.status || "active",
+          addresses: getCustomerData?.data?.addresses || [],
+        });
+      }
+    }
+  }, [id, getCustomerData]);
 
   const loadCustomer = async () => {
     const data = await getCustomer(id);
@@ -260,7 +273,7 @@ const CustomerDetailsPage = () => {
                   Total Spent
                 </label>
                 <p className="mt-1 text-2xl font-bold text-green-600">
-                  ${(customer.totalSpent || 0).toLocaleString()}
+                  ৳{(customer.totalSpent || 0).toLocaleString()}
                 </p>
               </div>
               <div>
@@ -268,7 +281,7 @@ const CustomerDetailsPage = () => {
                   Average Order Value
                 </label>
                 <p className="mt-1 text-lg font-semibold text-gray-900">
-                  $
+                  ৳
                   {customer.totalOrders
                     ? (customer.totalSpent / customer.totalOrders).toFixed(2)
                     : "0.00"}
@@ -364,7 +377,7 @@ const CustomerDetailsPage = () => {
       {showBlockConfirm && (
         <Modal onClose={() => setShowBlockConfirm(false)}>
           <div className="p-6">
-            <h2 className="text-xl font-semibold mb-4">
+            <h2 className="text-xl cursor-pointer font-semibold mb-4">
               {customer.status === "blocked"
                 ? "Unblock Customer"
                 : "Block Customer"}
@@ -377,7 +390,7 @@ const CustomerDetailsPage = () => {
             <div className="flex gap-3 justify-end">
               <button
                 onClick={() => setShowBlockConfirm(false)}
-                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                className="px-4 py-2 border bg-red-500 text-white border-gray-300 rounded-lg hover:bg-red-600"
               >
                 Cancel
               </button>

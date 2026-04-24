@@ -122,7 +122,7 @@ const ProductDetails = () => {
             <div className="flex gap-3">
               <Link
                 to={`/admin/products/edit/${product.id}`}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                className="px-4 py-2 bg-(--color) text-white rounded-lg hover:bg-blue-700"
               >
                 Edit Product
               </Link>

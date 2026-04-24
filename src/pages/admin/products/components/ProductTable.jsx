@@ -159,63 +159,6 @@ const ProductTable = ({
         </table>
       </div>
 
-      {/* Pagination controls */}
-      {products.length > 0 && (
-        <div className="px-6 py-4 border-t border-gray-200">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <select
-                value={itemsPerPage}
-                onChange={(e) => {
-                  setItemsPerPage(Number(e.target.value));
-                  setCurrentPage(1);
-                }}
-                className="px-2 py-1 border text-black border-gray-300 rounded-md text-sm"
-              >
-                <option value={5}>5 per page</option>
-                <option value={10}>10 per page</option>
-                <option value={25}>25 per page</option>
-                <option value={50}>50 per page</option>
-              </select>
-              <span className="text-sm text-gray-700">
-                Showing {indexOfFirstItem + 1} to{" "}
-                {Math.min(indexOfLastItem, products.length)} of{" "}
-                {products.length} results
-              </span>
-            </div>
-
-            <div className="flex gap-2">
-              <button
-                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-                className={`px-3 py-1 rounded border ${
-                  currentPage === 1
-                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                    : "hover:bg-gray-50"
-                }`}
-              >
-                <ChevronLeft size={16} />
-              </button>
-              <span className="px-3 py-1">
-                Page {currentPage} of {totalPages}
-              </span>
-              <button
-                onClick={() =>
-                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                }
-                disabled={currentPage === totalPages}
-                className={`px-3 py-1 rounded border ${
-                  currentPage === totalPages
-                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                    : "hover:bg-gray-50"
-                }`}
-              >
-                <ChevronRight size={16} />
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
       {products.length === 0 && (
         <div className="text-center py-12 text-gray-500">No products found</div>
       )}

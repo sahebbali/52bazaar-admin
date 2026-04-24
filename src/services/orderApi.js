@@ -18,14 +18,14 @@ export const orderApi = createApi({
         url: `/admin/get-all-orders?page=${body.page}&limit=${body.limit}&search=${body.search}&status=${body.status}&paymentStatus=${body.paymentStatus}&startDate=${body.startDate}&endDate=${body.endDate}`,
         method: "GET",
       }),
-      invalidatesTags: ["Order"],
+      providesTags: ["Order"],
     }),
     getOrdersById: builder.query({
       query: (id) => ({
         url: `/admin/get-order-by-id/${id}`,
         method: "GET",
       }),
-      invalidatesTags: ["Order"],
+      providesTags: ["Order"],
     }),
     updateOrderStatus: builder.mutation({
       query: (body) => ({

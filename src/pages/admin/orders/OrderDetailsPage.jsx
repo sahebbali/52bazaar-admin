@@ -88,7 +88,7 @@ const OrderDetailsPage = () => {
                 Order {order.orderId}
               </h1>
               <p className="mt-2 text-sm text-gray-600">
-                Placed on {new Date(order.date).toLocaleString()}
+                Placed on {new Date(order.createdAt).toLocaleString()}
               </p>
             </div>
             <div className="flex space-x-3">
@@ -119,7 +119,9 @@ const OrderDetailsPage = () => {
           <div className="lg:col-span-2 space-y-6">
             {/* Order Summary */}
             <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-lg font-semibold mb-4">Order Summary</h2>
+              <h2 className="text-lg text-black font-semibold mb-4">
+                Order Summary
+              </h2>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-gray-600">Order ID</p>
@@ -160,7 +162,7 @@ const OrderDetailsPage = () => {
 
             {/* Order Items */}
             <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-              <h2 className="text-lg font-semibold p-6 border-b">
+              <h2 className="text-lg text-black font-semibold p-6 border-b">
                 Order Items
               </h2>
               <div className="overflow-x-auto">
@@ -196,10 +198,10 @@ const OrderDetailsPage = () => {
                           {item.quantity}
                         </td>
                         <td className="px-6 py-4 text-sm text-gray-500">
-                          ${item.price.toFixed(2)}
+                          ৳{item.price.toFixed(2)}
                         </td>
                         <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                          ${(item.price * item.quantity).toFixed(2)}
+                          ৳{(item.price * item.quantity).toFixed(2)}
                         </td>
                       </tr>
                     ))}
@@ -213,7 +215,7 @@ const OrderDetailsPage = () => {
                         Subtotal:
                       </td>
                       <td className="px-6 py-4 font-medium text-black">
-                        ${order.subtotal.toFixed(2)}
+                        ৳{order.subtotal.toFixed(2)}
                       </td>
                     </tr>
                     <tr>
@@ -224,7 +226,7 @@ const OrderDetailsPage = () => {
                         Shipping:
                       </td>
                       <td className="px-6 py-4 font-medium text-black">
-                        ${order.shipping.toFixed(2)}
+                        ৳{order.shipping.toFixed(2)}
                       </td>
                     </tr>
                     <tr>
@@ -235,7 +237,7 @@ const OrderDetailsPage = () => {
                         Total:
                       </td>
                       <td className="px-6 py-4 font-bold text-lg text-black">
-                        ${order.total.toFixed(2)}
+                        ৳{order.total.toFixed(2)}
                       </td>
                     </tr>
                   </tfoot>

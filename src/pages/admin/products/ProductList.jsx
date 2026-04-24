@@ -72,7 +72,7 @@ const ProductList = () => {
 
   // Extract data from API response
   const products = data?.data || [];
-  const totalItems = data?.total || 0;
+  const totalItems = data?.pagination.total || 0;
 
   const { data: categoryData = [] } = useGetCategoryTreeQuery();
 

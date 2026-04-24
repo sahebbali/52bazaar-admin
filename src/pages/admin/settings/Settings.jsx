@@ -16,18 +16,26 @@ const Settings = () => {
     timezone: "UTC",
     dateFormat: "MM/DD/YYYY",
 
-    // Payment Settings
-    paymentGateway: "stripe",
-    stripePublicKey: "",
-    stripeSecretKey: "",
-    paypalClientId: "",
-    paypalSecret: "",
-    paypalMode: "sandbox",
-    razorpayKeyId: "",
-    razorpayKeySecret: "",
-    codEnabled: true,
-    bankTransferEnabled: false,
+    // Bangladesh Payment Gateways
+    bkashNumber: "",
+    bkashApiKey: "",
+    bkashApiSecret: "",
+    bkashUsername: "",
+    bkashPassword: "",
+    bkashEnvironment: "sandbox",
 
+    nagadMerchantId: "",
+    nagadNumber: "",
+    nagadPublicKey: "",
+    nagadPrivateKey: "",
+    nagadEnvironment: "sandbox",
+
+    upayMerchantId: "",
+    upayApiKey: "",
+    upayApiSecret: "",
+
+    rocketNumber: "",
+    rocketApiKey: "",
     // Email Settings
     smtpHost: "",
     smtpPort: "",
@@ -352,6 +360,7 @@ const Settings = () => {
             )}
 
             {/* Payment Settings */}
+            {/* Payment Settings */}
             {activeSection === "payment" && (
               <div className="bg-white rounded-xl shadow-sm overflow-hidden">
                 <div className="border-b border-gray-200 bg-gradient-to-r from-green-50 to-white px-4 sm:px-6 py-4">
@@ -371,15 +380,16 @@ const Settings = () => {
                     </label>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                       {[
-                        { id: "stripe", label: "Stripe", icon: "💳" },
-                        { id: "paypal", label: "PayPal", icon: "💰" },
-                        { id: "razorpay", label: "Razorpay", icon: "🏦" },
+                        { id: "bkash", label: "bKash", icon: "📱" },
+                        { id: "nagad", label: "Nagad", icon: "📲" },
+                        { id: "upay", label: "Upay", icon: "💸" },
+                        { id: "rocket", label: "Rocket", icon: "🚀" },
                       ].map((gateway) => (
                         <label
                           key={gateway.id}
                           className={`flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition ${
                             formData.paymentGateway === gateway.id
-                              ? "border-(--color-primary) bg-(--color-primary)"
+                              ? "border-(--color-primary) bg-(--color-primary)/10"
                               : "border-gray-200 hover:border-(--color-primary)"
                           }`}
                         >
@@ -400,86 +410,284 @@ const Settings = () => {
                     </div>
                   </div>
 
-                  {formData.paymentGateway === "stripe" && (
-                    <div className="space-y-4 bg-gray-50 p-4 rounded-lg">
-                      <h3 className="font-medium text-gray-900">
-                        Stripe Configuration
+                  {/* bKash Configuration */}
+                  {formData.paymentGateway === "bkash" && (
+                    <div className="space-y-4 bg-gradient-to-r from-pink-50 to-white p-4 rounded-lg border border-pink-200">
+                      <h3 className="font-medium text-gray-900 flex items-center gap-2">
+                        <span className="text-xl">📱</span> bKash Configuration
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Publishable Key
+                            bKash Merchant Number
                           </label>
                           <input
-                            type="text"
-                            name="stripePublicKey"
-                            value={formData.stripePublicKey}
+                            type="tel"
+                            name="bkashNumber"
+                            value={formData.bkashNumber || ""}
                             onChange={handleInputChange}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                            placeholder="pk_test_..."
+                            placeholder="01XXXXXXXXX"
                           />
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Secret Key
+                            API Key
+                          </label>
+                          <input
+                            type="text"
+                            name="bkashApiKey"
+                            value={formData.bkashApiKey || ""}
+                            onChange={handleInputChange}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                            placeholder="Your bKash API Key"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            API Secret
                           </label>
                           <input
                             type="password"
-                            name="stripeSecretKey"
-                            value={formData.stripeSecretKey}
+                            name="bkashApiSecret"
+                            value={formData.bkashApiSecret || ""}
                             onChange={handleInputChange}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                            placeholder="sk_test_..."
+                            placeholder="Your bKash API Secret"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Username
+                          </label>
+                          <input
+                            type="text"
+                            name="bkashUsername"
+                            value={formData.bkashUsername || ""}
+                            onChange={handleInputChange}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                            placeholder="bKash Username"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Password
+                          </label>
+                          <input
+                            type="password"
+                            name="bkashPassword"
+                            value={formData.bkashPassword || ""}
+                            onChange={handleInputChange}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                            placeholder="bKash Password"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Environment
+                          </label>
+                          <select
+                            name="bkashEnvironment"
+                            value={formData.bkashEnvironment || "sandbox"}
+                            onChange={handleInputChange}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                          >
+                            <option value="sandbox">Sandbox (Testing)</option>
+                            <option value="live">Live Production</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div className="bg-blue-50 p-3 rounded-lg mt-2">
+                        <p className="text-sm text-blue-800">
+                          💡 <strong>Note:</strong> For bKash integration, you
+                          need to register as a merchant at
+                          <a
+                            href="https://merchant.bkash.com"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 underline ml-1"
+                          >
+                            merchant.bkash.com
+                          </a>
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Nagad Configuration */}
+                  {formData.paymentGateway === "nagad" && (
+                    <div className="space-y-4 bg-gradient-to-r from-orange-50 to-white p-4 rounded-lg border border-orange-200">
+                      <h3 className="font-medium text-gray-900 flex items-center gap-2">
+                        <span className="text-xl">📲</span> Nagad Configuration
+                      </h3>
+                      <div className="grid grid-cos-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Nagad Merchant ID
+                          </label>
+                          <input
+                            type="text"
+                            name="nagadMerchantId"
+                            value={formData.nagadMerchantId || ""}
+                            onChange={handleInputChange}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                            placeholder="Your Nagad Merchant ID"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Merchant Number
+                          </label>
+                          <input
+                            type="tel"
+                            name="nagadNumber"
+                            value={formData.nagadNumber || ""}
+                            onChange={handleInputChange}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                            placeholder="01XXXXXXXXX"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Public Key
+                          </label>
+                          <input
+                            type="text"
+                            name="nagadPublicKey"
+                            value={formData.nagadPublicKey || ""}
+                            onChange={handleInputChange}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                            placeholder="Nagad Public Key"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Private Key
+                          </label>
+                          <input
+                            type="password"
+                            name="nagadPrivateKey"
+                            value={formData.nagadPrivateKey || ""}
+                            onChange={handleInputChange}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                            placeholder="Nagad Private Key"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Environment
+                          </label>
+                          <select
+                            name="nagadEnvironment"
+                            value={formData.nagadEnvironment || "sandbox"}
+                            onChange={handleInputChange}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                          >
+                            <option value="sandbox">Sandbox (Testing)</option>
+                            <option value="live">Live Production</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div className="bg-blue-50 p-3 rounded-lg mt-2">
+                        <p className="text-sm text-blue-800">
+                          💡 <strong>Note:</strong> For Nagad integration,
+                          register at
+                          <a
+                            href="https://nagad.com.bd"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 underline ml-1"
+                          >
+                            nagad.com.bd
+                          </a>
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Upay Configuration */}
+                  {formData.paymentGateway === "upay" && (
+                    <div className="space-y-4 bg-gradient-to-r from-purple-50 to-white p-4 rounded-lg border border-purple-200">
+                      <h3 className="font-medium text-gray-900 flex items-center gap-2">
+                        <span className="text-xl">💸</span> Upay Configuration
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Upay Merchant ID
+                          </label>
+                          <input
+                            type="text"
+                            name="upayMerchantId"
+                            value={formData.upayMerchantId || ""}
+                            onChange={handleInputChange}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                            placeholder="Your Upay Merchant ID"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            API Key
+                          </label>
+                          <input
+                            type="text"
+                            name="upayApiKey"
+                            value={formData.upayApiKey || ""}
+                            onChange={handleInputChange}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                            placeholder="Upay API Key"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            API Secret
+                          </label>
+                          <input
+                            type="password"
+                            name="upayApiSecret"
+                            value={formData.upayApiSecret || ""}
+                            onChange={handleInputChange}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                            placeholder="Upay API Secret"
                           />
                         </div>
                       </div>
                     </div>
                   )}
 
-                  {formData.paymentGateway === "paypal" && (
-                    <div className="space-y-4 bg-gray-50 p-4 rounded-lg">
-                      <h3 className="font-medium text-gray-900">
-                        PayPal Configuration
+                  {/* Rocket Configuration */}
+                  {formData.paymentGateway === "rocket" && (
+                    <div className="space-y-4 bg-gradient-to-r from-blue-50 to-white p-4 rounded-lg border border-blue-200">
+                      <h3 className="font-medium text-gray-900 flex items-center gap-2">
+                        <span className="text-xl">🚀</span> Rocket Configuration
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Client ID
+                            Rocket Merchant Number
                           </label>
                           <input
-                            type="text"
-                            name="paypalClientId"
-                            value={formData.paypalClientId}
+                            type="tel"
+                            name="rocketNumber"
+                            value={formData.rocketNumber || ""}
                             onChange={handleInputChange}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                            placeholder="01XXXXXXXXX"
                           />
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Secret
+                            API Key
                           </label>
                           <input
-                            type="password"
-                            name="paypalSecret"
-                            value={formData.paypalSecret}
+                            type="text"
+                            name="rocketApiKey"
+                            value={formData.rocketApiKey || ""}
                             onChange={handleInputChange}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                            placeholder="Rocket API Key"
                           />
                         </div>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Mode
-                        </label>
-                        <select
-                          name="paypalMode"
-                          value={formData.paypalMode}
-                          onChange={handleInputChange}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                        >
-                          <option value="sandbox">Sandbox (Testing)</option>
-                          <option value="live">Live</option>
-                        </select>
                       </div>
                     </div>
                   )}
@@ -518,7 +726,6 @@ const Settings = () => {
                 </div>
               </div>
             )}
-
             {/* Email Settings */}
             {activeSection === "email" && (
               <div className="bg-white rounded-xl shadow-sm overflow-hidden">

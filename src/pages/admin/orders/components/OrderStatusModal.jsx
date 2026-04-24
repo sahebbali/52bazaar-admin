@@ -10,8 +10,8 @@ const OrderStatusModal = ({ currentStatus, onClose, onUpdate }) => {
 
   const statusFlow = {
     pending: ["processing", "cancelled"],
-    processing: ["confirmed", "cancelled"],
-    confirmed: ["shipped", "cancelled"],
+
+    processing: ["shipped", "cancelled"],
     shipped: ["delivered", "cancelled"],
     delivered: ["refunded"],
     cancelled: [],
@@ -21,7 +21,7 @@ const OrderStatusModal = ({ currentStatus, onClose, onUpdate }) => {
   const statusOptions = [
     { value: "pending", label: "Pending" },
     { value: "processing", label: "Processing" },
-    { value: "confirmed", label: "Confirmed" },
+
     { value: "shipped", label: "Shipped" },
     { value: "delivered", label: "Delivered" },
     { value: "cancelled", label: "Cancelled" },
@@ -57,13 +57,14 @@ const OrderStatusModal = ({ currentStatus, onClose, onUpdate }) => {
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value)}
-                className="w-full px-3 py-2 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-(--color-primary)"
+                className="w-full px-3 py-2 border cursor-pointer text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-(--color-primary)"
               >
                 {statusOptions.map((option) => (
                   <option
                     key={option.value}
                     value={option.value}
                     disabled={!getAvailableStatuses().includes(option.value)}
+                    className="cursor-pointer"
                   >
                     {option.label}
                     {!getAvailableStatuses().includes(option.value) &&
