@@ -51,7 +51,7 @@ const InventoryTable = ({ products, onStockUpdate, onAdjustStock }) => {
                 Product
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                SKU
+                SLUG
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Current Stock
@@ -87,7 +87,7 @@ const InventoryTable = ({ products, onStockUpdate, onAdjustStock }) => {
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">{product.sku}</div>
+                  <div className="text-sm text-gray-900">{product.slug}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   {editingStock === product.id ? (

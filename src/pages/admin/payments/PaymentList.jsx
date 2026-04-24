@@ -323,7 +323,7 @@ export default function PaymentList() {
             <button
               onClick={handleExport}
               disabled={!payments.length}
-              className="flex items-center cursor-pointer gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center cursor-pointer gap-2 px-4 py-2 bg-(--color-primary) text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               📥 Export
             </button>
