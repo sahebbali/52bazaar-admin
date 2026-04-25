@@ -1,5 +1,6 @@
 // pages/OrderDetailsPage.jsx
 import React, { useState, useEffect } from "react";
+import ReactDOM from "react-dom/client";
 import { useParams, useNavigate } from "react-router-dom";
 import OrderTimeline from "./components/OrderTimeline";
 import OrderStatusModal from "./components/OrderStatusModal";
@@ -8,6 +9,8 @@ import {
   useUpdateOrderStatusMutation,
 } from "../../../services/orderApi";
 import { Notification } from "../../../components/ToastNotification";
+import PrintInvoice from "../../../components/PrintInvoice";
+import Logo from "../../../assets/logo/52-bazaar-logo.webp";
 
 const OrderDetailsPage = () => {
   const { id } = useParams();
@@ -57,7 +60,211 @@ const OrderDetailsPage = () => {
   };
 
   const handlePrintInvoice = () => {
-    window.print();
+    const toBase64 = (url) =>
+      fetch(url)
+        .then((res) => res.blob())
+        .then(
+          (blob) =>
+            new Promise((resolve) => {
+              const reader = new FileReader();
+              reader.onloadend = () => resolve(reader.result);
+              reader.readAsDataURL(blob);
+            }),
+        );
+
+    toBase64(Logo).then((base64Logo) => {
+      const iframe = document.createElement("iframe");
+      iframe.style.cssText =
+        "position:fixed;right:0;bottom:0;width:0;height:0;border:0";
+      document.body.appendChild(iframe);
+
+      const iframeDoc = iframe.contentWindow.document;
+      const printTime = new Date().toLocaleString("en-GB").replace(",", "");
+
+      const prevDue = order.previousDue ?? 0;
+      const cashPaid = order.cashPaid ?? order.total ?? 0;
+      const discount = order.discount ?? 0;
+      const cashBack = order.cashBack ?? 0;
+      const balance = prevDue - cashPaid - discount - cashBack;
+      const balanceColor = balance > 0 ? "#c0392b" : "#1a7a1a";
+
+      const shippingCity = order.shippingAddress?.[0]?.city ?? "—";
+      const orderDate = new Date(order.createdAt)
+        .toLocaleDateString("en-GB")
+        .replace(/\//g, ".");
+
+      iframeDoc.open();
+      iframeDoc.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="UTF-8" />
+          <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&display=swap" rel="stylesheet" />
+          <style>
+            * { box-sizing: border-box; margin: 0; padding: 0; }
+            body {
+              display: flex;
+              justify-content: center;
+              padding: 20px;
+              background: #fff;
+              font-family: 'IBM Plex Mono', 'Courier New', monospace;
+            }
+            .receipt { width: 320px; font-size: 12px; color: #111; padding: 20px 16px; }
+            .center { text-align: center; }
+            .logo-wrap {
+              text-align: center;
+              margin-bottom: 6px;
+            }
+            .logo-wrap img {
+              width: 72px;
+              height: 72px;
+              object-fit: contain;
+              display: inline-block;
+            }
+            .divider { border: none; border-top: 1px dashed #aaa; margin: 10px 0; }
+            .divider-solid { border: none; border-top: 1px dashed #ccc; margin: 8px 0; }
+            .row { display: flex; justify-content: space-between; padding: 3px 0; font-size: 11.5px; }
+            .row .label { color: #444; }
+            .row .value { font-weight: 500; }
+            .amount-row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 12px; }
+            .balance-row {
+              display: flex;
+              justify-content: space-between;
+              border-top: 2px solid #111;
+              margin-top: 6px;
+              padding-top: 8px;
+              font-weight: 700;
+              font-size: 14px;
+              color: ${balanceColor};
+            }
+            .store-name {
+              font-size: 17px;
+              font-weight: 700;
+              text-align: center;
+              margin: 4px 0 2px;
+            }
+            .store-sub {
+              font-size: 10px;
+              color: #555;
+              line-height: 1.5;
+              text-align: center;
+              margin: 0 0 4px;
+            }
+            .receipt-title {
+              text-align: center;
+              font-weight: 700;
+              font-size: 13px;
+              letter-spacing: 2px;
+              text-transform: uppercase;
+            }
+            .footer {
+              text-align: center;
+              font-size: 9px;
+              color: #888;
+              padding-top: 8px;
+              margin-top: 8px;
+            }
+            .signature {
+              text-align: center;
+              font-size: 11px;
+              color: #555;
+              margin-top: 12px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="receipt">
+
+            <div class="logo-wrap">
+              <img src="${base64Logo}" alt="52 Bazar Logo" />
+            </div>
+
+            <p class="store-name">52 Bazar</p>
+            <p class="store-sub">
+              Wholesale &amp; Retail Rice Supplier<br/>
+              A 33, Bhoar Sahara Bazar (Near Masjid Al-Aqsa)<br/>
+              Vatara, Dhaka-1229
+            </p>
+            <p class="center" style="font-size:11px; margin:0 0 8px;">01818-207859</p>
+
+            <hr class="divider"/>
+            <p class="receipt-title">Receipt</p>
+            <hr class="divider"/>
+
+            <div class="row">
+              <span class="label">Receipt No</span>
+              <span class="value">${order.orderId}</span>
+            </div>
+            <div class="row">
+              <span class="label">Date</span>
+              <span class="value">${orderDate}</span>
+            </div>
+            <div class="row">
+              <span class="label">Name</span>
+              <span class="value">${order.customer?.name ?? "—"}</span>
+            </div>
+            <div class="row">
+              <span class="label">Address</span>
+              <span class="value">${shippingCity}</span>
+            </div>
+            <div class="row">
+              <span class="label">Mobile No</span>
+              <span class="value">${order.customer?.phone ?? "—"}</span>
+            </div>
+
+            <hr class="divider"/>
+
+            <div class="amount-row">
+              <span>Previous Due</span>
+              <span>${prevDue.toLocaleString("en-IN")}</span>
+            </div>
+            <div class="amount-row">
+              <span>Cash Paid</span>
+              <span>${cashPaid.toLocaleString("en-IN")}</span>
+            </div>
+            <div class="amount-row">
+              <span>Discount</span>
+              <span>${discount.toLocaleString("en-IN")}</span>
+            </div>
+            <div class="amount-row">
+              <span>Cash Back</span>
+              <span>${cashBack.toLocaleString("en-IN")}</span>
+            </div>
+
+            <div class="balance-row">
+              <span>Balance</span>
+              <span>${Math.abs(balance).toLocaleString("en-IN")}</span>
+            </div>
+
+            <hr class="divider"/>
+
+            <div class="row">
+              <span class="label">Note:</span>
+              <span class="value">${order.note ?? ""}</span>
+            </div>
+
+            <p class="signature">Signature</p>
+            <hr class="divider-solid"/>
+
+            <div class="footer">
+              SOFTWARE: explore IT | 01777615690<br/>
+              Printing Time: ${printTime}
+            </div>
+
+          </div>
+        </body>
+      </html>
+    `);
+      iframeDoc.close();
+
+      iframe.onload = () => {
+        setTimeout(() => {
+          iframe.contentWindow.focus();
+          iframe.contentWindow.print();
+          document.body.removeChild(iframe);
+        }, 900);
+      };
+    });
   };
 
   const handleSendEmail = () => {
