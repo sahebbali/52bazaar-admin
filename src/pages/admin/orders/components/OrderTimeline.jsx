@@ -2,14 +2,16 @@
 import React from "react";
 
 const OrderTimeline = ({ timeline }) => {
+  console.log("Timeline data:", timeline); // Debugging log
+  const reversedTimeline = [...timeline].reverse();
   return (
     <div className="bg-white rounded-lg shadow-sm p-6">
-      <h2 className="text-lg font-semibold mb-4">Order Timeline</h2>
+      <h2 className="text-lg text-black font-semibold mb-4">Order Timeline</h2>
       <div className="flow-root">
         <ul className="-mb-8">
-          {timeline.map((event, index) => (
+          {reversedTimeline.map((event, index) => (
             <li key={index} className="relative pb-8">
-              {index < timeline.length - 1 && (
+              {index < reversedTimeline.length - 1 && (
                 <span
                   className="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200"
                   aria-hidden="true"
@@ -19,7 +21,7 @@ const OrderTimeline = ({ timeline }) => {
                 <div>
                   <span className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center ring-8 ring-white">
                     <svg
-                      className="h-4 w-4 text-blue-600"
+                      className="h-4 w-4 text-(--color-primary)"
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >

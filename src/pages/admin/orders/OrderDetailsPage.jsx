@@ -210,7 +210,7 @@ const OrderDetailsPage = () => {
                     <tr>
                       <td
                         colSpan="3"
-                        className="px-6 py-4 text-right font-medium"
+                        className="px-6 py-4 text-black text-right font-medium"
                       >
                         Subtotal:
                       </td>
@@ -221,7 +221,7 @@ const OrderDetailsPage = () => {
                     <tr>
                       <td
                         colSpan="3"
-                        className="px-6 py-4 text-right font-medium"
+                        className="px-6 py-4 text-black text-right font-medium"
                       >
                         Shipping:
                       </td>
@@ -232,7 +232,7 @@ const OrderDetailsPage = () => {
                     <tr>
                       <td
                         colSpan="3"
-                        className="px-6 py-4 text-right font-bold"
+                        className="px-6 py-4 text-black text-right font-bold"
                       >
                         Total:
                       </td>
@@ -250,32 +250,40 @@ const OrderDetailsPage = () => {
           <div className="space-y-6">
             {/* Customer Information */}
             <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-lg font-semibold mb-4">
+              <h2 className="text-lg text-black font-semibold mb-4">
                 Customer Information
               </h2>
               <div className="space-y-3">
                 <div>
-                  <p className="text-sm text-gray-600">Name</p>
                   <p className="font-medium text-black">
+                    <span className="text-sm text-gray-600 mr-2">Name:</span>
                     {order.customer.name}
                   </p>
                 </div>
+
                 <div>
-                  <p className="text-sm text-gray-600">Email</p>
                   <p className="font-medium text-black">
+                    <span className="text-sm text-gray-600 mr-2">Email:</span>
                     {order.customer.email}
                   </p>
                 </div>
+
                 <div>
-                  <p className="text-sm text-gray-600">Phone</p>
                   <p className="font-medium text-black">
+                    <span className="text-sm text-gray-600 mr-2">Phone:</span>
                     {order.customer.phone}
                   </p>
                 </div>
+
                 <div>
-                  <p className="text-sm text-gray-600">Shipping Address</p>
-                  <p className="font-medium whitespace-pre-line text-black">
-                    {order.customer.address}
+                  <p className="font-medium text-black">
+                    <span className="text-sm text-gray-600 mr-2">
+                      Shipping Address:
+                    </span>
+
+                    {order.shippingAddress?.[0]
+                      ? `${order.shippingAddress[0].street}, ${order.shippingAddress[0].city}, ${order.shippingAddress[0].state}, ${order.shippingAddress[0].postalCode}, ${order.shippingAddress[0].country}`
+                      : "No address available"}
                   </p>
                 </div>
               </div>
@@ -283,22 +291,29 @@ const OrderDetailsPage = () => {
 
             {/* Payment Information */}
             <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-lg font-semibold mb-4">
+              <h2 className="text-lg text-black font-semibold mb-4">
                 Payment Information
               </h2>
               <div className="space-y-3">
                 <div>
-                  <p className="text-sm text-gray-600">Method</p>
                   <p className="font-medium text-black">
+                    <span className="text-sm text-gray-600 mr-2">Method:</span>
                     {order.payment.method}
                   </p>
                 </div>
+
                 <div>
-                  <p className="text-sm text-gray-600">Transaction ID</p>
-                  <p className="font-medium">{order.payment.transactionId}</p>
+                  <p className="font-medium text-black">
+                    <span className="text-sm text-gray-600 mr-2">
+                      Transaction ID:
+                    </span>
+                    {order.payment.transactionId}
+                  </p>
                 </div>
-                <div>
-                  <p className="text-sm text-gray-600">Status</p>
+
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-gray-600">Status:</span>
+
                   <span
                     className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                       order.paymentStatus === "paid"
