@@ -5,6 +5,7 @@ import MobileOverlay from "./Sidebar/MobileOverlay";
 import SidebarLogo from "./Sidebar/SidebarLogo";
 import NavSection from "./Sidebar/NavSection";
 import SidebarUser from "./Sidebar/SidebarUser";
+import { LogOut } from "lucide-react";
 
 /**
  * Sidebar
@@ -44,6 +45,11 @@ export default function Sidebar({
     (path) => location.pathname === path,
     [location.pathname],
   );
+  const onLogout = () => {
+    localStorage.removeItem("52bazaarToken");
+    window.location.reload();
+    navigate("/");
+  };
 
   const handleNavClick = useCallback(
     (itemId, _path, _hasSub) => {
@@ -103,9 +109,19 @@ export default function Sidebar({
             />
           ))}
         </nav>
+        {/* Logout Button */}
+        <div className="px-3 pb-2">
+          <button
+            onClick={onLogout}
+            className="w-full flex items-center cursor-pointer gap-3 px-4 py-3 rounded-xl text-red-600 hover:bg-(--color-primary-hover) transition-all"
+          >
+            <LogOut size={20} />
+            {!(collapsed && !isMobile) && <span>Logout</span>}
+          </button>
+        </div>
 
         {/* User profile */}
-        <SidebarUser collapsed={collapsed && !isMobile} />
+        {/* <SidebarUser collapsed={collapsed && !isMobile} /> */}
       </aside>
     </>
   );
