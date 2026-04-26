@@ -47,7 +47,6 @@ export default function Sidebar({
   );
   const onLogout = () => {
     localStorage.removeItem("52bazaarToken");
-    window.location.reload();
     navigate("/");
   };
 

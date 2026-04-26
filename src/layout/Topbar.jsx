@@ -24,7 +24,6 @@ export default function Topbar({ collapsed, isMobile, onToggle, activeNav }) {
   const onLogout = () => {
     localStorage.removeItem("52bazaarToken");
     setOpenMenu(false);
-    window.location.reload();
     navigate("/");
   };
 
