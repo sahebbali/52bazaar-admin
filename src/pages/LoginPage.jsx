@@ -31,7 +31,7 @@ export default function LoginPage() {
       Notification(error?.data?.message || "Login failed", "error");
     }
   }, [data, isError, error, navigate]);
-  console.log("Login Data:", { data, isLoading, isError, error });
+  // console.log("Login Data:", { data, isLoading, isError, error });
 
   return (
     <div className="min-h-screen w-full bg-gray-50">

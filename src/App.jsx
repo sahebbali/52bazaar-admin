@@ -30,6 +30,7 @@ import Settings from "./pages/admin/settings/Settings";
 import AdminUsers from "./pages/admin/users/AdminUsers";
 import AddEditUser from "./pages/admin/users/AddEditUser";
 import PrivateRoute from "./routes/PrivateRoute";
+import CouponManagement from "./pages/admin/coupon/CouponManagement";
 
 // Dummy components for example
 
@@ -70,6 +71,8 @@ function App() {
             <Route path="payments" element={<PaymentList />} />
             <Route path="payments/:id" element={<PaymentDetails />} />
             <Route path="payments/:id/refund" element={<RefundManagement />} />
+
+            <Route path="coupons" element={<CouponManagement />} />
             {/* 🔥 Reports Routes */}
             <Route path="reports" element={<ReportsDashboard />}>
               <Route index element={<SalesReport />} />

@@ -57,12 +57,12 @@ export const NAV = [
         icon: "📈",
         path: "/admin/reports",
       },
-      // {
-      //   id: "coupon",
-      //   label: "Coupons",
-      //   icon: "🎟️",
-      //   path: "/admin/coupons",
-      // },
+      {
+        id: "coupon",
+        label: "Coupons",
+        icon: "🎟️",
+        path: "/admin/coupons",
+      },
     ],
   },
   {
