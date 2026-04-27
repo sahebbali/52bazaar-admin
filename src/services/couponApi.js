@@ -43,9 +43,9 @@ export const couponApi = createApi({
       }),
       invalidatesTags: ["Coupon"],
     }),
-    deleteProduct: builder.mutation({
+    deleteCoupon: builder.mutation({
       query: (id) => ({
-        url: `/admin/delete-product/${id}`, // RESTful approach (preferred)
+        url: `/admin/delete-coupons/${id}`, // RESTful approach (preferred)
         method: "DELETE",
       }),
       invalidatesTags: ["Coupon"],
@@ -58,5 +58,5 @@ export const {
   useGetAllCouponsQuery,
   useGetProductByIdQuery,
   useUpdateProductMutation,
-  useDeleteProductMutation,
+  useDeleteCouponMutation,
 } = couponApi;

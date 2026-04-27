@@ -13,6 +13,7 @@ import {
 import CouponForm from "./components/CouponForm";
 import {
   useAddCouponMutation,
+  useDeleteCouponMutation,
   useGetAllCouponsQuery,
 } from "../../../services/couponApi";
 import { Notification } from "../../../components/ToastNotification";
@@ -52,31 +53,41 @@ const CouponManagement = () => {
       error: addCouponErrorData,
     },
   ] = useAddCouponMutation();
-
   useEffect(() => {
     if (CouponData) {
       setCoupons(CouponData.data || []);
     }
   }, [CouponData]);
 
+  // delete coupon
+  const [
+    deleteCoupon,
+    {
+      data: deleteCouponData,
+      isLoading: deleteCouponLoading,
+      isError: deleteCouponError,
+      error: deleteCouponErrorData,
+    },
+  ] = useDeleteCouponMutation();
+
   useEffect(() => {
-    if (addCouponData) {
+    if (deleteCouponData) {
       Notification(
-        addCouponData?.message || "Coupon added successfully",
+        deleteCouponData?.message || "Coupon Deleted successfully",
         "success",
       );
       onCloseForm();
       refetch(); // Refresh the list after adding
     }
 
-    if (addCouponError) {
+    if (deleteCouponErrorData) {
       Notification(
-        addCouponErrorData?.data?.message || "Error adding coupon",
+        deleteCouponErrorData?.data?.message || "Error adding coupon",
         "error",
       );
-      console.error("Error adding coupon:", addCouponError);
+      console.error("Error adding coupon:", deleteCouponErrorData);
     }
-  }, [addCouponData, addCouponError, refetch]);
+  }, [deleteCouponData, deleteCouponErrorData, refetch]);
 
   const onCloseForm = () => {
     setShowForm(false);
@@ -95,11 +106,7 @@ const CouponManagement = () => {
   };
 
   const handleDeleteCoupon = async (id) => {
-    if (window.confirm("Are you sure you want to delete this coupon?")) {
-      // Add your delete mutation here
-      console.log("Delete coupon:", id);
-      refetch();
-    }
+    await deleteCoupon(id);
   };
 
   const handleToggleStatus = async (id) => {
@@ -412,7 +419,7 @@ const CouponManagement = () => {
                         <Edit size={18} />
                       </button>
                       <button
-                        onClick={() => handleDeleteCoupon(coupon.id)}
+                        onClick={() => handleDeleteCoupon(coupon._id)}
                         className="text-red-600 cursor-pointer hover:text-red-800"
                       >
                         <Trash2 size={18} />
