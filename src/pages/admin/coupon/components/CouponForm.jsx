@@ -155,7 +155,7 @@ const CouponForm = ({ onSubmit, onClose, initialData }) => {
                 className="w-full px-3 py-2 border text-black cursor-pointer border-gray-300 rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent"
               >
                 <option value="percentage">Percentage (%)</option>
-                <option value="fixed">Fixed Amount ($)</option>
+                <option value="fixed">Fixed Amount (৳)</option>
               </select>
             </div>
 
@@ -165,7 +165,7 @@ const CouponForm = ({ onSubmit, onClose, initialData }) => {
               </label>
               <div className="relative">
                 {formData.discountType === "fixed" && (
-                  <span className="absolute left-3 top-2 text-gray-500">$</span>
+                  <span className="absolute left-3 top-2 text-gray-500">৳</span>
                 )}
                 <input
                   type="number"
@@ -194,7 +194,7 @@ const CouponForm = ({ onSubmit, onClose, initialData }) => {
                 Minimum Purchase Amount *
               </label>
               <div className="relative">
-                <span className="absolute left-3 top-2 text-gray-500">$</span>
+                <span className="absolute left-3 top-2 text-gray-500">৳</span>
                 <input
                   type="number"
                   name="minPurchase"
@@ -217,7 +217,7 @@ const CouponForm = ({ onSubmit, onClose, initialData }) => {
                 Maximum Discount (Optional)
               </label>
               <div className="relative">
-                <span className="absolute left-3 top-2 text-gray-500">$</span>
+                <span className="absolute left-3 top-2 text-gray-500">৳</span>
                 <input
                   type="number"
                   name="maxDiscount"

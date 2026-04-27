@@ -1,5 +1,5 @@
 import { useEffect, useCallback } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { NAV } from "./navConfig";
 import MobileOverlay from "./Sidebar/MobileOverlay";
 import SidebarLogo from "./Sidebar/SidebarLogo";
@@ -25,6 +25,7 @@ export default function Sidebar({
   onMobileClose,
 }) {
   const location = useLocation();
+  const navigate = useNavigate();
 
   // Close drawer on route change (mobile only)
   useEffect(() => {

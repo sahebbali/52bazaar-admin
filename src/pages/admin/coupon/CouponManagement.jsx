@@ -2,12 +2,47 @@
 import React, { useState, useEffect } from "react";
 import { Plus, Edit, Trash2, Copy, Check } from "lucide-react";
 import CouponForm from "./components/CouponForm";
+import { useAddCouponMutation } from "../../../services/couponApi";
+import { Notification } from "../../../components/ToastNotification";
 
 const CouponManagement = () => {
   const [coupons, setCoupons] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editingCoupon, setEditingCoupon] = useState(null);
   const [copiedCode, setCopiedCode] = useState(null);
+
+  const [
+    addCoupon,
+    {
+      data: addCouponData,
+      isLoading: addCouponLoading,
+      isError: addCouponError,
+      error: addCouponErrorData,
+    },
+  ] = useAddCouponMutation();
+  console.log({ addCouponError });
+  console.log({ addCouponErrorData });
+
+  useEffect(() => {
+    if (addCouponData) {
+      Notification(
+        addCouponData?.message || "Coupon added successfully",
+        "success",
+      );
+
+      onCloseForm();
+      console.log("Coupon added successfully:", addCouponData);
+    }
+
+    if (addCouponError) {
+      Notification(
+        addCouponErrorData?.data?.message || "Error adding coupon",
+        "error",
+      );
+
+      console.error("Error adding coupon:", addCouponError);
+    }
+  }, [addCouponData, addCouponError]);
 
   // Load coupons from localStorage/API
   useEffect(() => {
@@ -59,15 +94,20 @@ const CouponManagement = () => {
     localStorage.setItem("coupons", JSON.stringify(updatedCoupons));
   };
 
-  const handleCreateCoupon = (couponData) => {
+  const onCloseForm = () => {
+    setShowForm(false);
+    setEditingCoupon(null);
+  };
+  const handleCreateCoupon = async (couponData) => {
     const newCoupon = {
       ...couponData,
       id: Date.now().toString(),
       usedCount: 0,
     };
     console.log("Creating coupon:", newCoupon);
-    saveCoupons([...coupons, newCoupon]);
-    setShowForm(false);
+    await addCoupon(couponData); // Call the RTK Query mutation to add coupon to backend
+    // saveCoupons([...coupons, newCoupon]);
+    // setShowForm(false);
   };
 
   const handleUpdateCoupon = (updatedData) => {
@@ -131,10 +171,7 @@ const CouponManagement = () => {
       {showForm && (
         <CouponForm
           onSubmit={editingCoupon ? handleUpdateCoupon : handleCreateCoupon}
-          onClose={() => {
-            setShowForm(false);
-            setEditingCoupon(null);
-          }}
+          onClose={onCloseForm}
           initialData={editingCoupon}
         />
       )}
