@@ -13,6 +13,7 @@ import {
 import CouponForm from "./components/CouponForm";
 import {
   useAddCouponMutation,
+  useCouponToggleStatusMutation,
   useDeleteCouponMutation,
   useGetAllCouponsQuery,
   useUpdateCouponMutation,
@@ -137,6 +138,35 @@ const CouponManagement = () => {
       console.error("Error adding coupon:", updateCouponErrorData);
     }
   }, [updateCouponData, updateCouponErrorData, refetch]);
+
+  // toggle status mutation
+  const [
+    toggleStatus,
+    {
+      data: toggleStatusData,
+      isLoading: toggleStatusLoading,
+      isError: toggleStatusError,
+      error: toggleStatusErrorData,
+    },
+  ] = useCouponToggleStatusMutation();
+  useEffect(() => {
+    if (toggleStatusData) {
+      Notification(
+        toggleStatusData?.message || "Coupon Updated successfully",
+        "success",
+      );
+      refetch(); // Refresh the list after adding
+    }
+
+    if (toggleStatusErrorData) {
+      Notification(
+        toggleStatusErrorData?.data?.message || "Error adding coupon",
+        "error",
+      );
+      console.error("Error adding coupon:", toggleStatusErrorData);
+    }
+  }, [toggleStatusData, toggleStatusErrorData, refetch]);
+
   const onCloseForm = () => {
     setShowForm(false);
     setEditingCoupon(null);
@@ -159,6 +189,7 @@ const CouponManagement = () => {
   const handleToggleStatus = async (id) => {
     // Add your toggle status mutation here
     console.log("Toggle status:", id);
+    await toggleStatus(id);
     refetch();
   };
 
@@ -479,7 +510,7 @@ const CouponManagement = () => {
                       <span className="text-gray-600">Discount:</span>
                       <span className="font-semibold text-gray-800">
                         {coupon.discountType === "percentage"
-                          ? `৳{coupon.discountValue}% OFF`
+                          ? `${coupon.discountValue}% OFF`
                           : `৳${coupon.discountValue} OFF`}
                       </span>
                     </div>
@@ -513,19 +544,32 @@ const CouponManagement = () => {
 
                   <div className="flex items-center justify-between pt-3 border-t">
                     <button
-                      onClick={() => handleToggleStatus(coupon.id)}
-                      className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
-                        coupon.isActive && !isExpired(coupon.endDate)
-                          ? "bg-green-100 text-green-700 hover:bg-green-200"
-                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                      onClick={() => handleToggleStatus(coupon._id)}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 ${
+                        coupon.isActive ? "bg-green-500" : "bg-gray-300"
                       }`}
                     >
-                      {coupon.isActive && !isExpired(coupon.endDate)
-                        ? "Active"
-                        : "Inactive"}
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition duration-300 ${
+                          coupon.isActive ? "translate-x-6" : "translate-x-1"
+                        }`}
+                      />
                     </button>
-                    <div className="text-xs text-gray-500">
-                      {isExpired(coupon.endDate) && "Expired"}
+
+                    <div className="flex items-center gap-2 text-xs">
+                      <span
+                        className={`font-medium ${
+                          coupon.isActive ? "text-green-600" : "text-gray-500"
+                        }`}
+                      >
+                        {coupon.isActive ? "Active" : "Inactive"}
+                      </span>
+
+                      {isExpired(coupon.endDate) && (
+                        <span className="text-red-500 font-medium">
+                          Expired
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>

@@ -43,6 +43,13 @@ export const couponApi = createApi({
       }),
       invalidatesTags: ["Coupon"],
     }),
+    couponToggleStatus: builder.mutation({
+      query: (id) => ({
+        url: `/admin/toggle-status/${id}`, // RESTful approach (preferred)
+        method: "PUT",
+      }),
+      invalidatesTags: ["Coupon"],
+    }),
     deleteCoupon: builder.mutation({
       query: (id) => ({
         url: `/admin/delete-coupons/${id}`, // RESTful approach (preferred)
@@ -59,4 +66,5 @@ export const {
   useGetProductByIdQuery,
   useUpdateCouponMutation,
   useDeleteCouponMutation,
+  useCouponToggleStatusMutation,
 } = couponApi;
