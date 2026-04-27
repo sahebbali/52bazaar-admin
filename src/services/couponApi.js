@@ -22,24 +22,10 @@ export const couponApi = createApi({
       }),
       invalidatesTags: ["Coupon"],
     }),
-    getAllProducts: builder.query({
-      query: ({
-        page = 1,
-        limit = 10,
-        search = "",
-        category = "",
-        status = "",
-        stockStatus = "",
-      }) => ({
-        url: "/admin/get-all-products",
-        params: {
-          page,
-          limit,
-          search,
-          category,
-          status,
-          stockStatus,
-        },
+    getAllCoupons: builder.query({
+      query: (body) => ({
+        url: `/admin/get-all-coupons?page=${body.page}&limit=${body.limit}&search=${body.search}&status=${body.status}&endDate=${body.endDate}`,
+        method: "GET",
       }),
       providesTags: ["Product"],
     }),
@@ -69,7 +55,7 @@ export const couponApi = createApi({
 
 export const {
   useAddCouponMutation,
-  useGetAllProductsQuery,
+  useGetAllCouponsQuery,
   useGetProductByIdQuery,
   useUpdateProductMutation,
   useDeleteProductMutation,
