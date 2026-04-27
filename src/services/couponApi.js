@@ -35,9 +35,9 @@ export const couponApi = createApi({
       }),
       providesTags: ["Coupon"],
     }),
-    updateProduct: builder.mutation({
+    updateCoupon: builder.mutation({
       query: (body) => ({
-        url: `/admin/update-product`, // RESTful approach (preferred)
+        url: `/admin/update-coupon/${body.id}`, // RESTful approach (preferred)
         method: "PUT",
         body,
       }),
@@ -57,6 +57,6 @@ export const {
   useAddCouponMutation,
   useGetAllCouponsQuery,
   useGetProductByIdQuery,
-  useUpdateProductMutation,
+  useUpdateCouponMutation,
   useDeleteCouponMutation,
 } = couponApi;

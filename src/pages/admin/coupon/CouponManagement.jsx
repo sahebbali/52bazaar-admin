@@ -15,6 +15,7 @@ import {
   useAddCouponMutation,
   useDeleteCouponMutation,
   useGetAllCouponsQuery,
+  useUpdateCouponMutation,
 } from "../../../services/couponApi";
 import { Notification } from "../../../components/ToastNotification";
 
@@ -53,6 +54,35 @@ const CouponManagement = () => {
       error: addCouponErrorData,
     },
   ] = useAddCouponMutation();
+
+  useEffect(() => {
+    if (addCouponData) {
+      Notification(
+        addCouponData?.message || "Coupon addd successfully",
+        "success",
+      );
+      onCloseForm();
+      refetch(); // Refresh the list after adding
+    }
+
+    if (addCouponErrorData) {
+      Notification(
+        addCouponErrorData?.data?.message || "Error adding coupon",
+        "error",
+      );
+      console.error("Error adding coupon:", addCouponErrorData);
+    }
+  }, [addCouponData, addCouponErrorData, refetch]);
+  // update coupon mutation
+  const [
+    updateCoupon,
+    {
+      data: updateCouponData,
+      isLoading: updateCouponLoading,
+      isError: updateCouponError,
+      error: updateCouponErrorData,
+    },
+  ] = useUpdateCouponMutation();
   useEffect(() => {
     if (CouponData) {
       setCoupons(CouponData.data || []);
@@ -89,6 +119,24 @@ const CouponManagement = () => {
     }
   }, [deleteCouponData, deleteCouponErrorData, refetch]);
 
+  useEffect(() => {
+    if (updateCouponData) {
+      Notification(
+        updateCouponData?.message || "Coupon Updated successfully",
+        "success",
+      );
+      onCloseForm();
+      refetch(); // Refresh the list after adding
+    }
+
+    if (updateCouponErrorData) {
+      Notification(
+        updateCouponErrorData?.data?.message || "Error adding coupon",
+        "error",
+      );
+      console.error("Error adding coupon:", updateCouponErrorData);
+    }
+  }, [updateCouponData, updateCouponErrorData, refetch]);
   const onCloseForm = () => {
     setShowForm(false);
     setEditingCoupon(null);
@@ -98,11 +146,10 @@ const CouponManagement = () => {
     await addCoupon(couponData);
   };
 
-  const handleUpdateCoupon = (updatedData) => {
+  const handleUpdateCoupon = async (updatedData) => {
     // Add your update mutation here
     console.log("Update coupon:", updatedData);
-    onCloseForm();
-    refetch();
+    await updateCoupon(updatedData);
   };
 
   const handleDeleteCoupon = async (id) => {
@@ -378,7 +425,7 @@ const CouponManagement = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {coupons.map((coupon) => (
               <div
-                key={coupon.id}
+                key={coupon._id}
                 className={`bg-white rounded-lg shadow-md border-l-4 overflow-hidden transition-all hover:shadow-lg ${
                   coupon.isActive && !isExpired(coupon.endDate)
                     ? "border-l-green-500"
@@ -432,21 +479,21 @@ const CouponManagement = () => {
                       <span className="text-gray-600">Discount:</span>
                       <span className="font-semibold text-gray-800">
                         {coupon.discountType === "percentage"
-                          ? `${coupon.discountValue}% OFF`
-                          : `$${coupon.discountValue} OFF`}
+                          ? `৳{coupon.discountValue}% OFF`
+                          : `৳${coupon.discountValue} OFF`}
                       </span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Minimum Purchase:</span>
                       <span className="font-semibold text-gray-800">
-                        ${coupon.minPurchase}
+                        ৳{coupon.minPurchase}
                       </span>
                     </div>
                     {coupon.maxDiscount && (
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-600">Max Discount:</span>
                         <span className="font-semibold text-gray-800">
-                          ${coupon.maxDiscount}
+                          ৳{coupon.maxDiscount}
                         </span>
                       </div>
                     )}

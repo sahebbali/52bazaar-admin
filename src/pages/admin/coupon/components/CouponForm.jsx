@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { X } from "lucide-react";
 
 const CouponForm = ({ onSubmit, onClose, initialData }) => {
+  console.log("Initial Data in CouponForm:", initialData);
   const [formData, setFormData] = useState({
     code: "",
     description: "",
@@ -14,6 +15,7 @@ const CouponForm = ({ onSubmit, onClose, initialData }) => {
     endDate: "",
     usageLimit: "",
     isActive: true,
+    id: null,
   });
 
   const [errors, setErrors] = useState({});
@@ -27,13 +29,16 @@ const CouponForm = ({ onSubmit, onClose, initialData }) => {
         discountValue: initialData.discountValue,
         minPurchase: initialData.minPurchase,
         maxDiscount: initialData.maxDiscount || "",
-        startDate: initialData.startDate,
-        endDate: initialData.endDate,
+        startDate: initialData.startDate?.split("T")[0] || "",
+        endDate: initialData.endDate?.split("T")[0] || "",
         usageLimit: initialData.usageLimit,
         isActive: initialData.isActive,
+        id: initialData._id,
       });
     }
   }, [initialData]);
+
+  console.log("Form Data in CouponForm:", formData);
 
   const validate = () => {
     const newErrors = {};
