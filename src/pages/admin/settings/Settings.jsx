@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Save, Globe, CreditCard, Mail, Bell, Upload, X } from "lucide-react";
 import {
+  useDeleteNumberMutation,
   useGetSettingQuery,
   useSaveSettingMutation,
 } from "../../../services/paymentApi";
@@ -136,6 +137,34 @@ const Settings = () => {
     }
   }, [data, error]);
 
+  //delete number
+  const [
+    deleteNumber,
+    {
+      data: deleteData,
+      isLoading: isDeleting,
+      isError: deleteError,
+      error: mutationError,
+    },
+  ] = useDeleteNumberMutation();
+  useEffect(() => {
+    if (deleteData) {
+      Notification(
+        deleteData.message || "Number deleted successfully!",
+        "success",
+      );
+      console.log("Number deleted successfully:", deleteData);
+    }
+    if (mutationError) {
+      Notification(
+        mutationError.data?.message ||
+          "Failed to delete number. Please try again.",
+        "error",
+      );
+      console.error("Failed to delete number:", mutationError);
+    }
+  }, [deleteData, mutationError]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -228,8 +257,9 @@ const Settings = () => {
     }
   };
 
-  const handleDeleteBkashNumber = (number) => {
-    console.log("Deleting bKash number:", number);
+  const handleDeleteBkashNumber = async (number, gateway) => {
+    await deleteNumber({ number, gateway });
+    console.log(`Deleting ${gateway} number:`, number);
   };
 
   const handleInputChange = (e) => {
@@ -572,51 +602,54 @@ const Settings = () => {
                             maxLength={11}
                           />
                         </div>
-                        {bkashNumbers?.length > 0 && (
-                          <div className="mt-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Saved bKash Numbers
-                            </label>
-                            <div className="space-y-2">
-                              {bkashNumbers.map((number, index) => (
-                                <div
-                                  key={index}
-                                  className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200"
-                                >
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-green-600">✓</span>
-                                    <span className="text-gray-700 font-mono">
-                                      {number}
-                                    </span>
-                                  </div>
-                                  <button
-                                    type="button"
-                                    onClick={() =>
-                                      handleDeleteBkashNumber(number)
-                                    }
-                                    // disabled={isDeleting}
-                                    className="text-red-600 hover:text-red-800 transition-colors disabled:opacity-50"
-                                  >
-                                    <svg
-                                      className="w-5 h-5"
-                                      fill="none"
-                                      stroke="currentColor"
-                                      viewBox="0 0 24 24"
-                                    >
-                                      <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                      />
-                                    </svg>
-                                  </button>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
                       </div>
+                      {bkashNumbers?.length > 0 && (
+                        <div className="mt-4">
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Saved bKash Numbers
+                          </label>
+                          <div className="space-y-2">
+                            {bkashNumbers.map((number, index) => (
+                              <div
+                                key={index}
+                                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200"
+                              >
+                                <div className="flex items-center gap-2">
+                                  <span className="text-green-600">✓</span>
+                                  <span className="text-gray-700 font-mono">
+                                    {number}
+                                  </span>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    handleDeleteBkashNumber(
+                                      number,
+                                      "bkashNumbers",
+                                    )
+                                  }
+                                  // disabled={isDeleting}
+                                  className="text-red-600 hover:text-red-800 transition-colors disabled:opacity-50"
+                                >
+                                  <svg
+                                    className="w-5 h-5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                    />
+                                  </svg>
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
 
@@ -642,6 +675,53 @@ const Settings = () => {
                           />
                         </div>
                       </div>
+                      {nagadNumbers?.length > 0 && (
+                        <div className="mt-4">
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Saved Nagad Numbers
+                          </label>
+                          <div className="space-y-2">
+                            {nagadNumbers.map((number, index) => (
+                              <div
+                                key={index}
+                                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200"
+                              >
+                                <div className="flex items-center gap-2">
+                                  <span className="text-green-600">✓</span>
+                                  <span className="text-gray-700 font-mono">
+                                    {number}
+                                  </span>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    handleDeleteBkashNumber(
+                                      number,
+                                      "nagadNumbers",
+                                    )
+                                  }
+                                  // disabled={isDeleting}
+                                  className="text-red-600 hover:text-red-800 transition-colors disabled:opacity-50"
+                                >
+                                  <svg
+                                    className="w-5 h-5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                    />
+                                  </svg>
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
 
@@ -667,6 +747,53 @@ const Settings = () => {
                           />
                         </div>
                       </div>
+                      {rocketNumbers?.length > 0 && (
+                        <div className="mt-4">
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Saved Rocket Numbers
+                          </label>
+                          <div className="space-y-2">
+                            {rocketNumbers.map((number, index) => (
+                              <div
+                                key={index}
+                                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200"
+                              >
+                                <div className="flex items-center gap-2">
+                                  <span className="text-green-600">✓</span>
+                                  <span className="text-gray-700 font-mono">
+                                    {number}
+                                  </span>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    handleDeleteBkashNumber(
+                                      number,
+                                      "rocketNumbers",
+                                    )
+                                  }
+                                  // disabled={isDeleting}
+                                  className="text-red-600 hover:text-red-800 transition-colors disabled:opacity-50"
+                                >
+                                  <svg
+                                    className="w-5 h-5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                    />
+                                  </svg>
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
 

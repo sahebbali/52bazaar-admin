@@ -45,6 +45,14 @@ export const paymentApi = createApi({
       }),
       invalidatesTags: ["Settings"],
     }),
+    deleteNumber: builder.mutation({
+      query: (body) => ({
+        url: `/admin/delete-number`,
+        method: "DELETE",
+        body,
+      }),
+      invalidatesTags: ["Settings"],
+    }),
     getSetting: builder.query({
       query: () => ({
         url: `/admin/get-settings`,
@@ -61,4 +69,5 @@ export const {
   useUpdatePaymentStatusMutation,
   useSaveSettingMutation,
   useGetSettingQuery,
+  useDeleteNumberMutation,
 } = paymentApi;
