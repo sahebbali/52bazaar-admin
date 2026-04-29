@@ -60,9 +60,9 @@ const Settings = () => {
 
   const { data: settingsData } = useGetSettingQuery();
 
-  console.log("Fetched settings data:", settingsData);
-  console.log("bkashNumbers:", bkashNumbers);
-  console.log("formData:", formData);
+  // console.log("Fetched settings data:", settingsData);
+  // console.log("bkashNumbers:", bkashNumbers);
+  // console.log("formData:", formData);
 
   // Helper function to clean form data
   const cleanFormData = (data) => {
@@ -126,14 +126,14 @@ const Settings = () => {
     if (data) {
       Notification(data.message || "Settings saved successfully!", "success");
       resetFormData();
-      console.log("Settings saved successfully:", data);
+      // console.log("Settings saved successfully:", data);
     }
     if (error) {
       Notification(
         error.data?.message || "Failed to save settings. Please try again.",
         "error",
       );
-      console.error("Failed to save settings:", error);
+      // console.error("Failed to save settings:", error);
     }
   }, [data, error]);
 
@@ -153,7 +153,7 @@ const Settings = () => {
         deleteData.message || "Number deleted successfully!",
         "success",
       );
-      console.log("Number deleted successfully:", deleteData);
+      // console.log("Number deleted successfully:", deleteData);
     }
     if (mutationError) {
       Notification(
@@ -161,7 +161,7 @@ const Settings = () => {
           "Failed to delete number. Please try again.",
         "error",
       );
-      console.error("Failed to delete number:", mutationError);
+      // console.error("Failed to delete number:", mutationError);
     }
   }, [deleteData, mutationError]);
 
@@ -244,7 +244,7 @@ const Settings = () => {
       form.append("bankTransferEnabled", formData.bankTransferEnabled);
     }
 
-    console.log("Saving settings form data:", Object.fromEntries(form));
+    // console.log("Saving settings form data:", Object.fromEntries(form));
 
     try {
       await saveSettings(form);
@@ -259,7 +259,7 @@ const Settings = () => {
 
   const handleDeleteBkashNumber = async (number, gateway) => {
     await deleteNumber({ number, gateway });
-    console.log(`Deleting ${gateway} number:`, number);
+    // console.log(`Deleting ${gateway} number:`, number);
   };
 
   const handleInputChange = (e) => {

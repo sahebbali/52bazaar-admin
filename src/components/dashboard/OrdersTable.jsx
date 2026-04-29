@@ -1,47 +1,5 @@
 import { useState, useEffect } from "react";
-
-const ORDERS = [
-  {
-    id: "#ORD-5812",
-    customer: "Rahim Uddin",
-    items: 3,
-    date: "31 Mar 2026",
-    amount: "$128.00",
-    status: "Delivered",
-  },
-  {
-    id: "#ORD-5811",
-    customer: "Karim Hossain",
-    items: 5,
-    date: "31 Mar 2026",
-    amount: "$245.50",
-    status: "Processing",
-  },
-  {
-    id: "#ORD-5810",
-    customer: "Nasrin Akter",
-    items: 2,
-    date: "30 Mar 2026",
-    amount: "$64.00",
-    status: "Pending",
-  },
-  {
-    id: "#ORD-5809",
-    customer: "Sohel Rana",
-    items: 7,
-    date: "30 Mar 2026",
-    amount: "$389.00",
-    status: "Cancelled",
-  },
-  {
-    id: "#ORD-5808",
-    customer: "Fatema Begum",
-    items: 4,
-    date: "29 Mar 2026",
-    amount: "$172.25",
-    status: "Delivered",
-  },
-];
+import { useGetAllOrdersQuery } from "../../services/orderApi";
 
 const STATUS_STYLES = {
   Delivered: "bg-green-100 text-green-800",
@@ -59,7 +17,36 @@ const STATUS_ICONS = {
 
 export default function OrdersTable() {
   const [isMobile, setIsMobile] = useState(false);
+  const [orders, setOrders] = useState([]);
   const [expandedRow, setExpandedRow] = useState(null);
+  const {
+    data: response,
+    isLoading,
+    error,
+    isFetching,
+  } = useGetAllOrdersQuery({
+    page: 1,
+    limit: 7,
+    search: "",
+    status: "",
+    paymentStatus: "",
+    startDate: "",
+    endDate: "",
+  });
+  console.log(
+    "Orders API Response:",
+    response,
+    "Loading:",
+    isLoading,
+    "Error:",
+    error,
+  );
+
+  useEffect(() => {
+    if (response) {
+      setOrders(response.orders || []); // Assuming the API returns { orders: [...] }
+    }
+  }, [response]);
 
   useEffect(() => {
     const checkMobile = () => {

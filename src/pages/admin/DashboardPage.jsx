@@ -3,6 +3,7 @@ import SalesChart from "./../../components/dashboard/SalesChart";
 import TopCategories from "./../../components/dashboard/TopCategories";
 import OrdersTable from "./../../components/dashboard/OrdersTable";
 import StatCard from "./../../components/dashboard/StatCard";
+import { Link } from "react-router-dom";
 
 const STATS = [
   {
@@ -69,7 +70,12 @@ export default function DashboardPage() {
             📥 Export
           </button>
           <button className="flex items-center gap-1 md:gap-2 px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm font-semibold text-white bg-(--color-primary) hover:bg-(--color-primary-hover) rounded-xl shadow-md shadow-(--color-primary)/20 transition-all">
-            ➕ Add Product
+            <Link
+              to="/admin/products/add"
+              className="flex items-center gap-1 md:gap-2"
+            >
+              ➕ Add Product
+            </Link>
           </button>
         </div>
       </div>
