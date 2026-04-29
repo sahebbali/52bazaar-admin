@@ -1,30 +1,20 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { useGetAllOrdersQuery } from "../../services/orderApi";
 
 const STATUS_STYLES = {
-  Delivered: "bg-green-100 text-green-800",
-  Processing: "bg-blue-100 text-blue-800",
-  Pending: "bg-yellow-100 text-yellow-800",
-  Cancelled: "bg-red-100 text-red-800",
-};
-
-const STATUS_ICONS = {
-  Delivered: "✓",
-  Processing: "⏳",
-  Pending: "🕐",
-  Cancelled: "✕",
+  delivered: "bg-green-100 text-green-800",
+  processing: "bg-blue-100 text-blue-800",
+  pending: "bg-yellow-100 text-yellow-800",
+  cancelled: "bg-red-100 text-red-800",
+  refunded: "bg-purple-100 text-purple-800",
 };
 
 export default function OrdersTable() {
   const [isMobile, setIsMobile] = useState(false);
-  const [orders, setOrders] = useState([]);
   const [expandedRow, setExpandedRow] = useState(null);
-  const {
-    data: response,
-    isLoading,
-    error,
-    isFetching,
-  } = useGetAllOrdersQuery({
+
+  const { data, isLoading, isError } = useGetAllOrdersQuery({
     page: 1,
     limit: 7,
     search: "",
@@ -33,203 +23,200 @@ export default function OrdersTable() {
     startDate: "",
     endDate: "",
   });
-  console.log(
-    "Orders API Response:",
-    response,
-    "Loading:",
-    isLoading,
-    "Error:",
-    error,
-  );
+
+  const orders = data?.orders || [];
 
   useEffect(() => {
-    if (response) {
-      setOrders(response.orders || []); // Assuming the API returns { orders: [...] }
-    }
-  }, [response]);
-
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
 
     checkMobile();
     window.addEventListener("resize", checkMobile);
+
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  const toggleRow = (orderId) => {
-    setExpandedRow(expandedRow === orderId ? null : orderId);
+  const toggleRow = (id) => {
+    setExpandedRow(expandedRow === id ? null : id);
   };
+
+  const formatDate = (date) =>
+    new Date(date).toLocaleDateString("en-BD", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+
+  const formatCurrency = (amount) => `৳${Number(amount || 0).toLocaleString()}`;
+
+  if (isLoading) {
+    return (
+      <div className="bg-white rounded-2xl p-5 shadow-sm">
+        <p className="text-sm text-gray-500">Loading orders...</p>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="bg-white rounded-2xl p-5 shadow-sm">
+        <p className="text-sm text-red-500">Failed to load orders</p>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white rounded-xl md:rounded-2xl border border-green-100 shadow-sm overflow-hidden">
-      <div className="flex items-center justify-between px-4 md:px-5 py-3 md:py-4 border-b border-gray-100">
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 md:px-5 py-4 border-b border-gray-100">
         <h3 className="text-sm md:text-base font-bold text-gray-800">
           🛍️ Recent Orders
         </h3>
-        <button className="text-xs md:text-sm text-(--color-primary) font-semibold hover:underline">
-          View All Orders →
-        </button>
+
+        <Link
+          to="/admin/orders"
+          className="text-xs md:text-sm text-(--color-primary) font-semibold hover:underline"
+        >
+          View All →
+        </Link>
       </div>
 
-      {/* Desktop Table View */}
-      <div className="hidden md:block overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="bg-gray-50">
-              {[
-                "Order ID",
-                "Customer",
-                "Items",
-                "Date",
-                "Amount",
-                "Status",
-                "Action",
-              ].map((h) => (
-                <th
-                  key={h}
-                  className="px-5 py-3 text-left text-[10px] uppercase tracking-widest text-gray-400 font-semibold"
-                >
-                  {h}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {ORDERS.map((order) => (
-              <tr
-                key={order.id}
-                className="border-t border-gray-100 hover:bg-green-50/40 transition-colors"
-              >
-                <td className="px-5 py-3.5">
-                  <span className="font-mono text-xs text-gray-400">
-                    {order.id}
-                  </span>
-                </td>
-                <td className="px-5 py-3.5 text-sm font-medium text-gray-700">
-                  {order.customer}
-                </td>
-                <td className="px-5 py-3.5 text-sm text-gray-500">
-                  {order.items} items
-                </td>
-                <td className="px-5 py-3.5 text-sm text-gray-500">
-                  {order.date}
-                </td>
-                <td className="px-5 py-3.5 font-mono text-sm font-bold text-gray-800">
-                  {order.amount}
-                </td>
-                <td className="px-5 py-3.5">
-                  <StatusBadge status={order.status} />
-                </td>
-                <td className="px-5 py-3.5">
-                  <button className="text-xs font-semibold text-(--color-primary) border border-(--color-primary) hover:bg-(--color-primary) hover:text-white px-3 py-1.5 rounded-lg transition-all">
-                    View
-                  </button>
-                </td>
+      {/* Empty */}
+      {orders.length === 0 && (
+        <div className="p-5 text-sm text-gray-500">No orders found</div>
+      )}
+
+      {/* Desktop */}
+      {!isMobile && orders.length > 0 && (
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="bg-gray-50">
+                {[
+                  "Order ID",
+                  "Customer",
+                  "Items",
+                  "Date",
+                  "Amount",
+                  "Status",
+                ].map((item) => (
+                  <th
+                    key={item}
+                    className="px-5 py-3 text-left text-[11px] uppercase text-gray-400 font-semibold"
+                  >
+                    {item}
+                  </th>
+                ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
 
-      {/* Mobile Card View */}
-      <div className="md:hidden divide-y divide-gray-100">
-        {ORDERS.map((order) => (
-          <div
-            key={order.id}
-            className="px-4 py-3 hover:bg-gray-50 transition-colors"
-          >
-            <div
-              className="flex items-center justify-between cursor-pointer"
-              onClick={() => toggleRow(order.id)}
-            >
-              <div className="flex-1">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="font-mono text-xs font-semibold text-gray-600">
-                    {order.id}
+            <tbody>
+              {orders.map((order) => (
+                <tr
+                  key={order._id}
+                  className="border-t border-gray-100 hover:bg-gray-50"
+                >
+                  <td className="px-5 py-4 font-mono text-xs text-black">
+                    {order.orderId}
+                  </td>
+
+                  <td className="px-5 py-4 text-sm font-medium text-black">
+                    {order.customer?.name || "Guest"}
+                  </td>
+
+                  <td className="px-5 py-4 text-sm text-black">
+                    {order.itemsCount} items
+                  </td>
+
+                  <td className="px-5 py-4 text-sm text-black">
+                    {formatDate(order.createdAt)}
+                  </td>
+
+                  <td className="px-5 py-4 font-semibold text-black">
+                    {formatCurrency(order.total)}
+                  </td>
+
+                  <td className="px-5 py-4">
+                    <StatusBadge status={order.status} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Mobile */}
+      {isMobile && orders.length > 0 && (
+        <div className="divide-y divide-gray-100">
+          {orders.map((order) => (
+            <div key={order._id} className="p-4">
+              <div
+                className="cursor-pointer"
+                onClick={() => toggleRow(order._id)}
+              >
+                <div className="flex justify-between items-center">
+                  <span className="font-mono text-xs text-gray-500">
+                    {order.orderId}
                   </span>
+
                   <StatusBadge status={order.status} />
                 </div>
-                <div className="flex items-center justify-between">
+
+                <div className="mt-2 flex justify-between items-center">
                   <div>
-                    <p className="text-sm font-medium text-gray-800">
-                      {order.customer}
+                    <p className="text-sm font-semibold">
+                      {order.customer?.name}
                     </p>
-                    <p className="text-xs text-gray-400 mt-0.5">
-                      {order.items} items • {order.date}
+
+                    <p className="text-xs text-gray-400">
+                      {order.itemsCount} items • {formatDate(order.createdAt)}
                     </p>
                   </div>
-                  <span className="font-mono text-base font-bold text-(--color-primary)">
-                    {order.amount}
+
+                  <span className="font-bold text-(--color-primary)">
+                    {formatCurrency(order.total)}
                   </span>
                 </div>
               </div>
-              <svg
-                className={`w-5 h-5 text-gray-400 ml-2 transition-transform duration-200 ${
-                  expandedRow === order.id ? "rotate-180" : ""
-                }`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
-            </div>
 
-            {/* Expanded Details */}
-            {expandedRow === order.id && (
-              <div className="mt-3 pt-3 border-t border-gray-100 animate-fadeIn">
-                <div className="grid grid-cols-2 gap-2 text-sm">
-                  <div>
-                    <p className="text-xs text-gray-400">Customer</p>
-                    <p className="text-sm font-medium text-gray-700 mt-0.5">
-                      {order.customer}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-400">Items</p>
-                    <p className="text-sm font-medium text-gray-700 mt-0.5">
-                      {order.items}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-400">Date</p>
-                    <p className="text-sm font-medium text-gray-700 mt-0.5">
-                      {order.date}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-400">Amount</p>
-                    <p className="text-sm font-medium text-(--color-primary) mt-0.5">
-                      {order.amount}
-                    </p>
-                  </div>
+              {expandedRow === order._id && (
+                <div className="mt-3 pt-3 border-t text-sm space-y-2">
+                  <p>
+                    <span className="text-black">Payment:</span>{" "}
+                    {order.payment?.method}
+                  </p>
+
+                  <p>
+                    <span className="text-black">Phone:</span>{" "}
+                    {order.customer?.phone || "N/A"}
+                  </p>
+
+                  <Link
+                    to={`/admin/orders/${order._id}`}
+                    className="block text-center mt-3 border rounded-lg py-2 text-(--color-primary) font-semibold"
+                  >
+                    View Details
+                  </Link>
                 </div>
-                <button className="w-full mt-3 text-xs font-semibold text-(--color-primary) border border-(--color-primary) hover:bg-(--color-primary) hover:text-white px-3 py-2 rounded-lg transition-all">
-                  View Order Details
-                </button>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
 
 function StatusBadge({ status }) {
+  const key = status?.toLowerCase();
+
   return (
     <span
-      className={`inline-flex items-center gap-1 px-2 py-0.5 md:px-2.5 md:py-1 rounded-full text-[10px] md:text-[11px] font-bold ${STATUS_STYLES[status]}`}
+      className={`px-2 py-1 rounded-full text-[11px] font-semibold ${
+        STATUS_STYLES[key] || "bg-gray-100 text-gray-700"
+      }`}
     >
-      <span className="text-xs">{STATUS_ICONS[status]}</span>
-      <span className="hidden xs:inline">{status}</span>
+      {status}
     </span>
   );
 }
