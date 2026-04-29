@@ -248,10 +248,10 @@ const Settings = () => {
 
     try {
       await saveSettings(form);
-      alert("Settings saved successfully!");
+      // alert("Settings saved successfully!");
     } catch (error) {
       console.error("Error saving settings:", error);
-      alert("Failed to save settings!");
+      // alert("Failed to save settings!");
     } finally {
       setLoading(false);
     }

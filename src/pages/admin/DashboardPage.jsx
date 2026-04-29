@@ -4,6 +4,7 @@ import TopCategories from "./../../components/dashboard/TopCategories";
 import OrdersTable from "./../../components/dashboard/OrdersTable";
 import StatCard from "./../../components/dashboard/StatCard";
 import { Link } from "react-router-dom";
+import { useGetDashboardDataQuery } from "../../services/categoryApi";
 
 const STATS = [
   {
@@ -41,8 +42,53 @@ const STATS = [
 ];
 
 export default function DashboardPage() {
+  const [stats, setStats] = useState([]);
   const [isMobile, setIsMobile] = useState(false);
+  const { data, isLoading, isError } = useGetDashboardDataQuery();
+  console.log("Dashboard Data:", data, isLoading, isError);
 
+  useEffect(() => {
+    if (!data) return;
+
+    const dashboard = data;
+
+    const formattedStats = [
+      {
+        icon: "💰",
+        label: "Total Revenue",
+        value: `৳${dashboard.revenue}`,
+        change: `${dashboard.percentage}% vs last month`,
+        up: dashboard.percentage >= 0,
+        iconBg: "bg-green-100",
+      },
+      {
+        icon: "🛍️",
+        label: "Total Orders",
+        value: dashboard.totalOrders,
+        change: `${dashboard.lastMonthOrders} last month`,
+        up: dashboard.totalOrders >= dashboard.lastMonthOrders,
+        iconBg: "bg-yellow-100",
+      },
+      {
+        icon: "👥",
+        label: "Customers",
+        value: dashboard.totalUsers,
+        change: "Active users",
+        up: true,
+        iconBg: "bg-blue-100",
+      },
+      {
+        icon: "📦",
+        label: "Products",
+        value: dashboard.totalProducts,
+        change: `${dashboard.outOfStock} out of stock`,
+        up: dashboard.outOfStock === 0,
+        iconBg: "bg-red-100",
+      },
+    ];
+
+    setStats(formattedStats);
+  }, [data]);
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
@@ -82,7 +128,7 @@ export default function DashboardPage() {
 
       {/* Stat Cards - Responsive Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5 mb-6">
-        {STATS.map((s) => (
+        {stats.map((s) => (
           <StatCard key={s.label} {...s} />
         ))}
       </div>

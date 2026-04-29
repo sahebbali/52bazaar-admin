@@ -49,6 +49,10 @@ export const categoryApi = createApi({
       query: () => "/admin/get-category-stats",
       providesTags: ["Category"],
     }),
+    getDashboardData: builder.query({
+      query: () => "/admin/get-dashboard-data",
+      providesTags: ["Category"],
+    }),
   }),
 });
 
@@ -59,4 +63,5 @@ export const {
   useDeleteCategoryMutation,
   useGetCategoryTreeQuery,
   useGetCategoryStatsQuery,
+  useGetDashboardDataQuery,
 } = categoryApi;
