@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Save, Globe, CreditCard, Mail, Bell, Upload, X } from "lucide-react";
+import {
+  useGetSettingQuery,
+  useSaveSettingMutation,
+} from "../../../services/paymentApi";
+import { Notification } from "../../../components/ToastNotification";
 
 const Settings = () => {
-  const [loading, setLoading] = useState(false);
-  const [activeSection, setActiveSection] = useState("general");
-  const [formData, setFormData] = useState({
+  const initialFormData = {
     // General Settings
     storeName: "",
     storeEmail: "",
@@ -12,30 +15,15 @@ const Settings = () => {
     storeAddress: "",
     storeLogo: null,
     storeLogoPreview: "",
-    currency: "USD",
-    timezone: "UTC",
+    currency: "BDT",
+    timezone: "BST",
     dateFormat: "MM/DD/YYYY",
 
     // Bangladesh Payment Gateways
     bkashNumber: "",
-    bkashApiKey: "",
-    bkashApiSecret: "",
-    bkashUsername: "",
-    bkashPassword: "",
-    bkashEnvironment: "sandbox",
-
-    nagadMerchantId: "",
     nagadNumber: "",
-    nagadPublicKey: "",
-    nagadPrivateKey: "",
-    nagadEnvironment: "sandbox",
-
-    upayMerchantId: "",
-    upayApiKey: "",
-    upayApiSecret: "",
-
     rocketNumber: "",
-    rocketApiKey: "",
+
     // Email Settings
     smtpHost: "",
     smtpPort: "",
@@ -55,41 +43,193 @@ const Settings = () => {
     alertEmail: "",
     dailyReport: true,
     weeklyReport: false,
-  });
+  };
+
+  const [formData, setFormData] = useState(initialFormData);
+
+  // Reset function
+  const resetFormData = () => {
+    setFormData(initialFormData);
+  };
+  const [loading, setLoading] = useState(false);
+  const [bkashNumbers, setBkashNumbers] = useState([]);
+  const [nagadNumbers, setNagadNumbers] = useState([]);
+  const [rocketNumbers, setRocketNumbers] = useState([]);
+  const [activeSection, setActiveSection] = useState("general");
+
+  const { data: settingsData } = useGetSettingQuery();
+
+  console.log("Fetched settings data:", settingsData);
+  console.log("bkashNumbers:", bkashNumbers);
+  console.log("formData:", formData);
+
+  // Helper function to clean form data
+  const cleanFormData = (data) => {
+    const cleaned = { ...data };
+    const fieldsToRemove = ["bkashNumber", "rocketNumber", "nagadNumber"];
+    fieldsToRemove.forEach((field) => delete cleaned[field]);
+    return cleaned;
+  };
 
   useEffect(() => {
-    fetchSettings();
-  }, []);
+    if (settingsData?.data) {
+      setFormData((prev) => ({
+        ...prev,
+        // General Settings
+        storeName: settingsData.data.storeName || prev.storeName,
+        storeEmail: settingsData.data.storeEmail || prev.storeEmail,
+        storePhone: settingsData.data.storePhone || prev.storePhone,
+        storeAddress: settingsData.data.storeAddress || prev.storeAddress,
+        storeLogo: settingsData.data.storeLogo || prev.storeLogo,
+        storeLogoPreview:
+          settingsData.data.storeLogoPreview || prev.storeLogoPreview,
+        currency: settingsData.data.currency || prev.currency,
+        timezone: settingsData.data.timezone || prev.timezone,
+        dateFormat: settingsData.data.dateFormat || prev.dateFormat,
 
-  const fetchSettings = async () => {
-    setLoading(true);
-    // Mock API call
-    const mockSettings = {
-      storeName: "ShopMaster",
-      storeEmail: "contact@shopmaster.com",
-      storePhone: "+1 (555) 123-4567",
-      storeAddress: "123 Commerce St, New York, NY 10001",
-      currency: "USD",
-      timezone: "America/New_York",
-      dateFormat: "MM/DD/YYYY",
-      paymentGateway: "stripe",
-      codEnabled: true,
-      orderNotifications: true,
-      lowStockNotifications: true,
-      lowStockThreshold: 10,
-      adminEmail: "admin@shopmaster.com",
-    };
-    setFormData((prev) => ({ ...prev, ...mockSettings }));
-    setLoading(false);
-  };
+        // Email Settings
+        smtpHost: settingsData.data.smtpHost || prev.smtpHost,
+        smtpPort: settingsData.data.smtpPort || prev.smtpPort,
+        smtpUser: settingsData.data.smtpUser || prev.smtpUser,
+        smtpPassword: settingsData.data.smtpPassword || prev.smtpPassword,
+        smtpEncryption: settingsData.data.smtpEncryption || prev.smtpEncryption,
+        fromEmail: settingsData.data.fromEmail || prev.fromEmail,
+        fromName: settingsData.data.fromName || prev.fromName,
+        emailTemplate: settingsData.data.emailTemplate || prev.emailTemplate,
+
+        // Notification Settings
+        orderNotifications:
+          settingsData.data.orderNotifications ?? prev.orderNotifications,
+        lowStockNotifications:
+          settingsData.data.lowStockNotifications ?? prev.lowStockNotifications,
+        lowStockThreshold:
+          settingsData.data.lowStockThreshold ?? prev.lowStockThreshold,
+        customerQueryNotifications:
+          settingsData.data.customerQueryNotifications ??
+          prev.customerQueryNotifications,
+        adminEmail: settingsData.data.adminEmail || prev.adminEmail,
+        alertEmail: settingsData.data.alertEmail || prev.alertEmail,
+        dailyReport: settingsData.data.dailyReport ?? prev.dailyReport,
+        weeklyReport: settingsData.data.weeklyReport ?? prev.weeklyReport,
+      }));
+
+      setRocketNumbers(settingsData.data.rocketNumbers || []);
+      setBkashNumbers(settingsData.data.bkashNumbers || []);
+      setNagadNumbers(settingsData.data.nagadNumbers || []);
+    }
+  }, [settingsData?.data]);
+
+  const [saveSettings, { data, isLoading: isSaving, isError, error }] =
+    useSaveSettingMutation();
+  useEffect(() => {
+    if (data) {
+      Notification(data.message || "Settings saved successfully!", "success");
+      resetFormData();
+      console.log("Settings saved successfully:", data);
+    }
+    if (error) {
+      Notification(
+        error.data?.message || "Failed to save settings. Please try again.",
+        "error",
+      );
+      console.error("Failed to save settings:", error);
+    }
+  }, [data, error]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    console.log("Saving settings:", formData);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setLoading(false);
-    alert("Settings saved successfully!");
+    const form = new FormData();
+
+    // Append all form fields to FormData
+    // General Settings
+    form.append("storeName", formData.storeName);
+    form.append("storeEmail", formData.storeEmail);
+    form.append("storePhone", formData.storePhone);
+    form.append("storeAddress", formData.storeAddress);
+    form.append("currency", formData.currency);
+    form.append("timezone", formData.timezone);
+    form.append("dateFormat", formData.dateFormat);
+
+    // Image file
+    if (formData.storeLogo instanceof File) {
+      form.append("images", formData.storeLogo);
+    }
+
+    // Payment Settings (Multiple Numbers as JSON arrays)
+    // If you're using multiple numbers, send as JSON
+    if (formData.bkashNumbers) {
+      form.append("bkashNumbers", JSON.stringify(formData.bkashNumbers));
+    } else if (formData.bkashNumber) {
+      // If using single number, convert to array
+      form.append("bkashNumbers", JSON.stringify([formData.bkashNumber]));
+    }
+
+    if (formData.nagadNumbers) {
+      form.append("nagadNumbers", JSON.stringify(formData.nagadNumbers));
+    } else if (formData.nagadNumber) {
+      form.append("nagadNumbers", JSON.stringify([formData.nagadNumber]));
+    }
+
+    if (formData.rocketNumbers) {
+      form.append("rocketNumbers", JSON.stringify(formData.rocketNumbers));
+    } else if (formData.rocketNumber) {
+      form.append("rocketNumbers", JSON.stringify([formData.rocketNumber]));
+    }
+
+    // // Email Settings
+    // form.append("smtpHost", formData.smtpHost);
+    // form.append("smtpPort", formData.smtpPort);
+    // form.append("smtpUser", formData.smtpUser);
+    // form.append("smtpPassword", formData.smtpPassword);
+    // form.append("smtpEncryption", formData.smtpEncryption);
+    form.append("fromEmail", formData.fromEmail);
+    form.append("fromName", formData.fromName);
+    form.append("emailTemplate", formData.emailTemplate);
+
+    // Notification Settings
+    form.append("orderNotifications", formData.orderNotifications);
+    form.append("lowStockNotifications", formData.lowStockNotifications);
+    form.append("lowStockThreshold", formData.lowStockThreshold);
+    form.append(
+      "customerQueryNotifications",
+      formData.customerQueryNotifications,
+    );
+    form.append("adminEmail", formData.adminEmail);
+    form.append("alertEmail", formData.alertEmail);
+    form.append("dailyReport", formData.dailyReport);
+    form.append("weeklyReport", formData.weeklyReport);
+
+    // Payment Gateway Selection (if you have this field)
+    if (formData.paymentGateway) {
+      form.append("paymentGateway", formData.paymentGateway);
+    }
+
+    // COD Enabled (if you have this field)
+    if (formData.codEnabled !== undefined) {
+      form.append("codEnabled", formData.codEnabled);
+    }
+
+    // Bank Transfer Enabled (if you have this field)
+    if (formData.bankTransferEnabled !== undefined) {
+      form.append("bankTransferEnabled", formData.bankTransferEnabled);
+    }
+
+    console.log("Saving settings form data:", Object.fromEntries(form));
+
+    try {
+      await saveSettings(form);
+      alert("Settings saved successfully!");
+    } catch (error) {
+      console.error("Error saving settings:", error);
+      alert("Failed to save settings!");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteBkashNumber = (number) => {
+    console.log("Deleting bKash number:", number);
   };
 
   const handleInputChange = (e) => {
@@ -128,18 +268,18 @@ const Settings = () => {
       icon: "💳",
       description: "Configure payment gateways",
     },
-    {
-      id: "email",
-      label: "Email Settings",
-      icon: "📧",
-      description: "SMTP and email templates",
-    },
-    {
-      id: "notifications",
-      label: "Notifications",
-      icon: "🔔",
-      description: "Admin alerts and notifications",
-    },
+    // {
+    //   id: "email",
+    //   label: "Email Settings",
+    //   icon: "📧",
+    //   description: "SMTP and email templates",
+    // },
+    // {
+    //   id: "notifications",
+    //   label: "Notifications",
+    //   icon: "🔔",
+    //   description: "Admin alerts and notifications",
+    // },
   ];
 
   return (
@@ -262,7 +402,7 @@ const Settings = () => {
                         name="storeName"
                         value={formData.storeName}
                         onChange={handleInputChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent"
+                        className="w-full px-3 py-2 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent"
                         required
                       />
                     </div>
@@ -275,7 +415,7 @@ const Settings = () => {
                         name="storeEmail"
                         value={formData.storeEmail}
                         onChange={handleInputChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent"
+                        className="w-full px-3 py-2 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent"
                         required
                       />
                     </div>
@@ -288,7 +428,7 @@ const Settings = () => {
                         name="storePhone"
                         value={formData.storePhone}
                         onChange={handleInputChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent"
+                        className="w-full px-3 py-2 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent"
                       />
                     </div>
                     <div>
@@ -299,8 +439,9 @@ const Settings = () => {
                         name="currency"
                         value={formData.currency}
                         onChange={handleInputChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent"
+                        className="w-full px-3 py-2 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent"
                       >
+                        <option value="BDT">BDT - Bangladeshi Taka</option>
                         <option value="USD">USD - US Dollar</option>
                         <option value="EUR">EUR - Euro</option>
                         <option value="GBP">GBP - British Pound</option>
@@ -315,12 +456,12 @@ const Settings = () => {
                         name="timezone"
                         value={formData.timezone}
                         onChange={handleInputChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent"
+                        className="w-full px-3 py-2 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent"
                       >
                         <option value="UTC">UTC</option>
+                        <option value="BST">BST</option>
                         <option value="America/New_York">Eastern Time</option>
-                        <option value="America/Chicago">Central Time</option>
-                        <option value="America/Denver">Mountain Time</option>
+
                         <option value="America/Los_Angeles">
                           Pacific Time
                         </option>
@@ -334,7 +475,7 @@ const Settings = () => {
                         name="dateFormat"
                         value={formData.dateFormat}
                         onChange={handleInputChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent"
+                        className="w-full px-3 py-2 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent"
                       >
                         <option value="MM/DD/YYYY">MM/DD/YYYY</option>
                         <option value="DD/MM/YYYY">DD/MM/YYYY</option>
@@ -351,7 +492,7 @@ const Settings = () => {
                       value={formData.storeAddress}
                       onChange={handleInputChange}
                       rows="3"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent"
+                      className="w-full px-3 py-2 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent"
                       placeholder="Enter your store address"
                     />
                   </div>
@@ -382,7 +523,7 @@ const Settings = () => {
                       {[
                         { id: "bkash", label: "bKash", icon: "📱" },
                         { id: "nagad", label: "Nagad", icon: "📲" },
-                        { id: "upay", label: "Upay", icon: "💸" },
+
                         { id: "rocket", label: "Rocket", icon: "🚀" },
                       ].map((gateway) => (
                         <label
@@ -419,97 +560,62 @@ const Settings = () => {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">
-                            bKash Merchant Number
+                            bKash Number
                           </label>
                           <input
                             type="tel"
                             name="bkashNumber"
                             value={formData.bkashNumber || ""}
                             onChange={handleInputChange}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                            className="w-full px-3 py-2 border text-black border-gray-300 rounded-lg"
                             placeholder="01XXXXXXXXX"
+                            maxLength={11}
                           />
                         </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            API Key
-                          </label>
-                          <input
-                            type="text"
-                            name="bkashApiKey"
-                            value={formData.bkashApiKey || ""}
-                            onChange={handleInputChange}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                            placeholder="Your bKash API Key"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            API Secret
-                          </label>
-                          <input
-                            type="password"
-                            name="bkashApiSecret"
-                            value={formData.bkashApiSecret || ""}
-                            onChange={handleInputChange}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                            placeholder="Your bKash API Secret"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Username
-                          </label>
-                          <input
-                            type="text"
-                            name="bkashUsername"
-                            value={formData.bkashUsername || ""}
-                            onChange={handleInputChange}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                            placeholder="bKash Username"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Password
-                          </label>
-                          <input
-                            type="password"
-                            name="bkashPassword"
-                            value={formData.bkashPassword || ""}
-                            onChange={handleInputChange}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                            placeholder="bKash Password"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Environment
-                          </label>
-                          <select
-                            name="bkashEnvironment"
-                            value={formData.bkashEnvironment || "sandbox"}
-                            onChange={handleInputChange}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                          >
-                            <option value="sandbox">Sandbox (Testing)</option>
-                            <option value="live">Live Production</option>
-                          </select>
-                        </div>
-                      </div>
-                      <div className="bg-blue-50 p-3 rounded-lg mt-2">
-                        <p className="text-sm text-blue-800">
-                          💡 <strong>Note:</strong> For bKash integration, you
-                          need to register as a merchant at
-                          <a
-                            href="https://merchant.bkash.com"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-600 underline ml-1"
-                          >
-                            merchant.bkash.com
-                          </a>
-                        </p>
+                        {bkashNumbers?.length > 0 && (
+                          <div className="mt-4">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Saved bKash Numbers
+                            </label>
+                            <div className="space-y-2">
+                              {bkashNumbers.map((number, index) => (
+                                <div
+                                  key={index}
+                                  className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200"
+                                >
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-green-600">✓</span>
+                                    <span className="text-gray-700 font-mono">
+                                      {number}
+                                    </span>
+                                  </div>
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      handleDeleteBkashNumber(number)
+                                    }
+                                    // disabled={isDeleting}
+                                    className="text-red-600 hover:text-red-800 transition-colors disabled:opacity-50"
+                                  >
+                                    <svg
+                                      className="w-5 h-5"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                      />
+                                    </svg>
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}
@@ -523,132 +629,16 @@ const Settings = () => {
                       <div className="grid grid-cos-1 md:grid-cols-2 gap-4">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Nagad Merchant ID
-                          </label>
-                          <input
-                            type="text"
-                            name="nagadMerchantId"
-                            value={formData.nagadMerchantId || ""}
-                            onChange={handleInputChange}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                            placeholder="Your Nagad Merchant ID"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Merchant Number
+                            Nagad Number
                           </label>
                           <input
                             type="tel"
                             name="nagadNumber"
                             value={formData.nagadNumber || ""}
                             onChange={handleInputChange}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                            className="w-full px-3 py-2 border text-black border-gray-300 rounded-lg"
                             placeholder="01XXXXXXXXX"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Public Key
-                          </label>
-                          <input
-                            type="text"
-                            name="nagadPublicKey"
-                            value={formData.nagadPublicKey || ""}
-                            onChange={handleInputChange}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                            placeholder="Nagad Public Key"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Private Key
-                          </label>
-                          <input
-                            type="password"
-                            name="nagadPrivateKey"
-                            value={formData.nagadPrivateKey || ""}
-                            onChange={handleInputChange}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                            placeholder="Nagad Private Key"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Environment
-                          </label>
-                          <select
-                            name="nagadEnvironment"
-                            value={formData.nagadEnvironment || "sandbox"}
-                            onChange={handleInputChange}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                          >
-                            <option value="sandbox">Sandbox (Testing)</option>
-                            <option value="live">Live Production</option>
-                          </select>
-                        </div>
-                      </div>
-                      <div className="bg-blue-50 p-3 rounded-lg mt-2">
-                        <p className="text-sm text-blue-800">
-                          💡 <strong>Note:</strong> For Nagad integration,
-                          register at
-                          <a
-                            href="https://nagad.com.bd"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-600 underline ml-1"
-                          >
-                            nagad.com.bd
-                          </a>
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Upay Configuration */}
-                  {formData.paymentGateway === "upay" && (
-                    <div className="space-y-4 bg-gradient-to-r from-purple-50 to-white p-4 rounded-lg border border-purple-200">
-                      <h3 className="font-medium text-gray-900 flex items-center gap-2">
-                        <span className="text-xl">💸</span> Upay Configuration
-                      </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Upay Merchant ID
-                          </label>
-                          <input
-                            type="text"
-                            name="upayMerchantId"
-                            value={formData.upayMerchantId || ""}
-                            onChange={handleInputChange}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                            placeholder="Your Upay Merchant ID"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            API Key
-                          </label>
-                          <input
-                            type="text"
-                            name="upayApiKey"
-                            value={formData.upayApiKey || ""}
-                            onChange={handleInputChange}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                            placeholder="Upay API Key"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            API Secret
-                          </label>
-                          <input
-                            type="password"
-                            name="upayApiSecret"
-                            value={formData.upayApiSecret || ""}
-                            onChange={handleInputChange}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                            placeholder="Upay API Secret"
+                            maxLength={11}
                           />
                         </div>
                       </div>
@@ -664,28 +654,16 @@ const Settings = () => {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Rocket Merchant Number
+                            Rocket Number
                           </label>
                           <input
                             type="tel"
                             name="rocketNumber"
                             value={formData.rocketNumber || ""}
                             onChange={handleInputChange}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                            className="w-full px-3 py-2 text-black border border-gray-300 rounded-lg"
                             placeholder="01XXXXXXXXX"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            API Key
-                          </label>
-                          <input
-                            type="text"
-                            name="rocketApiKey"
-                            value={formData.rocketApiKey || ""}
-                            onChange={handleInputChange}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                            placeholder="Rocket API Key"
+                            maxLength={11}
                           />
                         </div>
                       </div>
@@ -707,18 +685,6 @@ const Settings = () => {
                         />
                         <span className="text-gray-700">
                           Cash on Delivery (COD)
-                        </span>
-                      </label>
-                      <label className="flex items-center gap-3 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          name="bankTransferEnabled"
-                          checked={formData.bankTransferEnabled}
-                          onChange={handleInputChange}
-                          className="w-4 h-4 text-(--color-primary)"
-                        />
-                        <span className="text-gray-700">
-                          Bank Transfer / Wire Transfer
                         </span>
                       </label>
                     </div>

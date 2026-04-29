@@ -11,7 +11,7 @@ export const paymentApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ["Payment"],
+  tagTypes: ["Payment", "Settings"],
   endpoints: (builder) => ({
     getAllPayments: builder.query({
       query: (body) => ({
@@ -36,6 +36,22 @@ export const paymentApi = createApi({
       }),
       invalidatesTags: ["Payment"],
     }),
+
+    saveSetting: builder.mutation({
+      query: (body) => ({
+        url: `/admin/save-settings`,
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Settings"],
+    }),
+    getSetting: builder.query({
+      query: () => ({
+        url: `/admin/get-settings`,
+        method: "GET",
+      }),
+      providesTags: ["Settings"],
+    }),
   }),
 });
 
@@ -43,4 +59,6 @@ export const {
   useGetAllPaymentsQuery,
   useGetPaymentsByIdQuery,
   useUpdatePaymentStatusMutation,
+  useSaveSettingMutation,
+  useGetSettingQuery,
 } = paymentApi;
