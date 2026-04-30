@@ -81,179 +81,193 @@ const OrderDetailsPage = () => {
       const iframeDoc = iframe.contentWindow.document;
       const printTime = new Date().toLocaleString("en-GB").replace(",", "");
 
-      const prevDue = order.previousDue ?? 0;
-      const cashPaid = order.cashPaid ?? order.total ?? 0;
+      // Financial values
+      const subtotal = order.subtotal ?? 0;
       const discount = order.discount ?? 0;
+      const tax = order.tax ?? 0;
+      const shipping = order.shipping ?? 0;
+      const total = order.total ?? 0;
+      const prevDue = order.previousDue ?? 0;
+      const cashPaid = order.cashPaid ?? 0;
       const cashBack = order.cashBack ?? 0;
       const balance = prevDue - cashPaid - discount - cashBack;
       const balanceColor = balance > 0 ? "#c0392b" : "#1a7a1a";
 
+      // Order meta
       const shippingCity = order.shippingAddress?.[0]?.city ?? "—";
       const orderDate = new Date(order.createdAt)
         .toLocaleDateString("en-GB")
         .replace(/\//g, ".");
 
+      // Coupon code (if any)
+      const couponCode = order.coupons?.[0]?.code ?? null;
+
+      // Payment info
+      const paymentMethod = order.payment?.method ?? "—";
+      const bkashNumber = order.payment?.bkashNumber ?? null;
+      const transactionId = order.payment?.transactionId ?? "—";
+
+      // Build items rows
+      const itemsRows = (order.items ?? [])
+        .map((item) => {
+          const itemTotal = (item.price ?? 0) * (item.quantity ?? 1);
+          return `
+          <tr>
+            <td class="item-name">${item.name ?? "—"}</td>
+            <td style="text-align:center;">${item.quantity ?? 1}</td>
+            <td style="text-align:right;">৳${(item.price ?? 0).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+            <td style="text-align:right;">৳${itemTotal.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+          </tr>
+        `;
+        })
+        .join("");
+
+      // Payment method extra info
+      const paymentExtraRow = bkashNumber
+        ? `<div class="pi-row"><span>bKash Number</span><span>${bkashNumber}</span></div>`
+        : "";
+
       iframeDoc.open();
       iframeDoc.write(`
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <meta charset="UTF-8" />
-          <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&display=swap" rel="stylesheet" />
-          <style>
-            * { box-sizing: border-box; margin: 0; padding: 0; }
-            body {
-              display: flex;
-              justify-content: center;
-              padding: 20px;
-              background: #fff;
-              font-family: 'IBM Plex Mono', 'Courier New', monospace;
-            }
-            .receipt { width: 320px; font-size: 12px; color: #111; padding: 20px 16px; }
-            .center { text-align: center; }
-            .logo-wrap {
-              text-align: center;
-              margin-bottom: 6px;
-            }
-            .logo-wrap img {
-              width: 72px;
-              height: 72px;
-              object-fit: contain;
-              display: inline-block;
-            }
-            .divider { border: none; border-top: 1px dashed #aaa; margin: 10px 0; }
-            .divider-solid { border: none; border-top: 1px dashed #ccc; margin: 8px 0; }
-            .row { display: flex; justify-content: space-between; padding: 3px 0; font-size: 11.5px; }
-            .row .label { color: #444; }
-            .row .value { font-weight: 500; }
-            .amount-row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 12px; }
-            .balance-row {
-              display: flex;
-              justify-content: space-between;
-              border-top: 2px solid #111;
-              margin-top: 6px;
-              padding-top: 8px;
-              font-weight: 700;
-              font-size: 14px;
-              color: ${balanceColor};
-            }
-            .store-name {
-              font-size: 17px;
-              font-weight: 700;
-              text-align: center;
-              margin: 4px 0 2px;
-            }
-            .store-sub {
-              font-size: 10px;
-              color: #555;
-              line-height: 1.5;
-              text-align: center;
-              margin: 0 0 4px;
-            }
-            .receipt-title {
-              text-align: center;
-              font-weight: 700;
-              font-size: 13px;
-              letter-spacing: 2px;
-              text-transform: uppercase;
-            }
-            .footer {
-              text-align: center;
-              font-size: 9px;
-              color: #888;
-              padding-top: 8px;
-              margin-top: 8px;
-            }
-            .signature {
-              text-align: center;
-              font-size: 11px;
-              color: #555;
-              margin-top: 12px;
-            }
-          </style>
-        </head>
-        <body>
-          <div class="receipt">
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="UTF-8" />
+        <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+        <style>
+          * { box-sizing: border-box; margin: 0; padding: 0; }
+          body {
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            background: #fff;
+            font-family: 'IBM Plex Mono', 'Courier New', monospace;
+          }
+          .receipt { width: 320px; font-size: 12px; color: #111; padding: 20px 16px; }
+          .center { text-align: center; }
+          .logo-wrap { text-align: center; margin-bottom: 6px; }
+          .logo-wrap img { width: 72px; height: 72px; object-fit: contain; display: inline-block; }
+          .divider { border: none; border-top: 1px dashed #aaa; margin: 10px 0; }
+          .divider-solid { border: none; border-top: 1px dashed #ccc; margin: 8px 0; }
+          .row { display: flex; justify-content: space-between; padding: 3px 0; font-size: 11.5px; }
+          .row .label { color: #444; }
+          .row .value { font-weight: 500; }
+          .store-name { font-size: 17px; font-weight: 700; text-align: center; margin: 4px 0 2px; }
+          .store-sub { font-size: 10px; color: #555; line-height: 1.5; text-align: center; margin: 0 0 4px; }
+          .receipt-title { text-align: center; font-weight: 700; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; }
 
-            <div class="logo-wrap">
-              <img src="${base64Logo}" alt="52 Bazar Logo" />
-            </div>
+          /* ── Items Table ── */
+          .section-label { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
+          .items-table { width: 100%; border-collapse: collapse; font-size: 10.5px; margin: 4px 0 8px; }
+          .items-table thead tr { border-bottom: 1px solid #111; }
+          .items-table th { text-align: left; padding: 4px 2px; font-size: 10px; font-weight: 700; color: #111; letter-spacing: 0.5px; }
+          .items-table th:last-child, .items-table td:last-child { text-align: right; }
+          .items-table th:nth-child(2), .items-table td:nth-child(2) { text-align: center; }
+          .items-table th:nth-child(3), .items-table td:nth-child(3) { text-align: right; }
+          .items-table td { padding: 5px 2px; border-bottom: 1px dashed #e0e0e0; color: #222; vertical-align: top; }
+          .items-table td.item-name { font-weight: 500; max-width: 110px; word-break: break-word; }
 
-            <p class="store-name">52 Bazar</p>
-            <p class="store-sub">
-              Wholesale &amp; Retail Rice Supplier<br/>
-              A 33, Bhoar Sahara Bazar (Near Masjid Al-Aqsa)<br/>
-              Vatara, Dhaka-1229
-            </p>
-            <p class="center" style="font-size:11px; margin:0 0 8px;">01818-207859</p>
+          /* ── Summary ── */
+          .summary-row { display: flex; justify-content: space-between; padding: 3px 0; font-size: 11.5px; }
+          .summary-row.discount { color: #1a7a1a; }
+          .summary-row.tax { color: #555; }
+          .total-row { display: flex; justify-content: space-between; border-top: 2px solid #111; margin-top: 6px; padding-top: 8px; font-weight: 700; font-size: 14px; }
+          .balance-row { display: flex; justify-content: space-between; margin-top: 6px; padding-top: 8px; font-weight: 700; font-size: 13px; color: ${balanceColor}; border-top: 1px dashed #aaa; }
 
-            <hr class="divider"/>
-            <p class="receipt-title">Receipt</p>
-            <hr class="divider"/>
+          /* ── Payment Info ── */
+          .payment-box { background: #f9f9f9; border: 1px dashed #ddd; border-radius: 3px; padding: 7px 10px; margin: 6px 0; font-size: 10.5px; }
+          .pi-row { display: flex; justify-content: space-between; padding: 2px 0; }
 
-            <div class="row">
-              <span class="label">Receipt No</span>
-              <span class="value">${order.orderId}</span>
-            </div>
-            <div class="row">
-              <span class="label">Date</span>
-              <span class="value">${orderDate}</span>
-            </div>
-            <div class="row">
-              <span class="label">Name</span>
-              <span class="value">${order.customer?.name ?? "—"}</span>
-            </div>
-            <div class="row">
-              <span class="label">Address</span>
-              <span class="value">${shippingCity}</span>
-            </div>
-            <div class="row">
-              <span class="label">Mobile No</span>
-              <span class="value">${order.customer?.phone ?? "—"}</span>
-            </div>
+          .footer { text-align: center; font-size: 9px; color: #888; padding-top: 8px; margin-top: 8px; }
+          .signature { text-align: center; font-size: 11px; color: #555; margin-top: 14px; }
+        </style>
+      </head>
+      <body>
+        <div class="receipt">
 
-            <hr class="divider"/>
-
-            <div class="amount-row">
-              <span>Previous Due</span>
-              <span>${prevDue.toLocaleString("en-IN")}</span>
-            </div>
-            <div class="amount-row">
-              <span>Cash Paid</span>
-              <span>${cashPaid.toLocaleString("en-IN")}</span>
-            </div>
-            <div class="amount-row">
-              <span>Discount</span>
-              <span>${discount.toLocaleString("en-IN")}</span>
-            </div>
-            <div class="amount-row">
-              <span>Cash Back</span>
-              <span>${cashBack.toLocaleString("en-IN")}</span>
-            </div>
-
-            <div class="balance-row">
-              <span>Balance</span>
-              <span>${Math.abs(balance).toLocaleString("en-IN")}</span>
-            </div>
-
-            <hr class="divider"/>
-
-            <div class="row">
-              <span class="label">Note:</span>
-              <span class="value">${order.note ?? ""}</span>
-            </div>
-
-            <p class="signature">Signature</p>
-            <hr class="divider-solid"/>
-
-            <div class="footer">
-              SOFTWARE: explore IT | 01777615690<br/>
-              Printing Time: ${printTime}
-            </div>
-
+          <div class="logo-wrap">
+            <img src="${base64Logo}" alt="52 Bazar Logo" />
           </div>
-        </body>
-      </html>
+          <p class="store-name">52 Bazar</p>
+          <p class="store-sub">
+            Wholesale &amp; Retail Rice Supplier<br/>
+            A 33, Bhoar Sahara Bazar (Near Masjid Al-Aqsa)<br/>
+            Vatara, Dhaka-1229
+          </p>
+          <p class="center" style="font-size:11px;margin:0 0 8px;">01818-207859</p>
+
+          <hr class="divider"/>
+          <p class="receipt-title">Invoice</p>
+          <hr class="divider"/>
+
+          <div class="row"><span class="label">Receipt No</span><span class="value">${order.orderId}</span></div>
+          <div class="row"><span class="label">Date</span><span class="value">${orderDate}</span></div>
+          <div class="row"><span class="label">Name</span><span class="value">${order.customer?.name ?? "—"}</span></div>
+          <div class="row"><span class="label">Address</span><span class="value">${shippingCity}</span></div>
+          <div class="row"><span class="label">Mobile No</span><span class="value">${order.customer?.phone || "—"}</span></div>
+          <div class="row"><span class="label">Items Count</span><span class="value">${order.itemsCount ?? order.items?.length ?? 0}</span></div>
+
+          <hr class="divider"/>
+          <p class="section-label">Order Items</p>
+
+          <table class="items-table">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Qty</th>
+                <th>Price</th>
+                <th>Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${itemsRows}
+            </tbody>
+          </table>
+
+          <div class="summary-row"><span>Subtotal</span><span>৳${subtotal.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span></div>
+          <div class="summary-row discount">
+            <span>Discount${couponCode ? ` (${couponCode})` : ""}</span>
+            <span>- ৳${discount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
+          </div>
+          <div class="summary-row tax"><span>Tax / VAT</span><span>+ ৳${tax.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span></div>
+          <div class="summary-row"><span>Shipping</span><span>+ ৳${shipping.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span></div>
+          <div class="total-row"><span>TOTAL</span><span>৳${total.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span></div>
+
+          ${
+            prevDue > 0
+              ? `
+          <div class="balance-row">
+            <span>Balance Due</span>
+            <span>৳${Math.abs(balance).toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
+          </div>`
+              : ""
+          }
+
+          <hr class="divider"/>
+          <p class="section-label">Payment Info</p>
+          <div class="payment-box">
+            <div class="pi-row"><span>Method</span><span style="text-transform:capitalize;">${paymentMethod}</span></div>
+            ${paymentExtraRow}
+            <div class="pi-row"><span>Transaction ID</span><span style="font-size:9.5px;">${transactionId}</span></div>
+            <div class="pi-row"><span>Status</span><span style="text-transform:capitalize;">${order.paymentStatus ?? "—"}</span></div>
+          </div>
+
+          <div class="row">
+            <span class="label">Note:</span>
+            <span class="value">${order.notes ?? order.note ?? ""}</span>
+          </div>
+
+          <p class="signature">Signature</p>
+          <hr class="divider-solid"/>
+
+          <div class="footer">
+            SOFTWARE: explore IT | 01777615690<br/>
+            Printing Time: ${printTime}
+          </div>
+
+        </div>
+      </body>
+    </html>
     `);
       iframeDoc.close();
 
@@ -434,6 +448,28 @@ const OrderDetailsPage = () => {
                       </td>
                       <td className="px-6 py-4 font-medium text-black">
                         ৳{order.shipping.toFixed(2)}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td
+                        colSpan="3"
+                        className="px-6 py-2 text-black text-right font-medium"
+                      >
+                        Coupon Discount:
+                      </td>
+                      <td className="px-6 py-4 font-medium text-black">
+                        ৳{order.discount.toFixed(2)}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td
+                        colSpan="3"
+                        className="px-6 py-4 text-black text-right font-medium"
+                      >
+                        Tax:
+                      </td>
+                      <td className="px-6 py-4 font-medium text-black">
+                        ৳{order.tax.toFixed(2)}
                       </td>
                     </tr>
                     <tr>
