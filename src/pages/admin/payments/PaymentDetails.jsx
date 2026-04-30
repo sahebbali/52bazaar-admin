@@ -3,35 +3,70 @@ import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Loading } from "../../../common/Loading";
 import { METHOD_CONFIG, STATUS_CONFIG } from "./PaymentList";
-import { useGetPaymentsByIdQuery } from "../../../services/paymentApi";
-// Mock data for demonstration
+import {
+  useGetPaymentsByIdQuery,
+  useUpdatePaymentStatusMutation,
+} from "../../../services/paymentApi";
+import { Notification } from "../../../components/ToastNotification";
 
 export default function PaymentDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [payment, setPayment] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [showRefundModal, setShowRefundModal] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState("");
+  const [statusUpdating, setStatusUpdating] = useState(false);
 
   const { data: paymentData, isLoading } = useGetPaymentsByIdQuery(id);
+  const [
+    updatePaymentStatus,
+    { data: updateData, isLoading: isUpdating, isError, error },
+  ] = useUpdatePaymentStatusMutation();
+
   useEffect(() => {
-    console.log("Payment data fetched:", paymentData);
-    // Simulate API call
+    if (isLoading) {
+      setLoading(true);
+    }
+    if (updateData) {
+      Notification(updateData.message, "success");
+    }
+    if (isError) {
+      console.error("Error updating payment status:", error);
+      Notification(error.data.message, "error");
+    }
+  }, [isLoading, updateData, isError]);
+  useEffect(() => {
     setTimeout(() => {
       setPayment(paymentData);
+      setSelectedStatus(paymentData?.data?.status ?? "");
       setLoading(false);
     }, 500);
   }, [id, paymentData]);
 
-  const handleRefund = () => {
-    navigate(`/admin/payments/${id}/refund`);
+  const handleRefund = () => navigate(`/admin/payments/${id}/refund`);
+
+  const handleStatusUpdate = async () => {
+    if (!selectedStatus || selectedStatus === payment.data.status) return;
+    console.log("Updating status to:", selectedStatus, id);
+    setStatusUpdating(true);
+    try {
+      const obj = { orderId: id, status: selectedStatus };
+      await updatePaymentStatus(obj).unwrap();
+      setPayment((prev) => ({
+        ...prev,
+        data: { ...prev.data, status: selectedStatus },
+      }));
+    } catch (err) {
+      console.error("Failed to update status:", err);
+    } finally {
+      setStatusUpdating(false);
+    }
   };
 
-  if (loading) {
+  if (loading)
     return (
       <Loading type="spinner" size="lg" text="Loading payment details..." />
     );
-  }
 
   if (!payment) {
     return (
@@ -55,6 +90,8 @@ export default function PaymentDetails() {
     );
   }
 
+  const d = payment.data;
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="p-4 md:p-6">
@@ -72,20 +109,19 @@ export default function PaymentDetails() {
                 Payment Details
               </h1>
               <p className="text-sm text-gray-500 mt-1">
-                Transaction ID: {payment.data.transactionId}
+                Transaction ID: {d.transactionId}
               </p>
             </div>
             <div className="flex gap-3">
-              {payment.data.refundable &&
-                payment.data.status === "completed" && (
-                  <button
-                    onClick={handleRefund}
-                    className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
-                  >
-                    ↩️ Process Refund
-                  </button>
-                )}
-              <button className="px-4 py-2 border bg-(--color-primary) border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+              {d.refundable && d.status === "completed" && (
+                <button
+                  onClick={handleRefund}
+                  className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
+                >
+                  ↩️ Process Refund
+                </button>
+              )}
+              <button className="px-4 py-2 bg-(--color-primary) text-white border border-gray-300 rounded-lg hover:opacity-90 transition-colors">
                 📥 Download Receipt
               </button>
             </div>
@@ -93,7 +129,7 @@ export default function PaymentDetails() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Main Content */}
+          {/* ── Main Content ── */}
           <div className="lg:col-span-2 space-y-6">
             {/* Transaction Details */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -106,7 +142,7 @@ export default function PaymentDetails() {
                     Transaction ID
                   </label>
                   <p className="font-mono text-sm font-semibold text-gray-900 mt-1">
-                    {payment.data.transactionId}
+                    {d.transactionId}
                   </p>
                 </div>
                 <div>
@@ -114,10 +150,10 @@ export default function PaymentDetails() {
                     Order ID
                   </label>
                   <Link
-                    to={`/admin/orders/${payment.data.orderId}`}
+                    to={`/admin/orders/${d.orderId}`}
                     className="text-sm text-(--color-primary) hover:underline block mt-1"
                   >
-                    {payment.data.orderId} →
+                    {d.orderId} →
                   </Link>
                 </div>
                 <div>
@@ -125,7 +161,7 @@ export default function PaymentDetails() {
                     Amount
                   </label>
                   <p className="text-2xl font-bold text-(--color-primary) mt-1">
-                    {"৳ " + payment.data.total.toFixed(2)}
+                    ৳ {d.total?.toFixed(2)}
                   </p>
                 </div>
                 <div>
@@ -134,10 +170,10 @@ export default function PaymentDetails() {
                   </label>
                   <div className="mt-1">
                     <span
-                      className={`inline-flex items-center text-black gap-1 px-2 py-1 rounded-full text-xs font-medium ${STATUS_CONFIG[payment.status]?.color}`}
+                      className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${STATUS_CONFIG[d.status]?.color}`}
                     >
-                      {STATUS_CONFIG[payment.data.status]?.icon}{" "}
-                      {STATUS_CONFIG[payment.data.status]?.label}
+                      {STATUS_CONFIG[d.status]?.icon}{" "}
+                      {STATUS_CONFIG[d.status]?.label}
                     </span>
                   </div>
                 </div>
@@ -147,10 +183,10 @@ export default function PaymentDetails() {
                   </label>
                   <div className="mt-1">
                     <span
-                      className={`inline-flex items-center text-black gap-1 px-2 py-1 rounded-lg text-xs font-medium ${METHOD_CONFIG[payment.method]?.color}`}
+                      className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium ${METHOD_CONFIG[d.method]?.color}`}
                     >
-                      {METHOD_CONFIG[payment.data.method]?.icon}{" "}
-                      {METHOD_CONFIG[payment.data.method]?.label}
+                      {METHOD_CONFIG[d.method]?.icon}{" "}
+                      {METHOD_CONFIG[d.method]?.label}
                     </span>
                   </div>
                 </div>
@@ -159,8 +195,115 @@ export default function PaymentDetails() {
                     Transaction Date
                   </label>
                   <p className="text-sm text-gray-900 mt-1">
-                    {new Date(payment.data.date).toDateString()}
+                    {new Date(d.date).toLocaleDateString("en-GB", {
+                      day: "2-digit",
+                      month: "short",
+                      year: "numeric",
+                    })}
                   </p>
+                </div>
+
+                {/* bKash Number — only show if method is bkash */}
+                {d.method === "bkash" && d.bkashNumber && (
+                  <div>
+                    <label className="text-xs text-gray-500 uppercase">
+                      bKash Number
+                    </label>
+                    <p className="text-sm font-semibold text-pink-600 mt-1">
+                      📱 {d.bkashNumber}
+                    </p>
+                  </div>
+                )}
+
+                <div>
+                  <label className="text-xs text-gray-500 uppercase">
+                    Gateway Response
+                  </label>
+                  <p className="text-sm text-gray-900 mt-1">
+                    {d.gatewayResponse ?? "—"}
+                  </p>
+                </div>
+
+                {d.notes && (
+                  <div className="md:col-span-2">
+                    <label className="text-xs text-gray-500 uppercase">
+                      Notes
+                    </label>
+                    <p className="text-sm text-gray-700 mt-1 bg-gray-50 rounded px-3 py-2">
+                      {d.notes}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Order Summary */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                Order Summary
+              </h2>
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-gray-200 text-xs text-gray-500 uppercase">
+                    <th className="text-left pb-3">Product</th>
+                    <th className="text-center pb-3">Qty</th>
+                    <th className="text-right pb-3">Price</th>
+                    <th className="text-right pb-3">Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {d.items?.map((item) => (
+                    <tr key={item._id} className="border-b border-gray-100">
+                      <td className="py-3 flex items-center gap-3">
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="w-10 h-10 object-contain rounded bg-gray-50 border border-gray-100"
+                        />
+                        <div>
+                          <p className="font-medium text-gray-900">
+                            {item.name}
+                          </p>
+                          <p className="text-xs text-gray-400">{item.sku}</p>
+                        </div>
+                      </td>
+                      <td className="py-3 text-center text-gray-700">
+                        {item.quantity}
+                      </td>
+                      <td className="py-3 text-right text-gray-700">
+                        ৳{item.price?.toFixed(2)}
+                      </td>
+                      <td className="py-3 text-right font-medium text-gray-900">
+                        ৳{(item.price * item.quantity).toFixed(2)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              {/* Totals */}
+              <div className="mt-4 space-y-2 text-sm border-t border-gray-100 pt-4">
+                <div className="flex justify-between text-gray-500">
+                  <span>Subtotal</span>
+                  <span>৳{d.subtotal?.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-gray-500">
+                  <span>Tax / VAT</span>
+                  <span>+ ৳{d.tax?.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-gray-500">
+                  <span>Shipping</span>
+                  <span>+ ৳{d.shipping?.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-gray-500">
+                  <span>Discount</span>
+                  <span>- ৳{d.discount?.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between font-bold text-base text-gray-900 border-t border-gray-200 pt-2 mt-2">
+                  <span>Total</span>
+                  <span className="text-(--color-primary)">
+                    ৳{d.total?.toFixed(2)}
+                  </span>
                 </div>
               </div>
             </div>
@@ -176,7 +319,7 @@ export default function PaymentDetails() {
                     Customer Name
                   </label>
                   <p className="text-sm font-medium text-gray-900 mt-1">
-                    {payment.data.customer.name}
+                    {d.customer?.name || "—"}
                   </p>
                 </div>
                 <div>
@@ -184,7 +327,7 @@ export default function PaymentDetails() {
                     Customer Email
                   </label>
                   <p className="text-sm text-gray-900 mt-1">
-                    {payment.data.customer.email}
+                    {d.customer?.email || "—"}
                   </p>
                 </div>
                 <div>
@@ -192,8 +335,7 @@ export default function PaymentDetails() {
                     Phone Number
                   </label>
                   <p className="text-sm text-gray-900 mt-1">
-                    {" "}
-                    {payment.data.customer.phone}
+                    {d.customer?.phone || "—"}
                   </p>
                 </div>
                 <div>
@@ -201,145 +343,97 @@ export default function PaymentDetails() {
                     Billing Address
                   </label>
                   <p className="text-sm text-gray-900 mt-1">
-                    {payment.data.customer.address}
+                    {d.customer?.address || "—"}
                   </p>
                 </div>
               </div>
             </div>
-
-            {/* Gateway Response */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                Gateway Response
-              </h2>
-              <div className="bg-gray-50 rounded-lg p-4">
-                <pre className="text-xs text-gray-700 whitespace-pre-wrap font-mono">
-                  {JSON.stringify(
-                    {
-                      status: payment.gatewayResponse,
-                      transaction_id: payment.transactionId,
-                      amount: payment.amount,
-                      currency: "USD",
-                      payment_method: payment.method,
-                      timestamp: payment.date,
-                      gateway:
-                        payment.method === "bkash"
-                          ? "bKash API v2.0"
-                          : payment.method === "nagad"
-                            ? "Nagad API v1.5"
-                            : "Stripe API",
-                      response_code:
-                        payment.status === "completed"
-                          ? "200"
-                          : payment.status === "pending"
-                            ? "202"
-                            : "400",
-                    },
-                    null,
-                    2,
-                  )}
-                </pre>
-              </div>
-            </div>
           </div>
 
-          {/* Sidebar */}
+          {/* ── Sidebar ── */}
           <div className="space-y-6">
-            {/* Timeline */}
+            {/* Timeline — from real data */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">
                 Timeline
               </h2>
               <div className="space-y-4">
-                <div className="flex gap-3">
-                  <div className="flex-shrink-0 w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                    <span className="text-(--color-primary)">💰</span>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">
-                      Payment Created
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {new Date(payment.data.date).toLocaleString()}
-                    </p>
-                  </div>
-                </div>
-                {payment.status === "completed" && (
-                  <div className="flex gap-3">
-                    <div className="flex-shrink-0 w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                      <span className="text-(--color-primary)">✓</span>
+                {d.timeline?.map((event, index) => {
+                  const isLast = index === d.timeline.length - 1;
+                  const iconMap = {
+                    pending: { bg: "bg-yellow-100", icon: "⏳" },
+                    completed: { bg: "bg-green-100", icon: "✅" },
+                    refunded: { bg: "bg-orange-100", icon: "↩️" },
+                    failed: { bg: "bg-red-100", icon: "❌" },
+                    cancelled: { bg: "bg-gray-100", icon: "🚫" },
+                  };
+                  const style = iconMap[event.status] ?? {
+                    bg: "bg-gray-100",
+                    icon: "📋",
+                  };
+
+                  return (
+                    <div key={event._id} className="flex gap-3">
+                      <div
+                        className={`flex-shrink-0 w-8 h-8 ${style.bg} rounded-full flex items-center justify-center`}
+                      >
+                        <span>{style.icon}</span>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-900 capitalize">
+                          {event.status}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {new Date(event.date).toLocaleDateString("en-GB", {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                          })}{" "}
+                          {new Date(event.date).toLocaleTimeString("en-GB", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </p>
+                        {event.note && (
+                          <p className="text-xs text-gray-400 mt-0.5">
+                            {event.note}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-900">
-                        Payment Completed
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        {new Date(payment.data.date).toLocaleString()}
-                      </p>
-                    </div>
-                  </div>
-                )}
-                {payment.status === "refunded" && (
-                  <div className="flex gap-3">
-                    <div className="flex-shrink-0 w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
-                      <span className="text-orange-600">↺</span>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-900">
-                        Refund Processed
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        {new Date(payment.data.date).toLocaleString()}
-                      </p>
-                    </div>
-                  </div>
-                )}
+                  );
+                })}
               </div>
             </div>
 
-            {/* Payment Actions */}
+            {/* Actions — with status changer */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">
                 Actions
               </h2>
               <div className="space-y-3">
-                <button className="w-full px-4 py-2 bg-(--color-primary) text-white rounded-lg hover:bg-(--color-primary-hover) transition-colors">
-                  Send Receipt Email
-                </button>
-                <button className="w-full px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-                  Download Invoice
-                </button>
-                {payment.status === "pending" && (
-                  <button className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
-                    Cancel Transaction
+                {/* Change Payment Status */}
+                <div>
+                  <label className="text-xs text-gray-500 uppercase block mb-1">
+                    Change Payment Status
+                  </label>
+                  <select
+                    value={selectedStatus}
+                    onChange={(e) => setSelectedStatus(e.target.value)}
+                    className="w-full border text-black cursor-pointer border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-(--color-primary)"
+                  >
+                    <option value="pending">⏳ Pending</option>
+                    <option value="paid">✅ paid</option>
+                    <option value="failed">❌ Failed</option>
+                    <option value="refunded">↩️ Refunded</option>
+                  </select>
+                  <button
+                    onClick={handleStatusUpdate}
+                    disabled={statusUpdating || selectedStatus === d.status}
+                    className="mt-2 w-full px-4 cursor-pointer py-2 bg-(--color-primary) text-white rounded-lg hover:opacity-90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                  >
+                    {statusUpdating ? "Updating..." : "Update Status"}
                   </button>
-                )}
-              </div>
-            </div>
-
-            {/* Payment Metadata */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                Additional Information
-              </h2>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Payment ID:</span>
-                  <span className="font-mono text-gray-900">
-                    {payment.data.id}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">IP Address:</span>
-                  <span className="font-mono text-gray-900">
-                    {payment.data.customer.ipAddress}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">User Agent:</span>
-                  <span className="text-gray-900 text-right">
-                    Mozilla/5.0...
-                  </span>
                 </div>
               </div>
             </div>
