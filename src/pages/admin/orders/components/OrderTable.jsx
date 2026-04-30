@@ -120,9 +120,6 @@ const OrderTable = ({ orders, selectedOrders, onSelectAll, onSelectOrder }) => {
                 >
                   View
                 </Link>
-                <button className="text-green-600 hover:text-green-900">
-                  Print
-                </button>
               </td>
             </tr>
           ))}

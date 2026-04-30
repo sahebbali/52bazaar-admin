@@ -95,10 +95,23 @@ const OrderDetailsPage = () => {
 
       // Order meta
       const shippingCity = order.shippingAddress?.[0]?.city ?? "—";
-      const orderDate = new Date(order.createdAt)
-        .toLocaleDateString("en-GB")
-        .replace(/\//g, ".");
+      // Generate Invoice ID: YYYYMMDDxxxxxx (6-digit sequential from orderId)
+      // For Invoice ID date part (use the raw Date object)
+      const rawDate = new Date(order.createdAt);
+      const datePart = `${rawDate.getFullYear()}${String(rawDate.getMonth() + 1).padStart(2, "0")}${String(rawDate.getDate()).padStart(2, "0")}`;
 
+      // For display on the receipt (formatted string)
+      const orderDate = rawDate.toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      });
+      // "30 Apr 2026"
+
+      // Invoice ID
+      const orderNumber = order.orderId?.replace(/\D/g, "") ?? "1";
+      const paddedNumber = orderNumber.padStart(6, "0");
+      const invoiceId = `${datePart}${paddedNumber}`; // "20260430000029"
       // Coupon code (if any)
       const couponCode = order.coupons?.[0]?.code ?? null;
 
@@ -201,6 +214,10 @@ const OrderDetailsPage = () => {
           <hr class="divider"/>
 
           <div class="row"><span class="label">Receipt No</span><span class="value">${order.orderId}</span></div>
+          <div class="row">
+  <span class="label">Invoice ID</span>
+  <span class="value">${invoiceId}</span>
+</div>
           <div class="row"><span class="label">Date</span><span class="value">${orderDate}</span></div>
           <div class="row"><span class="label">Name</span><span class="value">${order.customer?.name ?? "—"}</span></div>
           <div class="row"><span class="label">Address</span><span class="value">${shippingCity}</span></div>
