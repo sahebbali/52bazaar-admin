@@ -288,6 +288,10 @@ export default function PaymentDetails() {
                   <span>৳{d.subtotal?.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-gray-500">
+                  <span>Discount</span>
+                  <span>- ৳{d.discount?.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-gray-500">
                   <span>Tax / VAT</span>
                   <span>+ ৳{d.tax?.toFixed(2)}</span>
                 </div>
@@ -295,10 +299,7 @@ export default function PaymentDetails() {
                   <span>Shipping</span>
                   <span>+ ৳{d.shipping?.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-gray-500">
-                  <span>Discount</span>
-                  <span>- ৳{d.discount?.toFixed(2)}</span>
-                </div>
+
                 <div className="flex justify-between font-bold text-base text-gray-900 border-t border-gray-200 pt-2 mt-2">
                   <span>Total</span>
                   <span className="text-(--color-primary)">

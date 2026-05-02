@@ -459,17 +459,6 @@ const OrderDetailsPage = () => {
                     <tr>
                       <td
                         colSpan="3"
-                        className="px-6 py-4 text-black text-right font-medium"
-                      >
-                        Shipping:
-                      </td>
-                      <td className="px-6 py-4 font-medium text-black">
-                        ৳{order.shipping.toFixed(2)}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td
-                        colSpan="3"
                         className="px-6 py-2 text-black text-right font-medium"
                       >
                         Coupon Discount:
@@ -478,6 +467,18 @@ const OrderDetailsPage = () => {
                         ৳{order.discount.toFixed(2)}
                       </td>
                     </tr>
+                    <tr>
+                      <td
+                        colSpan="3"
+                        className="px-6 py-4 text-black text-right font-medium"
+                      >
+                        Shipping:
+                      </td>
+                      <td className="px-6 py-4 font-medium text-black">
+                        ৳{order.shipping.toFixed(2)}
+                      </td>
+                    </tr>
+
                     <tr>
                       <td
                         colSpan="3"
