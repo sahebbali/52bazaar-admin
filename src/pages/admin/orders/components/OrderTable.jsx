@@ -118,7 +118,7 @@ const OrderTable = ({ orders, selectedOrders, onSelectAll, onSelectOrder }) => {
                   to={`/admin/orders/${order.orderId}`}
                   className="text-(--color-primary) hover:text-(--color-primary-hover) mr-3"
                 >
-                  View
+                  View Details
                 </Link>
               </td>
             </tr>
