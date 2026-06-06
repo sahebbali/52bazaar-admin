@@ -22,11 +22,13 @@ const AddEditProduct = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [allSubCategories, setAllSubCategories] = useState([]);
   const fileInputRef = useRef(null);
   const [formData, setFormData] = useState({
     name: "",
     sku: "",
     category: "",
+    subCategory: "",
     description: "",
     regularPrice: "",
     salePrice: "",
@@ -59,8 +61,8 @@ const AddEditProduct = () => {
     updateProduct,
     { data: updateData, isLoading: isUpdating, isError: isUpdateError },
   ] = useUpdateProductMutation();
-  console.log("updateData", updateData);
-  console.log("isUpdateError", isUpdateError);
+  // console.log("updateData", updateData);
+  // console.log("isUpdateError", isUpdateError);
   useEffect(() => {
     if (updateData) {
       Notification(updateData.message, "success");
@@ -77,11 +79,27 @@ const AddEditProduct = () => {
 
   console.log("Categories Tree from API:", categoryData);
   const categoryTree = useMemo(() => {
-    return (categoryData || []).map(({ name, icon }) => ({
+    return (categoryData || []).map(({ name, icon, subcategories }) => ({
       name,
       icon,
+      subcategories,
     }));
   }, [categoryData]);
+
+  useEffect(() => {
+    if (formData.category) {
+      const category = categoryTree.find(
+        (cat) => cat.name === formData.category,
+      );
+      console.log("Selected category:", category);
+      if (category) {
+        setAllSubCategories(category.subcategories || []);
+      } else {
+        setAllSubCategories([]);
+      }
+    }
+  }, [formData.category, categoryTree]);
+  console.log("Subcategories for selected category:", allSubCategories);
 
   const { data: productData } = useGetProductByIdQuery(id);
   // console.log("Fetched product data:", productData);
@@ -142,6 +160,7 @@ const AddEditProduct = () => {
         "slug",
         "description",
         "category",
+        "subCategory",
         "regularPrice",
         "originalPrice",
         "cost",
@@ -329,6 +348,24 @@ const AddEditProduct = () => {
                       {categoryTree.map((cat) => (
                         <option key={cat.name} value={cat.name}>
                           {cat.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-black mb-2">
+                      Sub Category *
+                    </label>
+                    <select
+                      name="subCategory"
+                      value={formData.subCategory}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-black"
+                    >
+                      <option value="">Select Sub Category</option>
+                      {allSubCategories?.map((subCat) => (
+                        <option key={subCat} value={subCat}>
+                          {subCat}
                         </option>
                       ))}
                     </select>

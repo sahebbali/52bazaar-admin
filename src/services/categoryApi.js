@@ -22,8 +22,8 @@ export const categoryApi = createApi({
       invalidatesTags: ["Category"],
     }),
     updateCategory: builder.mutation({
-      query: (body) => ({
-        url: "/admin/update-category",
+      query: ({ id, body }) => ({
+        url: `/admin/update-category/${id}`,
         method: "PUT",
         body,
       }),
