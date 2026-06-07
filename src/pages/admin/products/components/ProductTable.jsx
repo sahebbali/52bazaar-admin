@@ -104,13 +104,8 @@ const ProductTable = ({
                   </td>
                   <td className="px-6 py-4">
                     <div className="font-medium text-black">
-                      Original: ৳{product.originalPrice}
+                      {product.regularPrice} ৳
                     </div>
-                    {product.originalPrice && (
-                      <div className="text-sm text-gray-500 line-through">
-                        Regular: ৳{product.regularPrice}
-                      </div>
-                    )}
                   </td>
                   <td className="px-6 py-4">
                     <span

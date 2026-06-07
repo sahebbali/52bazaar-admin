@@ -501,16 +501,14 @@ function CategoryList({ categories, onEdit, onDelete, onAdd, showToast }) {
                     onChange={toggleAll}
                   />
                 </th>
-                {["Category", "Slug", "Status", "Parent", "Actions"].map(
-                  (h) => (
-                    <th
-                      key={h}
-                      className="px-5 py-3 text-left text-[10px] uppercase tracking-widest text-gray-400 font-semibold"
-                    >
-                      {h}
-                    </th>
-                  ),
-                )}
+                {["Category", "Slug", "Status", "Actions"].map((h) => (
+                  <th
+                    key={h}
+                    className="px-5 py-3 text-left text-[10px] uppercase tracking-widest text-gray-400 font-semibold"
+                  >
+                    {h}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
@@ -573,11 +571,6 @@ function CategoryList({ categories, onEdit, onDelete, onAdd, showToast }) {
                       <Badge status={cat.status} />
                     </td>
 
-                    <td className="px-5 py-4">
-                      <span className="text-xs text-gray-400">
-                        {cat.parent}
-                      </span>
-                    </td>
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-1.5">
                         <Btn
@@ -644,8 +637,8 @@ function CategoryList({ categories, onEdit, onDelete, onAdd, showToast }) {
                       {cat.slug}
                     </code>
                     <div className="flex items-center gap-3 mt-1 text-xs text-gray-400">
-                      <span>Parent: {getParentName(cat.parent)}</span>
-                      <span>•</span>
+                      {/* <span>Parent: {getParentName(cat.parent)}</span> */}
+                      {/* <span>•</span> */}
                       <span>{cat.products} products</span>
                       <span>•</span>
                       <span>{cat.createdAt}</span>
@@ -763,7 +756,8 @@ function CategoryForm({ categories, editData, onSave, onCancel, showToast }) {
 
   console.log("Categories Tree from API:", categoryData);
   const categoryTree = useMemo(() => {
-    return (categoryData || []).map(({ name, icon, subcategories }) => ({
+    return (categoryData || []).map(({ id, name, icon, subcategories }) => ({
+      id,
       name,
       icon,
       subcategories,
@@ -773,8 +767,8 @@ function CategoryForm({ categories, editData, onSave, onCancel, showToast }) {
   const isEdit = !!editData;
 
   const [form, setForm] = useState({
-    parent: editData?.parent ?? "",
     name: editData?.name ?? "",
+    parent: editData?.parent ?? "",
     subcategories: editData?.subcategories ?? [], // Add this line
     slug: editData?.slug ?? "",
     description: editData?.description ?? "",
@@ -998,24 +992,6 @@ function CategoryForm({ categories, editData, onSave, onCancel, showToast }) {
         <div className="flex-1 flex flex-col gap-5 min-w-0">
           {/* ① Basic Information */}
           <SectionCard title="Basic Information" icon="📋">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Parent Category
-              </label>
-              <select
-                name="parent"
-                value={form.parent}
-                onChange={(e) => set("parent", e.target.value)}
-                className="px-4 py-2 border cursor-pointer text-black border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-(--color-primary) focus:border-transparent w-full"
-              >
-                <option value="">{"Select Parent Category"}</option>
-                {categoryTree.map((cat) => (
-                  <option key={cat.name} value={cat.name}>
-                    {cat.name}
-                  </option>
-                ))}
-              </select>
-            </div>
             {/* Name */}
             <div className="flex flex-col gap-1.5">
               <label className="text-xs font-semibold text-gray-700 uppercase tracking-wider">
@@ -1035,7 +1011,24 @@ function CategoryForm({ categories, editData, onSave, onCancel, showToast }) {
                 <p className="text-[11px] text-red-500">{errors.name}</p>
               )}
             </div>
-
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Parent Category
+              </label>
+              <select
+                name="parent"
+                value={form.parent}
+                onChange={(e) => set("parent", e.target.value)}
+                className="px-4 py-2 border cursor-pointer text-black border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-(--color-primary) focus:border-transparent w-full"
+              >
+                <option value="">{"Select Parent Category"}</option>
+                {categoryTree.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
+            </div>
             {/* Subcategories Management */}
             <div className="flex flex-col gap-1.5">
               <label className="text-xs font-semibold text-gray-700 uppercase tracking-wider">

@@ -35,14 +35,14 @@ export const NAV = [
         id: "order",
         label: "Order",
         icon: "🛍️",
-        badge: 12,
+        // badge: 12,
         path: "/admin/orders",
       },
       {
         id: "inventory",
         label: "Inventory",
         icon: "📦",
-        badge: 8,
+        // badge: 8,
         path: "/admin/inventory",
       },
       {

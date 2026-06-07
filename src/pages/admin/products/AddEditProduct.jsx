@@ -32,7 +32,7 @@ const AddEditProduct = () => {
     description: "",
     regularPrice: "",
     salePrice: "",
-    cost: "",
+    // cost: "",
     stockQuantity: "",
     lowStockThreshold: "",
     images: [], // Array of { url, file, preview, isFeatured }
@@ -149,6 +149,14 @@ const AddEditProduct = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    if (formData.regularPrice < formData.originalPrice) {
+      Notification(
+        "Selling price cannot be greater than the purchase price.",
+        "warning",
+      );
+      setLoading(false);
+      return;
+    }
 
     try {
       const formDataToSend = new FormData();
@@ -163,7 +171,7 @@ const AddEditProduct = () => {
         "subCategory",
         "regularPrice",
         "originalPrice",
-        "cost",
+        // "cost",
         "stockQuantity",
         "lowStockThreshold",
         "unit",
@@ -406,15 +414,15 @@ const AddEditProduct = () => {
                 </h2>
               </div>
               <div className="p-4 sm:p-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
                   {[
                     {
-                      label: "Regular Price *",
+                      label: "Selling Price *",
                       name: "regularPrice",
                       required: true,
                     },
-                    { label: "Original Price", name: "originalPrice" },
-                    { label: "Cost", name: "cost" },
+                    { label: "Purchase Price", name: "originalPrice" },
+                    // { label: "Cost", name: "cost" },
                   ].map(({ label, name, required }) => (
                     <div key={name}>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
