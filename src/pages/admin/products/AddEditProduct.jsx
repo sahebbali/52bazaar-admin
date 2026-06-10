@@ -16,7 +16,10 @@ import {
 } from "../../../services/productApi";
 import { Notification } from "../../../components/ToastNotification";
 import { getStatusColor } from "./../../../utils/orderUtils";
-import { useGetCategoryTreeQuery } from "../../../services/categoryApi";
+import {
+  useGetCategoryOfChildQuery,
+  useGetCategoryTreeQuery,
+} from "../../../services/categoryApi";
 
 const AddEditProduct = () => {
   const { id } = useParams();
@@ -76,8 +79,13 @@ const AddEditProduct = () => {
 
   // console.log("my id", id);
   const { data: categoryData = [] } = useGetCategoryTreeQuery();
+  const { data: childCategories = [] } = useGetCategoryOfChildQuery(
+    formData.category,
+    { skip: !formData.category },
+  );
 
   console.log("Categories Tree from API:", categoryData);
+  console.log("Categories of child:", childCategories);
   const categoryTree = useMemo(() => {
     return (categoryData || []).map(({ name, icon, subcategories }) => ({
       name,
@@ -87,18 +95,12 @@ const AddEditProduct = () => {
   }, [categoryData]);
 
   useEffect(() => {
-    if (formData.category) {
-      const category = categoryTree.find(
-        (cat) => cat.name === formData.category,
-      );
-      console.log("Selected category:", category);
-      if (category) {
-        setAllSubCategories(category.subcategories || []);
-      } else {
-        setAllSubCategories([]);
-      }
-    }
-  }, [formData.category, categoryTree]);
+    setAllSubCategories(
+      formData.category && childCategories?.children?.length
+        ? childCategories.children
+        : [],
+    );
+  }, [formData.category, childCategories]);
   console.log("Subcategories for selected category:", allSubCategories);
 
   const { data: productData } = useGetProductByIdQuery(id);
@@ -113,35 +115,7 @@ const AddEditProduct = () => {
   const fetchProduct = async () => {
     console.log("Fetching product data...");
     setLoading(true);
-    // const mockProduct = {
-    //   name: "Wireless Headphones",
-    //   sku: "WH-001",
-    //   category: "Electronics",
-    //   description: "High-quality wireless headphones",
-    //   regularPrice: 99.99,
-    //   salePrice: 79.99,
-    //   cost: 45.0,
-    //   stockQuantity: 45,
-    //   lowStockThreshold: 10,
-    //   images: [
-    //     {
-    //       url: "https://via.placeholder.com/400?text=Image+1",
-    //       preview: "https://via.placeholder.com/400?text=Image+1",
-    //       isFeatured: true,
-    //     },
-    //     {
-    //       url: "https://via.placeholder.com/400?text=Image+2",
-    //       preview: "https://via.placeholder.com/400?text=Image+2",
-    //       isFeatured: false,
-    //     },
-    //   ],
-    //   slug: "wireless-headphones",
-    //   metaTitle: "Best Wireless Headphones",
-    //   metaDescription: "Shop our premium wireless headphones",
-    //   weight: "0.5",
-    //   dimensions: "20x15x5",
-    //   tags: ["headphones", "wireless", "audio"],
-    // };
+
     setFormData(productData.data || []);
     setLoading(false);
   };

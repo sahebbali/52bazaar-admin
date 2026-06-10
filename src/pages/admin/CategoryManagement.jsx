@@ -8,114 +8,6 @@ import {
 } from "../../services/categoryApi";
 import { Notification } from "../../components/ToastNotification";
 
-/* ─── MOCK DATA ───────────────────────────────── */
-const INITIAL_CATEGORIES = [
-  {
-    id: 1,
-    name: "Vegetables",
-    slug: "vegetables",
-    status: "active",
-    products: 142,
-    parent: null,
-    icon: "🥦",
-    description: "Fresh organic vegetables",
-    metaTitle: "Buy Fresh Vegetables Online",
-    metaDesc: "Shop the best organic vegetables.",
-    createdAt: "2024-01-15",
-  },
-  {
-    id: 2,
-    name: "Fruits",
-    slug: "fruits",
-    status: "active",
-    products: 98,
-    parent: null,
-    icon: "🍎",
-    description: "Seasonal and exotic fruits",
-    metaTitle: "Fresh Fruits Online",
-    metaDesc: "Order fresh fruits delivered.",
-    createdAt: "2024-01-18",
-  },
-  {
-    id: 3,
-    name: "Meat & Fish",
-    slug: "meat-fish",
-    status: "active",
-    products: 64,
-    parent: null,
-    icon: "🥩",
-    description: "Premium meat and seafood",
-    metaTitle: "Fresh Meat & Fish Delivery",
-    metaDesc: "Premium quality meat online.",
-    createdAt: "2024-02-01",
-  },
-  {
-    id: 4,
-    name: "Dairy",
-    slug: "dairy",
-    status: "active",
-    products: 47,
-    parent: null,
-    icon: "🥛",
-    description: "Fresh dairy products",
-    metaTitle: "Dairy Products Online",
-    metaDesc: "Fresh milk, cheese & more.",
-    createdAt: "2024-02-10",
-  },
-  {
-    id: 5,
-    name: "Leafy Greens",
-    slug: "leafy-greens",
-    status: "active",
-    products: 38,
-    parent: 1,
-    icon: "🥬",
-    description: "Spinach, lettuce, kale",
-    metaTitle: "Fresh Leafy Greens",
-    metaDesc: "Order leafy greens online.",
-    createdAt: "2024-02-20",
-  },
-  {
-    id: 6,
-    name: "Root Veggies",
-    slug: "root-veggies",
-    status: "inactive",
-    products: 22,
-    parent: 1,
-    icon: "🥕",
-    description: "Carrots, beetroot, radish",
-    metaTitle: "Root Vegetables Online",
-    metaDesc: "Buy root vegetables fresh.",
-    createdAt: "2024-03-01",
-  },
-  {
-    id: 7,
-    name: "Citrus Fruits",
-    slug: "citrus-fruits",
-    status: "active",
-    products: 18,
-    parent: 2,
-    icon: "🍊",
-    description: "Oranges, lemons, limes",
-    metaTitle: "Fresh Citrus Fruits",
-    metaDesc: "Vitamin C rich citrus fruits.",
-    createdAt: "2024-03-05",
-  },
-  {
-    id: 8,
-    name: "Bakery",
-    slug: "bakery",
-    status: "inactive",
-    products: 0,
-    parent: null,
-    icon: "🍞",
-    description: "Breads, cakes and pastries",
-    metaTitle: "Fresh Bakery Products",
-    metaDesc: "Freshly baked goods daily.",
-    createdAt: "2024-03-10",
-  },
-];
-
 /* ─── HELPERS ─────────────────────────────────── */
 function slugify(str) {
   return str
@@ -768,7 +660,7 @@ function CategoryForm({ categories, editData, onSave, onCancel, showToast }) {
 
   const [form, setForm] = useState({
     name: editData?.name ?? "",
-    parent: editData?.parent ?? "",
+    parent_id: editData?.parent_id ?? "",
     subcategories: editData?.subcategories ?? [], // Add this line
     slug: editData?.slug ?? "",
     description: editData?.description ?? "",
@@ -879,7 +771,7 @@ function CategoryForm({ categories, editData, onSave, onCancel, showToast }) {
       formData.append("name", form.name);
       formData.append("slug", form.slug);
       formData.append("description", form.description);
-      formData.append("parent", form.parent || "");
+      formData.append("parent_id", form.parent_id || "");
       formData.append("status", form.status);
       formData.append("icon", form.icon);
       formData.append("metaTitle", form.metaTitle);
@@ -1016,9 +908,9 @@ function CategoryForm({ categories, editData, onSave, onCancel, showToast }) {
                 Parent Category
               </label>
               <select
-                name="parent"
-                value={form.parent}
-                onChange={(e) => set("parent", e.target.value)}
+                name="parent_id"
+                value={form.parent_id}
+                onChange={(e) => set("parent_id", e.target.value)}
                 className="px-4 py-2 border cursor-pointer text-black border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-(--color-primary) focus:border-transparent w-full"
               >
                 <option value="">{"Select Parent Category"}</option>
