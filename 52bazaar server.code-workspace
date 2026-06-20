@@ -1,20 +1,23 @@
 {
   "folders": [
-	{
-		"path": "../52bazaar server"
-	},
-	{
-		"path": "../52bazaar"
-	},
-	{
-		"path": "../tescon server"
-	},
-	{
-		"path": "../tescon admin"
-	},
-	{
-		"path": "."
-	}
-],
-  "settings": {}
+    {
+      "path": "../52bazaar server",
+    },
+    {
+      "path": "../52bazaar",
+    },
+    {
+      "path": "../tescon server",
+    },
+    {
+      "path": "../tescon admin",
+    },
+    {
+      "path": ".",
+    },
+    {
+      "path": "../tescon",
+    },
+  ],
+  "settings": {},
 }

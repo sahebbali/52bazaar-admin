@@ -123,7 +123,8 @@ const AddEditProduct = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    if (formData.regularPrice < formData.originalPrice) {
+    console.log("Submitting form with data:", formData);
+    if (Number(formData.originalPrice) > Number(formData.regularPrice)) {
       Notification(
         "Selling price cannot be greater than the purchase price.",
         "warning",
